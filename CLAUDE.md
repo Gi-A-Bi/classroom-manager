@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # CLAUDE.md — 학급운영 플랫폼
 
 ## 프로젝트 개요
