@@ -8,9 +8,8 @@ import {
   todayString,
 } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
-import { getTheme, THEME_KEYS, THEMES } from "@/lib/themes";
+import { getTheme } from "@/lib/themes";
 import { logout } from "../login/actions";
-import { createAcademicYear, createClassroom } from "./actions";
 
 const CLASSROOM_MENU = [
   ["posts", "알림장"],
@@ -22,9 +21,9 @@ const CLASSROOM_MENU = [
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; year?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, year: yearParam } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -40,10 +39,18 @@ export default async function DashboardPage({
       .order("year", { ascending: false }),
   ]);
 
+  const availableYears = years ?? [];
+  // 학년도 선택: ?year= 파라미터, 없으면 가장 최근 학년도
+  const selectedYear =
+    availableYears.find((y) => String(y.year) === yearParam) ??
+    availableYears[0] ??
+    null;
+
   const classrooms =
-    years?.flatMap((y) =>
-      y.classrooms.map((c) => ({ ...c, yearName: y.name })),
-    ) ?? [];
+    selectedYear?.classrooms.map((c) => ({
+      ...c,
+      yearName: selectedYear.name,
+    })) ?? [];
   const classroomIds = classrooms.map((c) => c.id);
 
   const today = todayString();
@@ -97,11 +104,6 @@ export default async function DashboardPage({
   const nextEvent = nextEvents?.[0] ?? null;
   const dday = nextEvent ? daysBetween(today, nextEvent.event_date) : null;
 
-  const currentYear =
-    new Date().getMonth() + 1 >= 3
-      ? new Date().getFullYear()
-      : new Date().getFullYear() - 1;
-
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
       <header className="flex items-start justify-between gap-4">
@@ -127,14 +129,22 @@ export default async function DashboardPage({
             </p>
           )}
         </div>
-        <form action={logout}>
-          <button
-            type="submit"
+        <div className="flex shrink-0 gap-2">
+          <Link
+            href="/dashboard/settings"
             className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
           >
-            로그아웃
-          </button>
-        </form>
+            ⚙️ 설정
+          </Link>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+            >
+              로그아웃
+            </button>
+          </form>
+        </div>
       </header>
 
       {error && (
@@ -143,10 +153,28 @@ export default async function DashboardPage({
         </p>
       )}
 
-      {classrooms.length > 0 && (
+      {availableYears.length > 1 && (
+        <nav className="flex flex-wrap gap-1.5">
+          {availableYears.map((y) => (
+            <Link
+              key={y.id}
+              href={`/dashboard?year=${y.year}`}
+              className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                y.id === selectedYear?.id
+                  ? "bg-gray-900 text-white"
+                  : "border bg-white text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              {y.name}
+            </Link>
+          ))}
+        </nav>
+      )}
+
+      {classrooms.length > 0 ? (
         <section className="flex flex-col gap-3">
           <h2 className="text-xs font-bold tracking-wide text-gray-400">
-            오늘의 학급
+            {selectedYear?.name}의 학급
           </h2>
           {classrooms.map((c) => {
             const theme = getTheme(c.theme_color);
@@ -171,7 +199,7 @@ export default async function DashboardPage({
                     <h3 className="text-lg font-bold">
                       {c.name}{" "}
                       <span className="text-sm font-normal text-gray-500">
-                        {c.yearName} · 학급코드{" "}
+                        학급코드{" "}
                         <code className="rounded-md bg-gray-100 px-1.5 py-0.5 font-mono font-bold">
                           {c.class_code}
                         </code>
@@ -218,7 +246,9 @@ export default async function DashboardPage({
                             key={s.period}
                             className={`rounded-lg px-2.5 py-1 ${theme.soft}`}
                           >
-                            <span className={`font-bold tabular-nums ${theme.text}`}>
+                            <span
+                              className={`font-bold tabular-nums ${theme.text}`}
+                            >
                               {s.period}
                             </span>{" "}
                             <span className="font-medium">{s.subject}</span>
@@ -265,99 +295,22 @@ export default async function DashboardPage({
             );
           })}
         </section>
+      ) : (
+        <section className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed p-10 text-center">
+          <p className="text-3xl">🏫</p>
+          <p className="text-gray-500">
+            {selectedYear
+              ? `${selectedYear.name}에 아직 학급이 없어요.`
+              : "아직 학년도가 없어요."}
+          </p>
+          <Link
+            href="/dashboard/settings"
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          >
+            ⚙️ 설정에서 만들기
+          </Link>
+        </section>
       )}
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-xs font-bold tracking-wide text-gray-400">
-          학급 관리
-        </h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
-            <h3 className="font-semibold">학년도 등록</h3>
-            <form action={createAcademicYear} className="flex items-end gap-2">
-              <label className="flex flex-col gap-1 text-sm">
-                연도
-                <input
-                  type="number"
-                  name="year"
-                  required
-                  defaultValue={currentYear}
-                  min={2000}
-                  max={2100}
-                  className="w-28 rounded-lg border p-2"
-                />
-              </label>
-              <button
-                type="submit"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-              >
-                추가
-              </button>
-            </form>
-          </div>
-
-          <div className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
-            <h3 className="font-semibold">학급 만들기</h3>
-            {years && years.length > 0 ? (
-              <form action={createClassroom} className="flex flex-col gap-3">
-                <div className="flex items-end gap-2">
-                  <label className="flex flex-col gap-1 text-sm">
-                    학년도
-                    <select
-                      name="academic_year_id"
-                      required
-                      className="rounded-lg border p-2"
-                    >
-                      {years.map((y) => (
-                        <option key={y.id} value={y.id}>
-                          {y.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="flex flex-1 flex-col gap-1 text-sm">
-                    학급 이름
-                    <input
-                      type="text"
-                      name="name"
-                      required
-                      placeholder="3학년 2반"
-                      className="rounded-lg border p-2"
-                    />
-                  </label>
-                </div>
-                <fieldset className="flex flex-col gap-1.5 text-sm">
-                  <legend className="mb-1">테마 색</legend>
-                  <div className="flex flex-wrap gap-2">
-                    {THEME_KEYS.map((key, i) => (
-                      <label key={key} className="cursor-pointer" title={THEMES[key].label}>
-                        <input
-                          type="radio"
-                          name="theme_color"
-                          value={key}
-                          defaultChecked={i === 0}
-                          className="peer sr-only"
-                        />
-                        <span
-                          className={`block h-8 w-8 rounded-full ${THEMES[key].swatch} ring-offset-2 transition-transform hover:scale-110 peer-checked:ring-2 peer-checked:ring-gray-800`}
-                        />
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-                <button
-                  type="submit"
-                  className="self-start rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                >
-                  학급 생성
-                </button>
-              </form>
-            ) : (
-              <p className="text-sm text-gray-500">먼저 학년도를 등록해주세요.</p>
-            )}
-          </div>
-        </div>
-      </section>
     </main>
   );
 }

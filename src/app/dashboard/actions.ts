@@ -16,11 +16,13 @@ function generateClassCode() {
   return code;
 }
 
+const SETTINGS = "/dashboard/settings";
+
 export async function createAcademicYear(formData: FormData) {
   const year = Number(formData.get("year"));
 
   if (!Number.isInteger(year) || year < 2000 || year > 2100) {
-    redirect("/dashboard?error=" + encodeURIComponent("올바른 연도를 입력해주세요."));
+    redirect(SETTINGS + "?error=" + encodeURIComponent("올바른 연도를 입력해주세요."));
   }
 
   const supabase = await createClient();
@@ -40,11 +42,11 @@ export async function createAcademicYear(formData: FormData) {
       error.code === "23505"
         ? `${year}학년도는 이미 등록되어 있습니다.`
         : "학년도 등록에 실패했습니다.";
-    redirect("/dashboard?error=" + encodeURIComponent(message));
+    redirect(SETTINGS + "?error=" + encodeURIComponent(message));
   }
 
   revalidatePath("/dashboard");
-  redirect("/dashboard");
+  redirect(SETTINGS + "?success=" + encodeURIComponent(`${year}학년도를 등록했습니다.`));
 }
 
 export async function createClassroom(formData: FormData) {
@@ -53,10 +55,10 @@ export async function createClassroom(formData: FormData) {
   const themeColor = String(formData.get("theme_color") ?? "blue");
 
   if (!academicYearId || !name) {
-    redirect("/dashboard?error=" + encodeURIComponent("학년도와 학급 이름을 입력해주세요."));
+    redirect(SETTINGS + "?error=" + encodeURIComponent("학년도와 학급 이름을 입력해주세요."));
   }
   if (!(themeColor in THEMES)) {
-    redirect("/dashboard?error=" + encodeURIComponent("테마 색을 선택해주세요."));
+    redirect(SETTINGS + "?error=" + encodeURIComponent("테마 색을 선택해주세요."));
   }
 
   const supabase = await createClient();
@@ -78,7 +80,7 @@ export async function createClassroom(formData: FormData) {
 
     if (!error) {
       revalidatePath("/dashboard");
-      redirect("/dashboard");
+      redirect(SETTINGS + "?success=" + encodeURIComponent(`${name} 학급을 만들었습니다.`));
     }
     lastError = error;
     if (error.code !== "23505") break;
@@ -88,5 +90,5 @@ export async function createClassroom(formData: FormData) {
     lastError?.code === "23503" || lastError?.code === "42501"
       ? "학급을 만들 권한이 없습니다."
       : "학급 생성에 실패했습니다. 다시 시도해주세요.";
-  redirect("/dashboard?error=" + encodeURIComponent(message));
+  redirect(SETTINGS + "?error=" + encodeURIComponent(message));
 }
