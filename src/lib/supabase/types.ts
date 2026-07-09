@@ -117,6 +117,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          post_date: string
           title: string
           updated_at: string
         }
@@ -125,6 +126,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          post_date?: string
           title: string
           updated_at?: string
         }
@@ -133,6 +135,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          post_date?: string
           title?: string
           updated_at?: string
         }
@@ -175,6 +178,7 @@ export type Database = {
           nickname: string
           number: number
           pin_hash: string
+          pin_is_initial: boolean
           real_name: string | null
         }
         Insert: {
@@ -184,6 +188,7 @@ export type Database = {
           nickname: string
           number: number
           pin_hash: string
+          pin_is_initial?: boolean
           real_name?: string | null
         }
         Update: {
@@ -193,6 +198,7 @@ export type Database = {
           nickname?: string
           number?: number
           pin_hash?: string
+          pin_is_initial?: boolean
           real_name?: string | null
         }
         Relationships: [
