@@ -21,8 +21,13 @@ export default async function StudentHomePage() {
   // RLS가 JWT의 classroom_id 클레임으로 자기 학급 데이터만 허용한다
   const supabase = createStudentClient(session.token);
 
-  const [{ data: classroom }, { data: posts }, { data: todaySlots }, { data: todayEvents }] =
-    await Promise.all([
+  const [
+    { data: classroom },
+    { data: posts },
+    { data: todaySlots },
+    { data: todayEvents },
+    { data: myReads },
+  ] = await Promise.all([
       supabase
         .from("classrooms")
         .select("name")
@@ -44,7 +49,13 @@ export default async function StudentHomePage() {
         .from("events")
         .select("id, title, layer")
         .eq("event_date", today),
+      supabase
+        .from("post_reads")
+        .select("post_id")
+        .eq("student_id", session.studentId),
     ]);
+
+  const readSet = new Set((myReads ?? []).map((r) => r.post_id));
 
   // 학급이 조회되지 않으면 세션이 낡은 것 (학급 삭제 등)
   if (!classroom) redirect("/student/login");
@@ -122,9 +133,16 @@ export default async function StudentHomePage() {
               <li key={p.id}>
                 <Link
                   href={`/student/posts/${p.id}`}
-                  className="flex items-center justify-between rounded-xl border-2 p-4 active:bg-gray-50"
+                  className="flex items-center justify-between gap-2 rounded-xl border-2 p-4 active:bg-gray-50"
                 >
-                  <span className="font-medium">{p.title}</span>
+                  <span className="flex items-center gap-2 font-medium">
+                    {p.title}
+                    {!readSet.has(p.id) && (
+                      <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-600">
+                        안 읽음
+                      </span>
+                    )}
+                  </span>
                   <span className="shrink-0 text-sm text-gray-500">
                     {formatDate(p.post_date)}
                   </span>

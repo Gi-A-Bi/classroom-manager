@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getStudentSession } from "@/lib/student-auth";
 import { createStudentClient } from "@/lib/supabase/student";
+import { toggleItemCheck } from "./actions";
 
 function formatDate(dateString: string) {
   const d = new Date(dateString + "T00:00:00");
@@ -29,6 +30,30 @@ export default async function StudentPostPage({
 
   if (!post) notFound();
 
+  // 읽음 기록 (이미 있으면 무시) — 알림장을 열었다는 사실 자체가 읽음
+  await supabase.from("post_reads").upsert(
+    {
+      post_id: post.id,
+      student_id: session.studentId,
+      classroom_id: session.classroomId,
+    },
+    { onConflict: "post_id,student_id", ignoreDuplicates: true },
+  );
+
+  const [{ data: items }, { data: myChecks }] = await Promise.all([
+    supabase
+      .from("post_items")
+      .select("id, label")
+      .eq("post_id", post.id)
+      .order("position"),
+    supabase
+      .from("item_checks")
+      .select("item_id")
+      .eq("student_id", session.studentId),
+  ]);
+
+  const checkedSet = new Set((myChecks ?? []).map((c) => c.item_id));
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col gap-5 p-5">
       <nav>
@@ -44,6 +69,50 @@ export default async function StudentPostPage({
           {post.content}
         </div>
       </article>
+
+      {items && items.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h2 className="text-lg font-semibold">준비물 체크</h2>
+          <p className="text-sm text-gray-600">
+            준비한 것을 눌러서 체크해요. 다시 누르면 해제돼요.
+          </p>
+          <ul className="flex flex-col gap-2">
+            {items.map((item) => {
+              const checked = checkedSet.has(item.id);
+              return (
+                <li key={item.id}>
+                  <form action={toggleItemCheck}>
+                    <input type="hidden" name="item_id" value={item.id} />
+                    <input type="hidden" name="post_id" value={post.id} />
+                    <button
+                      type="submit"
+                      className={`flex w-full items-center gap-3 rounded-xl border-2 p-3.5 text-left text-base ${
+                        checked
+                          ? "border-green-500 bg-green-50"
+                          : "active:bg-gray-50"
+                      }`}
+                    >
+                      <span
+                        aria-hidden
+                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 text-sm font-bold ${
+                          checked
+                            ? "border-green-500 bg-green-500 text-white"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {checked ? "✓" : ""}
+                      </span>
+                      <span className={checked ? "font-medium" : ""}>
+                        {item.label}
+                      </span>
+                    </button>
+                  </form>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
     </main>
   );
 }

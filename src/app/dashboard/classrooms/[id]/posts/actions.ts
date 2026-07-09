@@ -19,21 +19,50 @@ export async function createPost(formData: FormData) {
     redirect(base + "?error=" + encodeURIComponent("날짜를 선택해주세요."));
   }
 
+  // 준비물: 한 줄에 하나씩 (선택 입력)
+  const itemLabels = String(formData.get("items") ?? "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .slice(0, 20);
+
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { error } = await supabase.from("posts").insert({
-    classroom_id: classroomId,
-    title,
-    content,
-    post_date: postDate,
-  });
+  const { data: post, error } = await supabase
+    .from("posts")
+    .insert({
+      classroom_id: classroomId,
+      title,
+      content,
+      post_date: postDate,
+    })
+    .select("id")
+    .single();
 
-  if (error) {
+  if (error || !post) {
     redirect(base + "?error=" + encodeURIComponent("알림장 저장에 실패했습니다."));
+  }
+
+  if (itemLabels.length > 0) {
+    const { error: itemError } = await supabase.from("post_items").insert(
+      itemLabels.map((label, i) => ({
+        post_id: post!.id,
+        classroom_id: classroomId,
+        label,
+        position: i,
+      })),
+    );
+    if (itemError) {
+      redirect(
+        base +
+          "?error=" +
+          encodeURIComponent("알림장은 저장됐지만 준비물 등록에 실패했습니다."),
+      );
+    }
   }
 
   revalidatePath(base);
