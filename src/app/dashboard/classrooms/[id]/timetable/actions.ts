@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DAYS, PERIODS } from "./constants";
+import { DAYS, MAX_PERIODS, MIN_PERIODS } from "./constants";
 
 export async function saveTimetable(formData: FormData) {
   const classroomId = String(formData.get("classroom_id") ?? "");
@@ -15,6 +15,14 @@ export async function saveTimetable(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // 교시 수는 폼 값이 아니라 학급 설정을 기준으로 한다
+  const { data: classroom } = await supabase
+    .from("classrooms")
+    .select("periods_per_day")
+    .eq("id", classroomId)
+    .single();
+  if (!classroom) redirect("/dashboard");
+
   const rows: {
     classroom_id: string;
     day_of_week: number;
@@ -24,7 +32,7 @@ export async function saveTimetable(formData: FormData) {
   const emptyCells = new Set<string>();
 
   for (const day of DAYS) {
-    for (const period of PERIODS) {
+    for (let period = 1; period <= classroom!.periods_per_day; period++) {
       const subject = String(formData.get(`slot_${day}_${period}`) ?? "")
         .trim()
         .slice(0, 20);
@@ -73,4 +81,44 @@ export async function saveTimetable(formData: FormData) {
 
   revalidatePath(base);
   redirect(base + "?success=" + encodeURIComponent("시간표를 저장했습니다."));
+}
+
+// 하루 교시 수 변경. 줄이면 초과 교시의 시간표는 삭제된다.
+export async function setPeriodsPerDay(formData: FormData) {
+  const classroomId = String(formData.get("classroom_id") ?? "");
+  const periods = Number(formData.get("periods_per_day"));
+  const base = `/dashboard/classrooms/${classroomId}/timetable`;
+
+  if (
+    !Number.isInteger(periods) ||
+    periods < MIN_PERIODS ||
+    periods > MAX_PERIODS
+  ) {
+    redirect(base + "?error=" + encodeURIComponent("교시 수는 4~8 사이여야 합니다."));
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { error } = await supabase
+    .from("classrooms")
+    .update({ periods_per_day: periods })
+    .eq("id", classroomId);
+
+  if (error) {
+    redirect(base + "?error=" + encodeURIComponent("교시 수 변경에 실패했습니다."));
+  }
+
+  // 줄어든 범위 밖의 시간표 정리
+  await supabase
+    .from("timetable_slots")
+    .delete()
+    .eq("classroom_id", classroomId)
+    .gt("period", periods);
+
+  revalidatePath(base);
+  redirect(base + "?success=" + encodeURIComponent(`하루 ${periods}교시로 설정했습니다.`));
 }

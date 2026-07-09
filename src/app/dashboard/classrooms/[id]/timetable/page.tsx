@@ -2,8 +2,8 @@ import { notFound, redirect } from "next/navigation";
 import { ClassroomNav } from "@/components/ClassroomNav";
 import { DAY_NAMES } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
-import { saveTimetable } from "./actions";
-import { DAYS, PERIODS } from "./constants";
+import { saveTimetable, setPeriodsPerDay } from "./actions";
+import { DAYS, MAX_PERIODS, MIN_PERIODS } from "./constants";
 
 export default async function TimetablePage({
   params,
@@ -22,7 +22,11 @@ export default async function TimetablePage({
   if (!user) redirect("/login");
 
   const [{ data: classroom }, { data: slots }] = await Promise.all([
-    supabase.from("classrooms").select("id, name").eq("id", id).single(),
+    supabase
+      .from("classrooms")
+      .select("id, name, periods_per_day")
+      .eq("id", id)
+      .single(),
     supabase
       .from("timetable_slots")
       .select("day_of_week, period, subject")
@@ -30,6 +34,11 @@ export default async function TimetablePage({
   ]);
 
   if (!classroom) notFound();
+
+  const periods = Array.from(
+    { length: classroom.periods_per_day },
+    (_, i) => i + 1,
+  );
 
   const subjectOf = new Map(
     (slots ?? []).map((s) => [`${s.day_of_week}-${s.period}`, s.subject]),
@@ -55,6 +64,39 @@ export default async function TimetablePage({
         </p>
       )}
 
+      <form
+        action={setPeriodsPerDay}
+        className="flex items-center gap-2 rounded-lg border p-3 text-sm"
+      >
+        <input type="hidden" name="classroom_id" value={classroom.id} />
+        <label className="flex items-center gap-2">
+          하루 교시 수
+          <select
+            name="periods_per_day"
+            defaultValue={classroom.periods_per_day}
+            className="rounded-md border p-1.5"
+          >
+            {Array.from(
+              { length: MAX_PERIODS - MIN_PERIODS + 1 },
+              (_, i) => MIN_PERIODS + i,
+            ).map((n) => (
+              <option key={n} value={n}>
+                {n}교시
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="submit"
+          className="rounded-md border px-3 py-1.5 hover:bg-gray-50"
+        >
+          변경
+        </button>
+        <span className="text-xs text-gray-500">
+          교시 수를 줄이면 그 아래 교시의 시간표는 지워집니다.
+        </span>
+      </form>
+
       <form action={saveTimetable} className="flex flex-col gap-4">
         <input type="hidden" name="classroom_id" value={classroom.id} />
         <div className="overflow-x-auto">
@@ -70,7 +112,7 @@ export default async function TimetablePage({
               </tr>
             </thead>
             <tbody>
-              {PERIODS.map((period) => (
+              {periods.map((period) => (
                 <tr key={period}>
                   <th className="border bg-gray-50 p-2 font-medium">
                     {period}
