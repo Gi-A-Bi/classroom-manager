@@ -74,6 +74,7 @@ export type Database = {
           id: string
           name: string
           periods_per_day: number
+          share_token: string | null
           teacher_id: string
           theme_color: string | null
         }
@@ -84,6 +85,7 @@ export type Database = {
           id?: string
           name: string
           periods_per_day?: number
+          share_token?: string | null
           teacher_id: string
           theme_color?: string | null
         }
@@ -94,6 +96,7 @@ export type Database = {
           id?: string
           name?: string
           periods_per_day?: number
+          share_token?: string | null
           teacher_id?: string
           theme_color?: string | null
         }
@@ -118,6 +121,7 @@ export type Database = {
         Row: {
           classroom_id: string
           created_at: string
+          end_date: string | null
           event_date: string
           id: string
           layer: string
@@ -126,6 +130,7 @@ export type Database = {
         Insert: {
           classroom_id: string
           created_at?: string
+          end_date?: string | null
           event_date: string
           id?: string
           layer: string
@@ -134,6 +139,7 @@ export type Database = {
         Update: {
           classroom_id?: string
           created_at?: string
+          end_date?: string | null
           event_date?: string
           id?: string
           layer?: string
@@ -399,7 +405,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      shared_calendar: {
+        Args: { p_from: string; p_to: string; p_token: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

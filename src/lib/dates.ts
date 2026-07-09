@@ -49,6 +49,35 @@ export function addMonths(year: number, monthIndex: number, delta: number) {
   return { year: d.getFullYear(), monthIndex: d.getMonth() };
 }
 
+// 해당 월의 마지막 날 (YYYY-MM-DD)
+export function monthEndString(year: number, monthIndex: number) {
+  return toDateString(new Date(year, monthIndex + 1, 0));
+}
+
+// 두 날짜(YYYY-MM-DD) 사이 일수 (to - from)
+export function daysBetween(from: string, to: string) {
+  const a = new Date(from + "T00:00:00");
+  const b = new Date(to + "T00:00:00");
+  return Math.round((b.getTime() - a.getTime()) / 86400000);
+}
+
+// "M/D" 짧은 표기
+export function formatMonthDay(dateString: string) {
+  return `${Number(dateString.slice(5, 7))}/${Number(dateString.slice(8))}`;
+}
+
+// from~to 사이의 모든 날짜 (YYYY-MM-DD 배열, 양 끝 포함)
+export function dateRange(from: string, to: string): string[] {
+  const out: string[] = [];
+  const d = new Date(from + "T00:00:00");
+  const endTime = new Date(to + "T00:00:00").getTime();
+  while (d.getTime() <= endTime) {
+    out.push(toDateString(d));
+    d.setDate(d.getDate() + 1);
+  }
+  return out;
+}
+
 // 월간 캘린더 격자: 주(월요일 시작) 단위 2차원 배열.
 // 해당 월 바깥 칸은 null.
 export function monthGrid(year: number, monthIndex: number): (string | null)[][] {
