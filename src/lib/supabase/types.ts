@@ -73,6 +73,7 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          periods_per_day: number
           teacher_id: string
           theme_color: string | null
         }
@@ -82,6 +83,7 @@ export type Database = {
           created_at?: string
           id?: string
           name: string
+          periods_per_day?: number
           teacher_id: string
           theme_color?: string | null
         }
@@ -91,6 +93,7 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+          periods_per_day?: number
           teacher_id?: string
           theme_color?: string | null
         }
@@ -143,6 +146,116 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "classrooms"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      item_checks: {
+        Row: {
+          checked_at: string
+          classroom_id: string
+          id: string
+          item_id: string
+          student_id: string
+        }
+        Insert: {
+          checked_at?: string
+          classroom_id: string
+          id?: string
+          item_id: string
+          student_id: string
+        }
+        Update: {
+          checked_at?: string
+          classroom_id?: string
+          id?: string
+          item_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "item_checks_item_id_classroom_id_fkey"
+            columns: ["item_id", "classroom_id"]
+            isOneToOne: false
+            referencedRelation: "post_items"
+            referencedColumns: ["id", "classroom_id"]
+          },
+          {
+            foreignKeyName: "item_checks_student_id_classroom_id_fkey"
+            columns: ["student_id", "classroom_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id", "classroom_id"]
+          },
+        ]
+      }
+      post_items: {
+        Row: {
+          classroom_id: string
+          id: string
+          label: string
+          position: number
+          post_id: string
+        }
+        Insert: {
+          classroom_id: string
+          id?: string
+          label: string
+          position?: number
+          post_id: string
+        }
+        Update: {
+          classroom_id?: string
+          id?: string
+          label?: string
+          position?: number
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_items_post_id_classroom_id_fkey"
+            columns: ["post_id", "classroom_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id", "classroom_id"]
+          },
+        ]
+      }
+      post_reads: {
+        Row: {
+          classroom_id: string
+          id: string
+          post_id: string
+          read_at: string
+          student_id: string
+        }
+        Insert: {
+          classroom_id: string
+          id?: string
+          post_id: string
+          read_at?: string
+          student_id: string
+        }
+        Update: {
+          classroom_id?: string
+          id?: string
+          post_id?: string
+          read_at?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_reads_post_id_classroom_id_fkey"
+            columns: ["post_id", "classroom_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id", "classroom_id"]
+          },
+          {
+            foreignKeyName: "post_reads_student_id_classroom_id_fkey"
+            columns: ["student_id", "classroom_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id", "classroom_id"]
           },
         ]
       }
