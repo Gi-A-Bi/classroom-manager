@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ClassroomNav } from "@/components/ClassroomNav";
 import { createClient } from "@/lib/supabase/server";
-import { addStudentsBulk } from "./actions";
+import { addStudentsBulk, resetStudentPin } from "./actions";
 
 export default async function StudentsPage({
   params,
@@ -27,7 +27,7 @@ export default async function StudentsPage({
       .single(),
     supabase
       .from("students")
-      .select("id, number, nickname")
+      .select("id, number, nickname, pin_is_initial")
       .eq("classroom_id", id)
       .order("number"),
   ]);
@@ -37,11 +37,7 @@ export default async function StudentsPage({
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <nav className="text-sm">
-        <Link href="/dashboard" className="text-blue-600 underline">
-          ← 대시보드로
-        </Link>
-      </nav>
+      <ClassroomNav classroomId={classroom.id} current="students" />
 
       <header>
         <h1 className="text-2xl font-bold">{classroom.name} 학생 명렬</h1>
@@ -104,13 +100,41 @@ export default async function StudentsPage({
           등록된 학생 {students?.length ?? 0}명
         </h2>
         {students && students.length > 0 ? (
-          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <ul className="flex flex-col gap-1.5">
             {students.map((s) => (
-              <li key={s.id} className="rounded-md border p-2 text-sm">
-                <span className="mr-2 font-mono text-gray-500">
-                  {s.number}번
+              <li
+                key={s.id}
+                className="flex items-center justify-between rounded-md border p-2 text-sm"
+              >
+                <span>
+                  <span className="mr-2 font-mono text-gray-500">
+                    {s.number}번
+                  </span>
+                  {s.nickname}
+                  <span
+                    className={`ml-3 rounded-full px-2 py-0.5 text-xs ${
+                      s.pin_is_initial
+                        ? "bg-amber-100 text-amber-800"
+                        : "bg-green-100 text-green-800"
+                    }`}
+                  >
+                    {s.pin_is_initial ? "초기 PIN(0000)" : "PIN 설정됨"}
+                  </span>
                 </span>
-                {s.nickname}
+                <form action={resetStudentPin}>
+                  <input type="hidden" name="student_id" value={s.id} />
+                  <input
+                    type="hidden"
+                    name="classroom_id"
+                    value={classroom.id}
+                  />
+                  <button
+                    type="submit"
+                    className="rounded-md border px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
+                  >
+                    PIN 초기화
+                  </button>
+                </form>
               </li>
             ))}
           </ul>

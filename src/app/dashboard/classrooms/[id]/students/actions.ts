@@ -90,3 +90,38 @@ export async function addStudentsBulk(formData: FormData) {
   revalidatePath(base);
   redirect(base + "?success=" + encodeURIComponent(`${parsed.length}명을 등록했습니다.`));
 }
+
+// PIN을 0000으로 리셋하고 다음 로그인 때 재설정을 강제한다.
+// 교사는 자기 학급 학생에 update 권한이 있으므로 RLS 클라이언트로 처리.
+export async function resetStudentPin(formData: FormData) {
+  const studentId = String(formData.get("student_id") ?? "");
+  const classroomId = String(formData.get("classroom_id") ?? "");
+  const base = `/dashboard/classrooms/${classroomId}/students`;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const pinHash = await hash("0000", 10);
+  const { data, error } = await supabase
+    .from("students")
+    .update({ pin_hash: pinHash, pin_is_initial: true })
+    .eq("id", studentId)
+    .select("number, nickname")
+    .single();
+
+  if (error || !data) {
+    redirect(base + "?error=" + encodeURIComponent("PIN 초기화에 실패했습니다."));
+  }
+
+  revalidatePath(base);
+  redirect(
+    base +
+      "?success=" +
+      encodeURIComponent(
+        `${data!.number}번 ${data!.nickname}의 PIN을 0000으로 초기화했습니다.`,
+      ),
+  );
+}
