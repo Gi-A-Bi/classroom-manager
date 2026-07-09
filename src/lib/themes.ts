@@ -68,3 +68,19 @@ export const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];
 export function getTheme(key?: string | null) {
   return THEMES[(key ?? "") as ThemeKey] ?? THEMES.blue;
 }
+
+// 파스텔 팝 — 시간표 칩 등 나열 요소에 순서대로 입히는 파스텔 조합
+export const PASTEL_CHIPS = [
+  "bg-purple-50 text-purple-800",
+  "bg-pink-50 text-pink-800",
+  "bg-teal-50 text-teal-800",
+  "bg-amber-50 text-amber-800",
+  "bg-blue-50 text-blue-800",
+  "bg-green-50 text-green-800",
+  "bg-orange-50 text-orange-800",
+  "bg-slate-100 text-slate-800",
+] as const;
+
+export function pastelChip(index: number) {
+  return PASTEL_CHIPS[index % PASTEL_CHIPS.length];
+}

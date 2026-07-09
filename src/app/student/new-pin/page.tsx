@@ -15,7 +15,8 @@ export default async function NewPinPage({
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 p-5">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">새 PIN 만들기</h1>
+        <p className="text-5xl">🔑</p>
+        <h1 className="mt-2 text-3xl font-extrabold">새 PIN 만들기</h1>
         <p className="mt-2 text-gray-600">
           처음 들어왔네요! 나만 아는 새 PIN을 정해주세요.
         </p>

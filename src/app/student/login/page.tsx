@@ -15,7 +15,8 @@ export default async function StudentLoginPage({
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 p-5">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">우리 반 들어가기</h1>
+        <p className="text-5xl">🏫</p>
+        <h1 className="mt-2 text-3xl font-extrabold">우리 반 들어가기</h1>
         <p className="mt-2 text-gray-600">
           선생님이 알려준 학급코드를 넣어요.
         </p>

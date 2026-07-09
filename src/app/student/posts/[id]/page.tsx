@@ -72,7 +72,7 @@ export default async function StudentPostPage({
 
       {items && items.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="text-lg font-semibold">준비물 체크</h2>
+          <h2 className="text-lg font-bold">🎒 준비물 체크</h2>
           <p className="text-sm text-gray-600">
             준비한 것을 눌러서 체크해요. 다시 누르면 해제돼요.
           </p>

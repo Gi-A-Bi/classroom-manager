@@ -109,7 +109,7 @@ export default async function DashboardPage({
       <header className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <p className="text-sm font-medium text-gray-500">
-            {profile?.display_name || "선생님"} 선생님의 학급 관리
+            👋 {profile?.display_name || "선생님"} 선생님, 안녕하세요
           </p>
           <h1 className="text-4xl font-extrabold tracking-tight tabular-nums">
             {Number(today.slice(5, 7))}월 {Number(today.slice(8))}일{" "}
@@ -174,7 +174,7 @@ export default async function DashboardPage({
       {classrooms.length > 0 ? (
         <section className="flex flex-col gap-3">
           <h2 className="text-xs font-bold tracking-wide text-gray-400">
-            {selectedYear?.name}의 학급
+            🏫 {selectedYear?.name}의 학급
           </h2>
           {classrooms.map((c) => {
             const theme = getTheme(c.theme_color);

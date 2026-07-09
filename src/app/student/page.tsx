@@ -9,7 +9,7 @@ import {
 } from "@/lib/dates";
 import { getStudentSession } from "@/lib/student-auth";
 import { createStudentClient } from "@/lib/supabase/student";
-import { getTheme } from "@/lib/themes";
+import { getTheme, pastelChip } from "@/lib/themes";
 import { studentLogout } from "./login/actions";
 
 function formatDate(dateString: string) {
@@ -105,14 +105,15 @@ export default async function StudentHomePage() {
             </form>
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight tabular-nums">
-            {Number(today.slice(5, 7))}월 {Number(today.slice(8))}일{" "}
+            {isWeekday ? "☀️" : "🌈"} {Number(today.slice(5, 7))}월{" "}
+            {Number(today.slice(8))}일{" "}
             <span className="text-xl font-bold text-gray-400">
               {DAY_NAMES[todayDow - 1]}요일
             </span>
           </h1>
           {nextEvent && dday !== null && (
             <p className="flex items-center gap-2 text-sm">
-              <span className="rounded-lg bg-gray-900 px-2 py-0.5 font-bold tabular-nums text-white">
+              <span className="rounded-full bg-white/80 px-2.5 py-0.5 font-extrabold tabular-nums text-red-500">
                 D-{dday}
               </span>
               <span className="font-medium">{nextEvent.title}</span>
@@ -127,7 +128,7 @@ export default async function StudentHomePage() {
       <section className="flex flex-col gap-2 rounded-2xl border bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between">
           <h2 className="font-bold">
-            오늘 시간표{" "}
+            ⏰ 오늘 시간표{" "}
             <span className="text-sm font-normal text-gray-500">
               {DAY_NAMES[todayDow - 1]}요일
             </span>
@@ -136,19 +137,17 @@ export default async function StudentHomePage() {
             href="/student/calendar"
             className="text-sm font-medium text-blue-700 underline underline-offset-2"
           >
-            캘린더
+            🗓️ 캘린더
           </Link>
         </div>
         {isWeekday && todaySlots && todaySlots.length > 0 ? (
           <ol className="flex flex-wrap gap-1.5">
-            {todaySlots.map((s) => (
+            {todaySlots.map((s, i) => (
               <li
                 key={s.period}
-                className={`rounded-lg px-2.5 py-1.5 text-sm ${theme.soft}`}
+                className={`rounded-xl px-2.5 py-1.5 text-sm ${pastelChip(i)}`}
               >
-                <span className={`font-bold tabular-nums ${theme.text}`}>
-                  {s.period}
-                </span>{" "}
+                <span className="font-bold tabular-nums">{s.period}교시</span>{" "}
                 <span className="font-semibold">{s.subject}</span>
               </li>
             ))}
@@ -181,24 +180,26 @@ export default async function StudentHomePage() {
       {todayPost && (
         <Link
           href={`/student/posts/${todayPost.id}`}
-          className="flex flex-col gap-1 rounded-2xl border-2 border-blue-200 bg-white p-4 shadow-sm transition-all hover:shadow-md active:bg-blue-50"
+          className="flex flex-col gap-1 rounded-2xl bg-amber-50 p-4 shadow-sm transition-all hover:shadow-md active:bg-amber-100"
         >
-          <span className="flex items-center gap-2 text-sm font-bold text-blue-700">
-            오늘 알림장
+          <span className="flex items-center gap-2 text-sm font-bold text-amber-700">
+            🔔 오늘 알림장
             {!readSet.has(todayPost.id) && (
               <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-600">
                 안 읽음
               </span>
             )}
           </span>
-          <span className="text-lg font-bold">{todayPost.title}</span>
-          <span className="text-sm text-gray-500">눌러서 읽어보세요 →</span>
+          <span className="text-lg font-bold text-amber-900">
+            {todayPost.title}
+          </span>
+          <span className="text-sm text-amber-700">눌러서 읽어보세요 →</span>
         </Link>
       )}
 
       <section className="flex flex-col gap-2">
         <h2 className="px-1 text-sm font-bold text-gray-500">
-          지난 알림장
+          📚 지난 알림장
         </h2>
         {otherPosts.length > 0 ? (
           <ul className="flex flex-col gap-1.5">
