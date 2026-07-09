@@ -116,22 +116,35 @@ export default async function DashboardPage({
         <h2 className="font-semibold">내 학급</h2>
         {years?.flatMap((y) =>
           y.classrooms.map((c) => (
-            <Link
+            <div
               key={c.id}
-              href={`/dashboard/classrooms/${c.id}/students`}
-              className="flex items-center justify-between rounded-lg border p-4 hover:bg-gray-50"
+              className="flex items-center justify-between rounded-lg border p-4"
             >
               <span>
                 <span className="font-medium">{c.name}</span>{" "}
                 <span className="text-sm text-gray-500">({y.name})</span>
+                <span className="ml-3 text-sm">
+                  학급코드{" "}
+                  <code className="rounded bg-gray-100 px-2 py-1 font-mono font-bold">
+                    {c.class_code}
+                  </code>
+                </span>
               </span>
-              <span className="text-sm">
-                학급코드{" "}
-                <code className="rounded bg-gray-100 px-2 py-1 font-mono font-bold">
-                  {c.class_code}
-                </code>
+              <span className="flex gap-3 text-sm">
+                <Link
+                  href={`/dashboard/classrooms/${c.id}/posts`}
+                  className="text-blue-600 underline"
+                >
+                  알림장
+                </Link>
+                <Link
+                  href={`/dashboard/classrooms/${c.id}/students`}
+                  className="text-blue-600 underline"
+                >
+                  학생 명렬
+                </Link>
               </span>
-            </Link>
+            </div>
           )),
         )}
         {(!years || years.every((y) => y.classrooms.length === 0)) && (
