@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { ClassroomHeader } from "@/components/ClassroomHeader";
 import { ClassroomNav } from "@/components/ClassroomNav";
 import { createClient } from "@/lib/supabase/server";
 import { addStudentsBulk, resetStudentPin } from "./actions";
@@ -22,7 +23,7 @@ export default async function StudentsPage({
   const [{ data: classroom }, { data: students }] = await Promise.all([
     supabase
       .from("classrooms")
-      .select("id, name, class_code")
+      .select("id, name, class_code, theme_color")
       .eq("id", id)
       .single(),
     supabase
@@ -39,16 +40,15 @@ export default async function StudentsPage({
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
       <ClassroomNav classroomId={classroom.id} current="students" />
 
-      <header>
-        <h1 className="text-2xl font-bold">{classroom.name} 학생 명렬</h1>
-        <p className="mt-1 text-sm text-gray-600">
-          학급코드{" "}
-          <code className="rounded bg-gray-100 px-2 py-1 font-mono font-bold">
-            {classroom.class_code}
-          </code>{" "}
-          — 학생들은 이 코드와 번호, PIN으로 접속합니다.
-        </p>
-      </header>
+      <ClassroomHeader
+        name={classroom.name}
+        title="학생 명렬"
+        classCode={classroom.class_code}
+        themeColor={classroom.theme_color}
+      />
+      <p className="-mt-3 text-sm text-gray-500">
+        학생들은 학급코드와 출석번호, PIN으로 접속합니다.
+      </p>
 
       {error && (
         <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>
@@ -59,7 +59,7 @@ export default async function StudentsPage({
         </p>
       )}
 
-      <section className="flex flex-col gap-3 rounded-lg border p-4">
+      <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
         <h2 className="font-semibold">명렬 일괄 등록</h2>
         <p className="text-sm text-gray-600">
           한 줄에 한 명씩 「번호 이름」 형식으로 붙여넣어 주세요. 이름 대신
@@ -104,7 +104,7 @@ export default async function StudentsPage({
             {students.map((s) => (
               <li
                 key={s.id}
-                className="flex items-center justify-between rounded-md border p-2 text-sm"
+                className="flex items-center justify-between rounded-lg border bg-white p-2.5 text-sm shadow-sm"
               >
                 <span>
                   <span className="mr-2 font-mono text-gray-500">

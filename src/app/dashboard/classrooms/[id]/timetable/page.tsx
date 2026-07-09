@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { ClassroomHeader } from "@/components/ClassroomHeader";
 import { ClassroomNav } from "@/components/ClassroomNav";
 import { DAY_NAMES } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
@@ -24,7 +25,7 @@ export default async function TimetablePage({
   const [{ data: classroom }, { data: slots }] = await Promise.all([
     supabase
       .from("classrooms")
-      .select("id, name, periods_per_day")
+      .select("id, name, periods_per_day, theme_color")
       .eq("id", id)
       .single(),
     supabase
@@ -48,12 +49,14 @@ export default async function TimetablePage({
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
       <ClassroomNav classroomId={classroom.id} current="timetable" />
 
-      <header>
-        <h1 className="text-2xl font-bold">{classroom.name} 시간표</h1>
-        <p className="mt-1 text-sm text-gray-600">
-          과목을 입력하고 저장하세요. 비워두면 해당 교시는 지워집니다.
-        </p>
-      </header>
+      <ClassroomHeader
+        name={classroom.name}
+        title="시간표"
+        themeColor={classroom.theme_color}
+      />
+      <p className="-mt-3 text-sm text-gray-500">
+        과목을 입력하고 저장하세요. 비워두면 해당 교시는 지워집니다.
+      </p>
 
       {error && (
         <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>
@@ -66,7 +69,7 @@ export default async function TimetablePage({
 
       <form
         action={setPeriodsPerDay}
-        className="flex items-center gap-2 rounded-lg border p-3 text-sm"
+        className="flex flex-wrap items-center gap-2 rounded-xl border bg-white p-3.5 text-sm shadow-sm"
       >
         <input type="hidden" name="classroom_id" value={classroom.id} />
         <label className="flex items-center gap-2">
@@ -99,7 +102,7 @@ export default async function TimetablePage({
 
       <form action={saveTimetable} className="flex flex-col gap-4">
         <input type="hidden" name="classroom_id" value={classroom.id} />
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-xl border bg-white p-3 shadow-sm">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr>

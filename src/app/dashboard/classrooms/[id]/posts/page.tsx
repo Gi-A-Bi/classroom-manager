@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { ClassroomHeader } from "@/components/ClassroomHeader";
 import { ClassroomNav } from "@/components/ClassroomNav";
 import { createClient } from "@/lib/supabase/server";
 import { createPost } from "./actions";
@@ -28,7 +29,7 @@ export default async function ClassroomPostsPage({
     await Promise.all([
       supabase
         .from("classrooms")
-        .select("id, name, class_code")
+        .select("id, name, class_code, theme_color")
         .eq("id", id)
         .single(),
       supabase
@@ -91,15 +92,12 @@ export default async function ClassroomPostsPage({
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
       <ClassroomNav classroomId={classroom.id} current="posts" />
 
-      <header>
-        <h1 className="text-2xl font-bold">{classroom.name} 알림장</h1>
-        <p className="mt-1 text-sm text-gray-600">
-          학급코드{" "}
-          <code className="rounded bg-gray-100 px-2 py-1 font-mono font-bold">
-            {classroom.class_code}
-          </code>
-        </p>
-      </header>
+      <ClassroomHeader
+        name={classroom.name}
+        title="알림장"
+        classCode={classroom.class_code}
+        themeColor={classroom.theme_color}
+      />
 
       {error && (
         <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>
@@ -110,7 +108,7 @@ export default async function ClassroomPostsPage({
         </p>
       )}
 
-      <section className="flex flex-col gap-3 rounded-lg border p-4">
+      <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
         <h2 className="font-semibold">알림장 쓰기</h2>
         <form action={createPost} className="flex flex-col gap-3">
           <input type="hidden" name="classroom_id" value={classroom.id} />
@@ -176,7 +174,7 @@ export default async function ClassroomPostsPage({
                 (i) => i.post_id === p.id,
               );
               return (
-                <li key={p.id} className="flex flex-col gap-3 rounded-lg border p-4">
+                <li key={p.id} className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium">{p.title}</h3>
                     <span className="text-sm text-gray-500">

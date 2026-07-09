@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ClassroomHeader } from "@/components/ClassroomHeader";
 import { ClassroomNav } from "@/components/ClassroomNav";
 import {
   addMonths,
@@ -42,7 +43,11 @@ export default async function CalendarPage({
   const today = todayString();
 
   const [{ data: classroom }, { data: events }] = await Promise.all([
-    supabase.from("classrooms").select("id, name").eq("id", id).single(),
+    supabase
+      .from("classrooms")
+      .select("id, name, theme_color")
+      .eq("id", id)
+      .single(),
     supabase
       .from("events")
       .select("id, title, event_date, layer")
@@ -65,15 +70,17 @@ export default async function CalendarPage({
     <main className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
       <ClassroomNav classroomId={classroom.id} current="calendar" />
 
-      <header>
-        <h1 className="text-2xl font-bold">{classroom.name} 캘린더</h1>
-      </header>
+      <ClassroomHeader
+        name={classroom.name}
+        title="캘린더"
+        themeColor={classroom.theme_color}
+      />
 
       {error && (
         <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>
       )}
 
-      <section className="flex flex-col gap-3 rounded-lg border p-4">
+      <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
         <h2 className="font-semibold">일정 등록</h2>
         <form action={createEvent} className="flex flex-wrap items-end gap-3">
           <input type="hidden" name="classroom_id" value={classroom.id} />
@@ -140,7 +147,7 @@ export default async function CalendarPage({
           </Link>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-xl border bg-white p-3 shadow-sm">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr>

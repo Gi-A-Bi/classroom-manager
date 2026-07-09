@@ -13,10 +13,15 @@ export default async function LoginPage({
       <h1 className="text-2xl font-bold">교사 로그인</h1>
 
       {error && (
-        <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>
+        <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </p>
       )}
 
-      <form action={login} className="flex flex-col gap-3">
+      <form
+        action={login}
+        className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm"
+      >
         <label className="flex flex-col gap-1 text-sm">
           이메일
           <input
