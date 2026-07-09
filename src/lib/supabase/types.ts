@@ -111,6 +111,41 @@ export type Database = {
           },
         ]
       }
+      events: {
+        Row: {
+          classroom_id: string
+          created_at: string
+          event_date: string
+          id: string
+          layer: string
+          title: string
+        }
+        Insert: {
+          classroom_id: string
+          created_at?: string
+          event_date: string
+          id?: string
+          layer: string
+          title: string
+        }
+        Update: {
+          classroom_id?: string
+          created_at?: string
+          event_date?: string
+          id?: string
+          layer?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           classroom_id: string
@@ -204,6 +239,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "students_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      timetable_slots: {
+        Row: {
+          classroom_id: string
+          created_at: string
+          day_of_week: number
+          id: string
+          period: number
+          subject: string
+        }
+        Insert: {
+          classroom_id: string
+          created_at?: string
+          day_of_week: number
+          id?: string
+          period: number
+          subject: string
+        }
+        Update: {
+          classroom_id?: string
+          created_at?: string
+          day_of_week?: number
+          id?: string
+          period?: number
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timetable_slots_classroom_id_fkey"
             columns: ["classroom_id"]
             isOneToOne: false
             referencedRelation: "classrooms"

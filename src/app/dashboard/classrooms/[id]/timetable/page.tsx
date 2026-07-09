@@ -1,0 +1,103 @@
+import { notFound, redirect } from "next/navigation";
+import { ClassroomNav } from "@/components/ClassroomNav";
+import { DAY_NAMES } from "@/lib/dates";
+import { createClient } from "@/lib/supabase/server";
+import { saveTimetable } from "./actions";
+import { DAYS, PERIODS } from "./constants";
+
+export default async function TimetablePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string; success?: string }>;
+}) {
+  const { id } = await params;
+  const { error, success } = await searchParams;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const [{ data: classroom }, { data: slots }] = await Promise.all([
+    supabase.from("classrooms").select("id, name").eq("id", id).single(),
+    supabase
+      .from("timetable_slots")
+      .select("day_of_week, period, subject")
+      .eq("classroom_id", id),
+  ]);
+
+  if (!classroom) notFound();
+
+  const subjectOf = new Map(
+    (slots ?? []).map((s) => [`${s.day_of_week}-${s.period}`, s.subject]),
+  );
+
+  return (
+    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+      <ClassroomNav classroomId={classroom.id} current="timetable" />
+
+      <header>
+        <h1 className="text-2xl font-bold">{classroom.name} 시간표</h1>
+        <p className="mt-1 text-sm text-gray-600">
+          과목을 입력하고 저장하세요. 비워두면 해당 교시는 지워집니다.
+        </p>
+      </header>
+
+      {error && (
+        <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>
+      )}
+      {success && (
+        <p className="rounded-md bg-green-50 p-3 text-sm text-green-700">
+          {success}
+        </p>
+      )}
+
+      <form action={saveTimetable} className="flex flex-col gap-4">
+        <input type="hidden" name="classroom_id" value={classroom.id} />
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr>
+                <th className="w-14 border bg-gray-50 p-2">교시</th>
+                {DAYS.map((day) => (
+                  <th key={day} className="border bg-gray-50 p-2">
+                    {DAY_NAMES[day - 1]}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {PERIODS.map((period) => (
+                <tr key={period}>
+                  <th className="border bg-gray-50 p-2 font-medium">
+                    {period}
+                  </th>
+                  {DAYS.map((day) => (
+                    <td key={day} className="border p-1">
+                      <input
+                        type="text"
+                        name={`slot_${day}_${period}`}
+                        maxLength={20}
+                        defaultValue={subjectOf.get(`${day}-${period}`) ?? ""}
+                        className="w-full min-w-16 rounded p-1.5 text-center focus:bg-blue-50"
+                      />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <button
+          type="submit"
+          className="self-start rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          시간표 저장
+        </button>
+      </form>
+    </main>
+  );
+}
