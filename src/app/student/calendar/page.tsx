@@ -83,6 +83,7 @@ export default async function StudentCalendarPage({
         </span>
       </div>
 
+      <div className="rounded-2xl border bg-white p-2 shadow-sm">
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr>
@@ -127,6 +128,7 @@ export default async function StudentCalendarPage({
           ))}
         </tbody>
       </table>
+      </div>
 
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">이번 달 일정</h2>
@@ -135,7 +137,7 @@ export default async function StudentCalendarPage({
             {events.map((e) => (
               <li
                 key={e.id}
-                className="flex items-center gap-2 rounded-lg border-2 p-2.5 text-sm"
+                className="flex items-center gap-2 rounded-xl border bg-white p-3 text-sm shadow-sm"
               >
                 <span className="shrink-0 text-gray-500">
                   {Number(e.event_date.slice(5, 7))}/{Number(e.event_date.slice(8))}

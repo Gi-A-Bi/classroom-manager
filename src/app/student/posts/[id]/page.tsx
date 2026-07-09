@@ -65,7 +65,7 @@ export default async function StudentPostPage({
       <article className="flex flex-col gap-3">
         <p className="text-sm text-gray-500">{formatDate(post.post_date)}</p>
         <h1 className="text-2xl font-bold">{post.title}</h1>
-        <div className="rounded-xl border-2 p-4 leading-relaxed whitespace-pre-wrap">
+        <div className="rounded-2xl border bg-white p-4 leading-relaxed whitespace-pre-wrap shadow-sm">
           {post.content}
         </div>
       </article>
@@ -86,10 +86,10 @@ export default async function StudentPostPage({
                     <input type="hidden" name="post_id" value={post.id} />
                     <button
                       type="submit"
-                      className={`flex w-full items-center gap-3 rounded-xl border-2 p-3.5 text-left text-base ${
+                      className={`flex w-full items-center gap-3 rounded-xl border-2 bg-white p-3.5 text-left text-base shadow-sm ${
                         checked
                           ? "border-green-500 bg-green-50"
-                          : "active:bg-gray-50"
+                          : "border-gray-200 active:bg-gray-50"
                       }`}
                     >
                       <span

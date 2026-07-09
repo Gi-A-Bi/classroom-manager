@@ -22,12 +22,15 @@ export default async function NewPinPage({
       </div>
 
       {error && (
-        <p className="rounded-xl bg-red-50 p-4 text-center text-red-700">
+        <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-center text-red-700">
           {error}
         </p>
       )}
 
-      <form action={setNewPin} className="flex flex-col gap-4">
+      <form
+        action={setNewPin}
+        className="flex flex-col gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+      >
         <label className="flex flex-col gap-1.5">
           <span className="font-medium">새 PIN (숫자 4자리)</span>
           <input
