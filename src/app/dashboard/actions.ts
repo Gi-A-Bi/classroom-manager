@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { THEMES } from "@/lib/themes";
 
 // 학급코드: 혼동하기 쉬운 문자(0/O, 1/I)를 뺀 6자리
 const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -49,9 +50,13 @@ export async function createAcademicYear(formData: FormData) {
 export async function createClassroom(formData: FormData) {
   const academicYearId = String(formData.get("academic_year_id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
+  const themeColor = String(formData.get("theme_color") ?? "blue");
 
   if (!academicYearId || !name) {
     redirect("/dashboard?error=" + encodeURIComponent("학년도와 학급 이름을 입력해주세요."));
+  }
+  if (!(themeColor in THEMES)) {
+    redirect("/dashboard?error=" + encodeURIComponent("테마 색을 선택해주세요."));
   }
 
   const supabase = await createClient();
@@ -68,6 +73,7 @@ export async function createClassroom(formData: FormData) {
       teacher_id: user.id,
       name,
       class_code: generateClassCode(),
+      theme_color: themeColor,
     });
 
     if (!error) {
