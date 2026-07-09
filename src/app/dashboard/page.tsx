@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { DAY_NAMES, dayOfWeekMon1, formatKoreanDate, todayString } from "@/lib/dates";
+import {
+  DAY_NAMES,
+  dayOfWeekMon1,
+  daysBetween,
+  formatKoreanDate,
+  todayString,
+} from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { getTheme, THEME_KEYS, THEMES } from "@/lib/themes";
 import { logout } from "../login/actions";
@@ -72,9 +78,24 @@ export default async function DashboardPage({
             .from("events")
             .select("id, classroom_id, title, layer")
             .in("classroom_id", classroomIds)
-            .eq("event_date", today),
+            .lte("event_date", today)
+            .or(`end_date.gte.${today},event_date.eq.${today}`),
         ])
       : [{ data: [] }, { data: [] }, { data: [] }];
+
+  // 히어로 D-day: 가장 가까운 다가오는 일정 (오늘 이후 시작)
+  const { data: nextEvents } =
+    classroomIds.length > 0
+      ? await supabase
+          .from("events")
+          .select("title, event_date, layer")
+          .in("classroom_id", classroomIds)
+          .gt("event_date", today)
+          .order("event_date")
+          .limit(1)
+      : { data: [] };
+  const nextEvent = nextEvents?.[0] ?? null;
+  const dday = nextEvent ? daysBetween(today, nextEvent.event_date) : null;
 
   const currentYear =
     new Date().getMonth() + 1 >= 3
@@ -83,14 +104,33 @@ export default async function DashboardPage({
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          {profile?.display_name || "선생님"}의 학급 관리
-        </h1>
+      <header className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-1.5">
+          <p className="text-sm font-medium text-gray-500">
+            {profile?.display_name || "선생님"} 선생님의 학급 관리
+          </p>
+          <h1 className="text-4xl font-extrabold tracking-tight tabular-nums">
+            {Number(today.slice(5, 7))}월 {Number(today.slice(8))}일{" "}
+            <span className="text-2xl font-bold text-gray-400">
+              {DAY_NAMES[todayDow - 1]}요일
+            </span>
+          </h1>
+          {nextEvent && dday !== null && (
+            <p className="flex items-center gap-2 text-sm">
+              <span className="rounded-lg bg-gray-900 px-2 py-0.5 font-bold tabular-nums text-white">
+                D-{dday}
+              </span>
+              <span className="font-medium">{nextEvent.title}</span>
+              <span className="text-gray-400">
+                {formatKoreanDate(nextEvent.event_date)}
+              </span>
+            </p>
+          )}
+        </div>
         <form action={logout}>
           <button
             type="submit"
-            className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+            className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
           >
             로그아웃
           </button>
@@ -105,8 +145,8 @@ export default async function DashboardPage({
 
       {classrooms.length > 0 && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-semibold text-gray-500">
-            투데이 · {formatKoreanDate(today)}
+          <h2 className="text-xs font-bold tracking-wide text-gray-400">
+            오늘의 학급
           </h2>
           {classrooms.map((c) => {
             const theme = getTheme(c.theme_color);
@@ -123,7 +163,7 @@ export default async function DashboardPage({
             return (
               <div
                 key={c.id}
-                className="overflow-hidden rounded-xl border bg-white shadow-sm"
+                className="overflow-hidden rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-md"
               >
                 <div className={`h-1.5 ${theme.topbar}`} />
                 <div className="flex flex-col gap-3 p-5">
@@ -142,7 +182,7 @@ export default async function DashboardPage({
                         <Link
                           key={key}
                           href={`/dashboard/classrooms/${c.id}/${key}`}
-                          className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-50"
+                          className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-50"
                         >
                           {label}
                         </Link>
@@ -178,14 +218,18 @@ export default async function DashboardPage({
                             key={s.period}
                             className={`rounded-lg px-2.5 py-1 ${theme.soft}`}
                           >
-                            <span className="text-gray-500">{s.period}</span>{" "}
+                            <span className={`font-bold tabular-nums ${theme.text}`}>
+                              {s.period}
+                            </span>{" "}
                             <span className="font-medium">{s.subject}</span>
                           </li>
                         ))}
                       </ol>
                     ) : (
                       <span className="text-gray-400">
-                        {isWeekday ? "아직 입력 전" : "주말"}
+                        {isWeekday
+                          ? "✏️ 아직 시간표가 없어요 — 시간표 탭에서 입력해보세요"
+                          : "🌤️ 주말이에요"}
                       </span>
                     )}
                   </div>
@@ -211,7 +255,9 @@ export default async function DashboardPage({
                         ))}
                       </ul>
                     ) : (
-                      <span className="text-gray-400">아직 없음</span>
+                      <span className="text-gray-400">
+                        📝 아직 알림장이 없어요 — 오늘 첫 알림장을 써보세요
+                      </span>
                     )}
                   </div>
                 </div>
@@ -222,7 +268,9 @@ export default async function DashboardPage({
       )}
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold text-gray-500">학급 관리</h2>
+        <h2 className="text-xs font-bold tracking-wide text-gray-400">
+          학급 관리
+        </h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
             <h3 className="font-semibold">학년도 등록</h3>
@@ -291,7 +339,7 @@ export default async function DashboardPage({
                           className="peer sr-only"
                         />
                         <span
-                          className={`block h-8 w-8 rounded-full ${THEMES[key].swatch} ring-offset-2 peer-checked:ring-2 peer-checked:ring-gray-800`}
+                          className={`block h-8 w-8 rounded-full ${THEMES[key].swatch} ring-offset-2 transition-transform hover:scale-110 peer-checked:ring-2 peer-checked:ring-gray-800`}
                         />
                       </label>
                     ))}

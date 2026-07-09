@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { DAY_NAMES, dayOfWeekMon1, todayString } from "@/lib/dates";
+import {
+  DAY_NAMES,
+  dayOfWeekMon1,
+  daysBetween,
+  formatMonthDay,
+  todayString,
+} from "@/lib/dates";
 import { getStudentSession } from "@/lib/student-auth";
 import { createStudentClient } from "@/lib/supabase/student";
 import { getTheme } from "@/lib/themes";
@@ -46,7 +52,11 @@ export default async function StudentHomePage() {
           .eq("day_of_week", todayDow)
           .order("period")
       : Promise.resolve({ data: [] as { period: number; subject: string }[] }),
-    supabase.from("events").select("id, title, layer").eq("event_date", today),
+    supabase
+      .from("events")
+      .select("id, title, layer")
+      .lte("event_date", today)
+      .or(`end_date.gte.${today},event_date.eq.${today}`),
     supabase
       .from("post_reads")
       .select("post_id")
@@ -55,6 +65,16 @@ export default async function StudentHomePage() {
 
   // 학급이 조회되지 않으면 세션이 낡은 것 (학급 삭제 등)
   if (!classroom) redirect("/student/login");
+
+  // 다가오는 일정 D-day
+  const { data: nextEvents } = await supabase
+    .from("events")
+    .select("title, event_date")
+    .gt("event_date", today)
+    .order("event_date")
+    .limit(1);
+  const nextEvent = nextEvents?.[0] ?? null;
+  const dday = nextEvent ? daysBetween(today, nextEvent.event_date) : null;
 
   const theme = getTheme(classroom.theme_color);
   const readSet = new Set((myReads ?? []).map((r) => r.post_id));
@@ -67,23 +87,40 @@ export default async function StudentHomePage() {
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col gap-4 p-4">
       <header className={`overflow-hidden rounded-2xl ${theme.soft}`}>
         <div className={`h-1.5 ${theme.topbar}`} />
-        <div className="flex items-center justify-between px-4 py-3">
-          <div>
-            <h1 className={`text-xl font-bold ${theme.text}`}>
-              {classroom.name}
-            </h1>
-            <p className="text-sm text-gray-600">
-              {session.number}번 {session.nickname}
+        <div className="flex flex-col gap-2 px-4 pt-3 pb-4">
+          <div className="flex items-center justify-between">
+            <p className={`font-bold ${theme.text}`}>
+              {classroom.name} ·{" "}
+              <span className="font-medium">
+                {session.number}번 {session.nickname}
+              </span>
             </p>
+            <form action={studentLogout}>
+              <button
+                type="submit"
+                className="rounded-lg bg-white/70 px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-white"
+              >
+                나가기
+              </button>
+            </form>
           </div>
-          <form action={studentLogout}>
-            <button
-              type="submit"
-              className="rounded-lg bg-white/70 px-3 py-1.5 text-sm text-gray-600"
-            >
-              나가기
-            </button>
-          </form>
+          <h1 className="text-3xl font-extrabold tracking-tight tabular-nums">
+            {Number(today.slice(5, 7))}월 {Number(today.slice(8))}일{" "}
+            <span className="text-xl font-bold text-gray-400">
+              {DAY_NAMES[todayDow - 1]}요일
+            </span>
+          </h1>
+          {nextEvent && dday !== null && (
+            <p className="flex items-center gap-2 text-sm">
+              <span className="rounded-lg bg-gray-900 px-2 py-0.5 font-bold tabular-nums text-white">
+                D-{dday}
+              </span>
+              <span className="font-medium">{nextEvent.title}</span>
+              <span className="text-gray-500 tabular-nums">
+                {formatMonthDay(nextEvent.event_date)}
+              </span>
+            </p>
+          )}
         </div>
       </header>
 
@@ -109,14 +146,18 @@ export default async function StudentHomePage() {
                 key={s.period}
                 className={`rounded-lg px-2.5 py-1.5 text-sm ${theme.soft}`}
               >
-                <span className="text-gray-500">{s.period}</span>{" "}
+                <span className={`font-bold tabular-nums ${theme.text}`}>
+                  {s.period}
+                </span>{" "}
                 <span className="font-semibold">{s.subject}</span>
               </li>
             ))}
           </ol>
         ) : (
           <p className="text-sm text-gray-400">
-            {isWeekday ? "오늘 시간표가 아직 없어요." : "오늘은 쉬는 날이에요!"}
+            {isWeekday
+              ? "📭 오늘 시간표가 아직 없어요."
+              : "🌤️ 오늘은 쉬는 날이에요!"}
           </p>
         )}
         {todayEvents && todayEvents.length > 0 && (
@@ -140,7 +181,7 @@ export default async function StudentHomePage() {
       {todayPost && (
         <Link
           href={`/student/posts/${todayPost.id}`}
-          className="flex flex-col gap-1 rounded-2xl border-2 border-blue-200 bg-white p-4 shadow-sm active:bg-blue-50"
+          className="flex flex-col gap-1 rounded-2xl border-2 border-blue-200 bg-white p-4 shadow-sm transition-all hover:shadow-md active:bg-blue-50"
         >
           <span className="flex items-center gap-2 text-sm font-bold text-blue-700">
             오늘 알림장
@@ -165,7 +206,7 @@ export default async function StudentHomePage() {
               <li key={p.id}>
                 <Link
                   href={`/student/posts/${p.id}`}
-                  className="flex items-center justify-between gap-2 rounded-xl border bg-white p-3.5 shadow-sm active:bg-gray-50"
+                  className="flex items-center justify-between gap-2 rounded-xl border bg-white p-3.5 shadow-sm transition-all hover:shadow-md active:bg-gray-50"
                 >
                   <span className="flex items-center gap-2 font-medium">
                     {p.title}
@@ -184,8 +225,10 @@ export default async function StudentHomePage() {
           </ul>
         ) : (
           !todayPost && (
-            <p className="rounded-xl border-2 border-dashed p-5 text-center text-sm text-gray-400">
-              아직 알림장이 없어요.
+            <p className="rounded-xl border-2 border-dashed p-6 text-center text-sm text-gray-400">
+              📮 아직 알림장이 없어요.
+              <br />
+              선생님이 쓰면 여기에 나타나요!
             </p>
           )
         )}

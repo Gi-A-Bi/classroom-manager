@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import {
   addMonths,
   DAY_NAMES,
+  dateRange,
+  formatMonthDay,
+  monthEndString,
   monthGrid,
   monthString,
   parseMonth,
@@ -28,6 +31,8 @@ export default async function StudentCalendarPage({
 
   const { year, monthIndex } = parseMonth(month);
   const thisMonth = monthString(year, monthIndex);
+  const monthStart = `${thisMonth}-01`;
+  const monthEnd = monthEndString(year, monthIndex);
   const prev = addMonths(year, monthIndex, -1);
   const next = addMonths(year, monthIndex, 1);
   const weeks = monthGrid(year, monthIndex);
@@ -36,16 +41,22 @@ export default async function StudentCalendarPage({
   const supabase = createStudentClient(session.token);
   const { data: events } = await supabase
     .from("events")
-    .select("id, title, event_date, layer")
-    .gte("event_date", `${thisMonth}-01`)
-    .lte("event_date", `${thisMonth}-31`)
+    .select("id, title, event_date, end_date, layer")
+    .lte("event_date", monthEnd)
+    .or(`end_date.gte.${monthStart},event_date.gte.${monthStart}`)
     .order("event_date");
 
+  // 기간 일정은 해당 기간의 모든 날짜에 표시
   const eventsByDate = new Map<string, NonNullable<typeof events>>();
   for (const e of events ?? []) {
-    const list = eventsByDate.get(e.event_date) ?? [];
-    list.push(e);
-    eventsByDate.set(e.event_date, list);
+    const from = e.event_date < monthStart ? monthStart : e.event_date;
+    const rawTo = e.end_date ?? e.event_date;
+    const to = rawTo > monthEnd ? monthEnd : rawTo;
+    for (const date of dateRange(from, to)) {
+      const list = eventsByDate.get(date) ?? [];
+      list.push(e);
+      eventsByDate.set(date, list);
+    }
   }
 
   return (
@@ -139,8 +150,9 @@ export default async function StudentCalendarPage({
                 key={e.id}
                 className="flex items-center gap-2 rounded-xl border bg-white p-3 text-sm shadow-sm"
               >
-                <span className="shrink-0 text-gray-500">
-                  {Number(e.event_date.slice(5, 7))}/{Number(e.event_date.slice(8))}
+                <span className="shrink-0 font-bold tabular-nums text-gray-600">
+                  {formatMonthDay(e.event_date)}
+                  {e.end_date && `~${formatMonthDay(e.end_date)}`}
                 </span>
                 <span
                   className={`shrink-0 rounded px-1.5 py-0.5 text-xs ${LAYER_STYLE[e.layer as keyof typeof LAYER_STYLE]}`}
@@ -152,8 +164,8 @@ export default async function StudentCalendarPage({
             ))}
           </ul>
         ) : (
-          <p className="rounded-xl border-2 border-dashed p-4 text-center text-sm text-gray-500">
-            이번 달 일정이 없어요.
+          <p className="rounded-xl border-2 border-dashed p-6 text-center text-sm text-gray-400">
+            🗓️ 이번 달 일정이 없어요.
           </p>
         )}
       </section>

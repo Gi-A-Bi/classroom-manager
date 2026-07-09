@@ -86,15 +86,15 @@ export default async function StudentPostPage({
                     <input type="hidden" name="post_id" value={post.id} />
                     <button
                       type="submit"
-                      className={`flex w-full items-center gap-3 rounded-xl border-2 bg-white p-3.5 text-left text-base shadow-sm ${
+                      className={`flex w-full items-center gap-3 rounded-xl border-2 bg-white p-3.5 text-left text-base shadow-sm transition-all duration-200 ${
                         checked
                           ? "border-green-500 bg-green-50"
-                          : "border-gray-200 active:bg-gray-50"
+                          : "border-gray-200 hover:border-gray-300 active:bg-gray-50"
                       }`}
                     >
                       <span
                         aria-hidden
-                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 text-sm font-bold ${
+                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 text-sm font-bold transition-colors duration-200 ${
                           checked
                             ? "border-green-500 bg-green-500 text-white"
                             : "border-gray-300"

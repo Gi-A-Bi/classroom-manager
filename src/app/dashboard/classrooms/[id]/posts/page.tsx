@@ -188,7 +188,13 @@ export default async function ClassroomPostsPage({
                   {totalStudents > 0 && (
                     <div className="flex flex-col gap-1.5 border-t pt-3">
                       <span className="text-sm font-medium">
-                        읽음 {readCount}/{totalStudents}
+                        읽음{" "}
+                        <strong
+                          className={`tabular-nums ${readCount === totalStudents ? "text-green-600" : "text-blue-700"}`}
+                        >
+                          {readCount}
+                        </strong>
+                        <span className="text-gray-400">/{totalStudents}</span>
                       </span>
                       <div className="flex flex-wrap gap-1">
                         {students!.map((s) => {
@@ -240,7 +246,10 @@ export default async function ClassroomPostsPage({
             })}
           </ul>
         ) : (
-          <p className="text-sm text-gray-500">아직 작성한 알림장이 없습니다.</p>
+          <p className="rounded-xl border-2 border-dashed p-8 text-center text-sm text-gray-400">
+            📝 아직 알림장이 없습니다.
+            <br />첫 알림장을 쓰면 학생들 화면에 바로 나타나요.
+          </p>
         )}
       </section>
     </main>
