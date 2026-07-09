@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ClassroomNav } from "@/components/ClassroomNav";
 import { createClient } from "@/lib/supabase/server";
 import { createPost } from "./actions";
 
@@ -49,17 +49,7 @@ export default async function ClassroomPostsPage({
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <nav className="flex gap-4 text-sm">
-        <Link href="/dashboard" className="text-blue-600 underline">
-          ← 대시보드로
-        </Link>
-        <Link
-          href={`/dashboard/classrooms/${classroom.id}/students`}
-          className="text-blue-600 underline"
-        >
-          학생 명렬 보기
-        </Link>
-      </nav>
+      <ClassroomNav classroomId={classroom.id} current="posts" />
 
       <header>
         <h1 className="text-2xl font-bold">{classroom.name} 알림장</h1>
