@@ -10,7 +10,13 @@ export default async function LoginPage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 p-6">
-      <h1 className="text-2xl font-bold">교사 로그인</h1>
+      <div className="text-center">
+        <p className="text-5xl">🏫</p>
+        <h1 className="mt-2 text-2xl font-extrabold">교사 로그인</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          우리 반을 만들고 운영하는 공간이에요.
+        </p>
+      </div>
 
       {error && (
         <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">

@@ -109,7 +109,7 @@ export default async function ClassroomPostsPage({
       )}
 
       <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">알림장 쓰기</h2>
+        <h2 className="font-semibold">✏️ 알림장 쓰기</h2>
         <form action={createPost} className="flex flex-col gap-3">
           <input type="hidden" name="classroom_id" value={classroom.id} />
           <div className="flex gap-2">
@@ -163,7 +163,13 @@ export default async function ClassroomPostsPage({
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">작성한 알림장 {posts?.length ?? 0}개</h2>
+        <h2 className="font-semibold">
+          📚 작성한 알림장{" "}
+          <span className="tabular-nums text-blue-700">
+            {posts?.length ?? 0}
+          </span>
+          개
+        </h2>
         {posts && posts.length > 0 ? (
           <ul className="flex flex-col gap-3">
             {posts.map((p) => {

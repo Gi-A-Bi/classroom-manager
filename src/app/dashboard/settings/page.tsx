@@ -55,7 +55,7 @@ export default async function SettingsPage({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
-          <h2 className="font-semibold">학년도 등록</h2>
+          <h2 className="font-semibold">🗓️ 학년도 등록</h2>
           <form action={createAcademicYear} className="flex items-end gap-2">
             <label className="flex flex-col gap-1 text-sm">
               연도
@@ -82,7 +82,7 @@ export default async function SettingsPage({
         </section>
 
         <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
-          <h2 className="font-semibold">학급 만들기</h2>
+          <h2 className="font-semibold">🏫 학급 만들기</h2>
           {years && years.length > 0 ? (
             <form action={createClassroom} className="flex flex-col gap-3">
               <div className="flex items-end gap-2">
@@ -149,7 +149,7 @@ export default async function SettingsPage({
 
       <section className="flex flex-col gap-3">
         <h2 className="text-xs font-bold tracking-wide text-gray-400">
-          전체 학급
+          📚 전체 학급
         </h2>
         {years?.flatMap((y) =>
           y.classrooms.map((c) => {

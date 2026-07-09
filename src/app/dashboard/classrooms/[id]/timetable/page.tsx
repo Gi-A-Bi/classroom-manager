@@ -3,6 +3,7 @@ import { ClassroomHeader } from "@/components/ClassroomHeader";
 import { ClassroomNav } from "@/components/ClassroomNav";
 import { DAY_NAMES } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
+import { getTheme } from "@/lib/themes";
 import { saveTimetable, setPeriodsPerDay } from "./actions";
 import { DAYS, MAX_PERIODS, MIN_PERIODS } from "./constants";
 
@@ -36,6 +37,7 @@ export default async function TimetablePage({
 
   if (!classroom) notFound();
 
+  const theme = getTheme(classroom.theme_color);
   const periods = Array.from(
     { length: classroom.periods_per_day },
     (_, i) => i + 1,
@@ -106,9 +108,14 @@ export default async function TimetablePage({
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr>
-                <th className="w-14 border bg-gray-50 p-2">교시</th>
+                <th className={`w-14 border p-2 ${theme.soft} ${theme.text}`}>
+                  교시
+                </th>
                 {DAYS.map((day) => (
-                  <th key={day} className="border bg-gray-50 p-2">
+                  <th
+                    key={day}
+                    className={`border p-2 ${theme.soft} ${theme.text}`}
+                  >
                     {DAY_NAMES[day - 1]}
                   </th>
                 ))}
@@ -117,7 +124,9 @@ export default async function TimetablePage({
             <tbody>
               {periods.map((period) => (
                 <tr key={period}>
-                  <th className="border bg-gray-50 p-2 font-medium">
+                  <th
+                    className={`border bg-gray-50 p-2 font-bold tabular-nums ${theme.text}`}
+                  >
                     {period}
                   </th>
                   {DAYS.map((day) => (

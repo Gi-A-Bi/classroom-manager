@@ -7,16 +7,10 @@ import {
   formatKoreanDate,
   todayString,
 } from "@/lib/dates";
+import { CLASSROOM_MENU } from "@/components/ClassroomNav";
 import { createClient } from "@/lib/supabase/server";
-import { getTheme } from "@/lib/themes";
+import { getTheme, pastelChip } from "@/lib/themes";
 import { logout } from "../login/actions";
-
-const CLASSROOM_MENU = [
-  ["posts", "알림장"],
-  ["students", "학생 명렬"],
-  ["timetable", "시간표"],
-  ["calendar", "캘린더"],
-] as const;
 
 export default async function DashboardPage({
   searchParams,
@@ -205,14 +199,14 @@ export default async function DashboardPage({
                         </code>
                       </span>
                     </h3>
-                    <nav className="flex gap-1">
-                      {CLASSROOM_MENU.map(([key, label]) => (
+                    <nav className="flex flex-wrap gap-1.5">
+                      {CLASSROOM_MENU.map((m) => (
                         <Link
-                          key={key}
-                          href={`/dashboard/classrooms/${c.id}/${key}`}
-                          className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-50"
+                          key={m.key}
+                          href={`/dashboard/classrooms/${c.id}/${m.key}`}
+                          className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${m.pill}`}
                         >
-                          {label}
+                          {m.label}
                         </Link>
                       ))}
                     </nav>
@@ -241,14 +235,12 @@ export default async function DashboardPage({
                     </span>
                     {isWeekday && slots.length > 0 ? (
                       <ol className="flex flex-wrap gap-1.5">
-                        {slots.map((s) => (
+                        {slots.map((s, i) => (
                           <li
                             key={s.period}
-                            className={`rounded-lg px-2.5 py-1 ${theme.soft}`}
+                            className={`rounded-xl px-2.5 py-1 ${pastelChip(i)}`}
                           >
-                            <span
-                              className={`font-bold tabular-nums ${theme.text}`}
-                            >
+                            <span className="font-bold tabular-nums">
                               {s.period}
                             </span>{" "}
                             <span className="font-medium">{s.subject}</span>

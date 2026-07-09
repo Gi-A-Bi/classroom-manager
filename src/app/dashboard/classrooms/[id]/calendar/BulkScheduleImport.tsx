@@ -34,7 +34,7 @@ export function BulkScheduleImport({
   return (
     <details className="rounded-xl border bg-white shadow-sm open:pb-5">
       <summary className="cursor-pointer px-5 py-4 font-semibold transition-colors hover:bg-gray-50">
-        학사일정 붙여넣기{" "}
+        📎 학사일정 붙여넣기{" "}
         <span className="text-sm font-normal text-gray-500">
           한글·엑셀 표를 복사해서 한 번에 등록
         </span>

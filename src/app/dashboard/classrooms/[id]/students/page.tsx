@@ -60,7 +60,7 @@ export default async function StudentsPage({
       )}
 
       <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">명렬 일괄 등록</h2>
+        <h2 className="font-semibold">📋 명렬 일괄 등록</h2>
         <p className="text-sm text-gray-600">
           한 줄에 한 명씩 「번호 이름」 형식으로 붙여넣어 주세요. 이름 대신
           별명을 써도 됩니다.
@@ -97,7 +97,11 @@ export default async function StudentsPage({
 
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">
-          등록된 학생 {students?.length ?? 0}명
+          🧑‍🏫 등록된 학생{" "}
+          <span className="tabular-nums text-blue-700">
+            {students?.length ?? 0}
+          </span>
+          명
         </h2>
         {students && students.length > 0 ? (
           <ul className="flex flex-col gap-1.5">

@@ -117,7 +117,7 @@ export default async function CalendarPage({
       )}
 
       <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">일정 등록</h2>
+        <h2 className="font-semibold">📌 일정 등록</h2>
         <form action={createEvent} className="flex flex-wrap items-end gap-3">
           <input type="hidden" name="classroom_id" value={classroom.id} />
           <input type="hidden" name="month" value={thisMonth} />
@@ -177,7 +177,7 @@ export default async function CalendarPage({
       <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-semibold">
-            학부모 공유 링크{" "}
+            🔗 학부모 공유 링크{" "}
             <span className="text-sm font-normal text-gray-500">
               로그인 없이 캘린더만 볼 수 있는 읽기 전용 주소
             </span>
@@ -260,8 +260,13 @@ export default async function CalendarPage({
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr>
-                {DAY_NAMES.map((name) => (
-                  <th key={name} className="border bg-gray-50 p-2">
+                {DAY_NAMES.map((name, i) => (
+                  <th
+                    key={name}
+                    className={`border bg-gray-50 p-2 ${
+                      i === 5 ? "text-blue-600" : i === 6 ? "text-red-500" : ""
+                    }`}
+                  >
                     {name}
                   </th>
                 ))}

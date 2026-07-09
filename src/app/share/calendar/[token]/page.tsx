@@ -136,8 +136,13 @@ export default async function SharedCalendarPage({
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr>
-              {DAY_NAMES.map((name) => (
-                <th key={name} className="border bg-gray-50 p-1 text-xs">
+              {DAY_NAMES.map((name, i) => (
+                <th
+                  key={name}
+                  className={`border bg-gray-50 p-1 text-xs ${
+                    i === 5 ? "text-blue-600" : i === 6 ? "text-red-500" : ""
+                  }`}
+                >
                   {name}
                 </th>
               ))}
