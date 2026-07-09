@@ -15,11 +15,18 @@ M1 — 수직 조각 (진행 중)
   Supabase CLI(dev 의존성) + `supabase start` 로컬 스택 기동
 - 2026-07-09: M1 핵심 스키마 + RLS 마이그레이션 작성·적용·검증 완료
   (20260709014218_m1_core_schema.sql — 테넌트 격리/학생 조회/쓰기 차단 테스트 통과)
+- 2026-07-09: Supabase 클라이언트 유틸(@supabase/ssr) + 세션 갱신 proxy.ts
+  (Next 16은 middleware.ts가 proxy.ts로 개명됨)
+- 2026-07-09: 교사 회원가입/로그인/로그아웃 (+비로그인 /dashboard 접근 차단)
+- 2026-07-09: 대시보드 — 학년도 등록, 학급 생성(학급코드 6자리 자동 발급)
+- 2026-07-09: 학생 명렬 일괄 등록 ("번호 이름" 여러 줄 붙여넣기, 초기 PIN 공통
+  bcrypt 해시, 형식·중복 검증) — 브라우저 E2E 흐름 전체 확인 완료
 
 ## 다음 할 것
-1. Supabase 클라이언트 유틸 작성 (@supabase/ssr, RLS 적용 클라이언트)
-2. 교사 이메일 인증 (가입/로그인 UI)
-3. 학생 커스텀 인증 (학급코드+번호+PIN → JWT 발급, app_role/classroom_id/student_id 클레임)
+1. 학생 커스텀 인증 (학급코드+번호+PIN 로그인 → 커스텀 JWT 발급,
+   app_role/classroom_id/student_id 클레임, service_role은 서버 라우트에서만)
+2. 알림장 작성(교사)/조회(학생) — M1 수직 조각 완성
+3. UI 다듬기 (카드 레이아웃, 모바일 대응)
 
 ## 메모 / 결정 사항
 - import alias는 `@/*`, 소스는 `src/` 디렉토리 사용
@@ -34,3 +41,5 @@ M1 — 수직 조각 (진행 중)
 - Windows 제약: analytics 비활성화(config.toml), `supabase start --ignore-health-check` 사용,
   `db reset` 실패 시 `stop --no-backup` 후 재시작으로 대체
 - 로컬 키는 `.env.local`(gitignore됨), service_role 키는 NEXT_PUBLIC_ 접두사 금지
+- WSL2 설치 후 Windows가 3000번대 포트를 예약 → 개발 서버는 3300 포트 사용
+- 명렬 붙여넣기의 이름은 nickname 컬럼에 저장 (개인정보 최소화 — 실명 필수 아님)
