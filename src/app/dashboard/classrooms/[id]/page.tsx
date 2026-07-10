@@ -120,15 +120,33 @@ export default async function ClassroomHomePage({
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-5 p-6">
-      {/* 헤더 */}
+      {/* 헤더 — 큰 제목 + 손그림 밑줄(테마색) */}
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
           <span className="text-sm font-medium text-ink-faint">
             {classroom.academic_years?.name ?? ""}
           </span>
-          <h1 className="font-display text-[34px] leading-none tracking-tight text-ink">
-            {classroom.name}
-          </h1>
+          <div className="relative inline-block pb-2">
+            <h1 className="font-display text-5xl leading-none tracking-tight text-ink">
+              {classroom.name}
+            </h1>
+            {/* 손으로 그은 듯한 밑줄 */}
+            <svg
+              className={`absolute -bottom-0.5 left-0 w-full ${theme.text}`}
+              height="9"
+              viewBox="0 0 200 9"
+              preserveAspectRatio="none"
+              fill="none"
+              aria-hidden
+            >
+              <path
+                d="M3 5.5 Q 45 1.5 90 4.5 T 175 4 T 197 3.5"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
         </div>
         <CopyCodeChip code={classroom.class_code} />
       </header>
@@ -233,9 +251,15 @@ export default async function ClassroomHomePage({
         {/* 이번 달 달력 */}
         <div className="flex flex-col gap-2 md:col-span-2">
           <div className="flex items-baseline justify-between">
-            <h2 className="font-display text-xl text-ink">
-              {monthIndex + 1}월
-              <span className="ml-1.5 font-sans text-sm font-normal text-ink-faint">
+            <h2 className="font-display text-4xl leading-none text-ink">
+              <span className="relative inline-block">
+                <span
+                  aria-hidden
+                  className={`absolute inset-x-[-2px] bottom-0.5 -z-10 h-3.5 -rotate-1 rounded-sm ${theme.soft}`}
+                />
+                {monthIndex + 1}월
+              </span>
+              <span className="ml-2 font-sans text-sm font-normal text-ink-faint">
                 {year}
               </span>
             </h2>
@@ -317,7 +341,9 @@ export default async function ClassroomHomePage({
         {/* 최근 알림장 */}
         <div className="flex flex-col gap-2">
           <div className="flex items-baseline justify-between">
-            <h2 className="font-display text-xl text-ink">최근 알림장</h2>
+            <h2 className="font-display text-2xl leading-none text-ink">
+              최근 알림장
+            </h2>
             <Link
               href={`${base}/posts`}
               className="text-sm text-ink-soft transition-colors hover:text-ink"
