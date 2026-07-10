@@ -133,12 +133,20 @@ export default async function StudentHomePage() {
               {DAY_NAMES[todayDow - 1]}요일
             </span>
           </h2>
-          <Link
-            href="/student/calendar"
-            className="text-sm font-medium text-blue-700 underline underline-offset-2"
-          >
-            🗓️ 캘린더
-          </Link>
+          <span className="flex gap-3">
+            <Link
+              href="/student/seats"
+              className="text-sm font-medium text-blue-700 underline underline-offset-2"
+            >
+              🪑 자리
+            </Link>
+            <Link
+              href="/student/calendar"
+              className="text-sm font-medium text-blue-700 underline underline-offset-2"
+            >
+              🗓️ 캘린더
+            </Link>
+          </span>
         </div>
         {isWeekday && todaySlots && todaySlots.length > 0 ? (
           <ol className="flex flex-wrap gap-1.5">
