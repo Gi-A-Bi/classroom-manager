@@ -56,7 +56,7 @@ export default async function ToolsDrawerPage({
         title="도구"
         themeColor={classroom.theme_color}
       />
-      <p className="-mt-3 text-sm text-gray-500">
+      <p className="-mt-3 text-sm text-ink-soft">
         자주 쓰는 외부 프로그램(자리바꾸기·타이머·퀴즈 등) 링크를 카드로 모아두는
         서랍이에요. 카드는 모든 학급에서 함께 쓰여요.
       </p>
@@ -68,15 +68,15 @@ export default async function ToolsDrawerPage({
       )}
 
       {/* 등록/수정 폼 */}
-      <section className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">
-          {editing ? "✏️ 카드 수정" : "➕ 링크 카드 추가"}
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <h2 className="font-semibold text-ink">
+          {editing ? "카드 수정" : "링크 카드 추가"}
         </h2>
         <form action={editing ? updateTool : addTool} className="flex flex-col gap-3">
           <input type="hidden" name="classroom_id" value={classroom.id} />
           {editing && <input type="hidden" name="tool_id" value={editing.id} />}
           <div className="flex flex-wrap gap-3">
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1 text-sm text-ink-soft">
               이름
               <input
                 type="text"
@@ -84,10 +84,10 @@ export default async function ToolsDrawerPage({
                 required
                 defaultValue={editing?.name ?? ""}
                 placeholder="자리바꾸기"
-                className="w-40 rounded-lg border p-2"
+                className="w-40 rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
               />
             </label>
-            <label className="flex min-w-52 flex-1 flex-col gap-1 text-sm">
+            <label className="flex min-w-52 flex-1 flex-col gap-1 text-sm text-ink-soft">
               주소(URL)
               <input
                 type="url"
@@ -95,21 +95,21 @@ export default async function ToolsDrawerPage({
                 required
                 defaultValue={editing?.url ?? ""}
                 placeholder="https://..."
-                className="rounded-lg border p-2"
+                className="rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
               />
             </label>
           </div>
-          <label className="flex flex-col gap-1 text-sm">
-            설명 <span className="text-xs text-gray-400">(선택)</span>
+          <label className="flex flex-col gap-1 text-sm text-ink-soft">
+            설명 <span className="text-xs text-ink-faint">(선택)</span>
             <input
               type="text"
               name="description"
               defaultValue={editing?.description ?? ""}
               placeholder="제비뽑기로 자리 정하기"
-              className="rounded-lg border p-2"
+              className="rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
             />
           </label>
-          <fieldset className="flex flex-col gap-1.5 text-sm">
+          <fieldset className="flex flex-col gap-1.5 text-sm text-ink-soft">
             <legend className="mb-1">아이콘 색</legend>
             <div className="flex flex-wrap gap-2">
               {THEME_KEYS.map((key, i) => (
@@ -124,7 +124,7 @@ export default async function ToolsDrawerPage({
                     className="peer sr-only"
                   />
                   <span
-                    className={`block h-8 w-8 rounded-full ${THEMES[key].swatch} ring-offset-2 transition-transform hover:scale-110 peer-checked:ring-2 peer-checked:ring-gray-800`}
+                    className={`block h-8 w-8 rounded-full ${THEMES[key].swatch} ring-offset-2 transition-transform hover:scale-110 peer-checked:ring-2 peer-checked:ring-ink`}
                   />
                 </label>
               ))}
@@ -133,14 +133,14 @@ export default async function ToolsDrawerPage({
           <div className="flex gap-2">
             <button
               type="submit"
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="rounded-lg bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
             >
               {editing ? "수정 저장" : "추가"}
             </button>
             {editing && (
               <a
                 href={`/dashboard/classrooms/${classroom.id}/tools`}
-                className="rounded-lg border px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+                className="rounded-lg border border-line px-4 py-2 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
               >
                 취소
               </a>
@@ -151,7 +151,7 @@ export default async function ToolsDrawerPage({
 
       {/* 카드 목록 */}
       <section className="flex flex-col gap-2">
-        <h2 className="text-xs font-bold tracking-wide text-gray-400">
+        <h2 className="text-xs font-bold tracking-wide text-ink-faint">
           등록된 도구 {list.length}개
           {favCount > 0 && ` · 즐겨찾기 ${favCount}`}
         </h2>
@@ -162,7 +162,7 @@ export default async function ToolsDrawerPage({
               return (
                 <li
                   key={tool.id}
-                  className="flex flex-col gap-2 rounded-xl border bg-white p-4 shadow-sm"
+                  className="flex flex-col gap-2 rounded-xl border border-line bg-paper p-4"
                 >
                   <div className="flex items-start gap-3">
                     <a
@@ -177,15 +177,15 @@ export default async function ToolsDrawerPage({
                         🔗
                       </span>
                       <span className="min-w-0">
-                        <span className="block font-semibold hover:underline">
+                        <span className="block font-semibold text-ink hover:underline">
                           {tool.name} ↗
                         </span>
                         {tool.description && (
-                          <span className="block text-sm text-gray-500">
+                          <span className="block text-sm text-ink-soft">
                             {tool.description}
                           </span>
                         )}
-                        <span className="block truncate text-xs text-gray-400">
+                        <span className="block truncate text-xs text-ink-faint">
                           {tool.url}
                         </span>
                       </span>
@@ -200,7 +200,7 @@ export default async function ToolsDrawerPage({
                             type="submit"
                             disabled={i === 0}
                             title="위로"
-                            className="rounded-md px-1.5 py-1 text-gray-400 transition-colors hover:bg-gray-50 disabled:opacity-30"
+                            className="rounded-md px-1.5 py-1 text-ink-faint transition-colors hover:bg-paper-soft disabled:opacity-30"
                           >
                             ↑
                           </button>
@@ -213,7 +213,7 @@ export default async function ToolsDrawerPage({
                             type="submit"
                             disabled={i === list.length - 1}
                             title="아래로"
-                            className="rounded-md px-1.5 py-1 text-gray-400 transition-colors hover:bg-gray-50 disabled:opacity-30"
+                            className="rounded-md px-1.5 py-1 text-ink-faint transition-colors hover:bg-paper-soft disabled:opacity-30"
                           >
                             ↓
                           </button>
@@ -221,7 +221,7 @@ export default async function ToolsDrawerPage({
                         <a
                           href={`/dashboard/classrooms/${classroom.id}/tools?edit=${tool.id}`}
                           title="수정"
-                          className="rounded-md px-2 py-1 text-sm text-gray-500 transition-colors hover:bg-gray-50"
+                          className="rounded-md px-2 py-1 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
                         >
                           수정
                         </a>
@@ -231,7 +231,7 @@ export default async function ToolsDrawerPage({
                           <button
                             type="submit"
                             title="삭제"
-                            className="rounded-md px-2 py-1 text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500"
+                            className="rounded-md px-2 py-1 text-ink-faint transition-colors hover:bg-red-50 hover:text-red-500"
                           >
                             ×
                           </button>
@@ -240,7 +240,7 @@ export default async function ToolsDrawerPage({
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 border-t pt-2">
+                  <div className="flex flex-wrap gap-2 border-t border-line pt-2">
                     <form action={toggleVisible}>
                       <input type="hidden" name="classroom_id" value={classroom.id} />
                       <input type="hidden" name="tool_id" value={tool.id} />
@@ -250,7 +250,7 @@ export default async function ToolsDrawerPage({
                         className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                           tool.is_student_visible
                             ? "bg-green-100 text-green-700"
-                            : "border bg-white text-gray-500 hover:bg-gray-50"
+                            : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
                         }`}
                       >
                         {tool.is_student_visible ? "✓ 학생에게 보임" : "학생에게 보이기"}
@@ -265,7 +265,7 @@ export default async function ToolsDrawerPage({
                         className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                           tool.is_favorite
                             ? "bg-amber-100 text-amber-700"
-                            : "border bg-white text-gray-500 hover:bg-gray-50"
+                            : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
                         }`}
                       >
                         {tool.is_favorite ? "★ 즐겨찾기" : "☆ 즐겨찾기"}
@@ -277,11 +277,11 @@ export default async function ToolsDrawerPage({
             })}
           </ul>
         ) : (
-          <p className="rounded-xl border-2 border-dashed p-8 text-center text-sm text-gray-400">
-            🧰 첫 링크 카드를 추가해보세요.
+          <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-8 text-center font-hand text-base text-ink-soft">
+            첫 링크 카드를 추가해보세요.
           </p>
         )}
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-ink-faint">
           즐겨찾기한 카드는 대시보드 투데이 뷰에 바로가기로 나와요(최대 2개).
           학생에게 보이기를 켜면 학생 홈에 버튼이 생겨요.
         </p>

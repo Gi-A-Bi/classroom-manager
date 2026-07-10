@@ -11,7 +11,7 @@ const CATEGORY_STYLE: Record<string, string> = {
   상담: "bg-purple-100 text-purple-700",
   관찰: "bg-blue-100 text-blue-700",
   칭찬: "bg-green-100 text-green-700",
-  기타: "bg-gray-100 text-gray-600",
+  기타: "bg-paper-soft text-ink-soft",
 };
 
 export default async function StudentRecordsPage({
@@ -82,7 +82,7 @@ export default async function StudentRecordsPage({
         title="기록 카드"
         themeColor={classroom.theme_color}
       />
-      <p className="-mt-3 text-sm text-gray-500">
+      <p className="-mt-3 text-sm text-ink-soft">
         🔒 이 기록은 선생님만 볼 수 있어요. 학생·학부모 화면 어디에도 나타나지
         않습니다.
       </p>
@@ -98,8 +98,8 @@ export default async function StudentRecordsPage({
           href={buildUrl(undefined, category)}
           className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
             !selectedStudent
-              ? "bg-gray-900 text-white"
-              : "border bg-white text-gray-600 hover:bg-gray-50"
+              ? "bg-ink text-paper"
+              : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
           }`}
         >
           전체
@@ -110,8 +110,8 @@ export default async function StudentRecordsPage({
             href={buildUrl(s.id, category)}
             className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
               selectedStudent?.id === s.id
-                ? "bg-gray-900 text-white"
-                : "border bg-white text-gray-600 hover:bg-gray-50"
+                ? "bg-ink text-paper"
+                : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
             }`}
           >
             {s.number} {s.nickname}
@@ -119,19 +119,19 @@ export default async function StudentRecordsPage({
         ))}
       </div>
 
-      <section className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">✍️ 기록 남기기</h2>
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <h2 className="font-semibold text-ink">기록 남기기</h2>
         <form action={addRecord} className="flex flex-col gap-3">
           <input type="hidden" name="classroom_id" value={classroom.id} />
           <input type="hidden" name="back" value={currentUrl} />
           <div className="flex flex-wrap items-end gap-3">
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1 text-sm text-ink-soft">
               학생
               <select
                 name="student_id"
                 required
                 defaultValue={selectedStudent?.id ?? ""}
-                className="rounded-lg border p-2"
+                className="rounded-lg border border-line bg-paper-soft p-2 text-ink"
               >
                 <option value="" disabled>
                   선택
@@ -143,19 +143,19 @@ export default async function StudentRecordsPage({
                 ))}
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1 text-sm text-ink-soft">
               날짜
               <input
                 type="date"
                 name="record_date"
                 required
                 defaultValue={todayString()}
-                className="rounded-lg border p-2"
+                className="rounded-lg border border-line bg-paper-soft p-2 text-ink"
               />
             </label>
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1 text-sm text-ink-soft">
               유형
-              <select name="category" defaultValue="상담" className="rounded-lg border p-2">
+              <select name="category" defaultValue="상담" className="rounded-lg border border-line bg-paper-soft p-2 text-ink">
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -169,11 +169,11 @@ export default async function StudentRecordsPage({
             required
             rows={3}
             placeholder="기록 내용 (이 화면에서만 보입니다)"
-            className="rounded-lg border p-2 text-sm"
+            className="rounded-lg border border-line bg-paper-soft p-2 text-sm text-ink placeholder:text-ink-faint"
           />
           <button
             type="submit"
-            className="self-start rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="self-start rounded-lg bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
           >
             기록 저장
           </button>
@@ -182,7 +182,7 @@ export default async function StudentRecordsPage({
 
       <section className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-xs font-bold tracking-wide text-gray-400">
+          <h2 className="text-xs font-bold tracking-wide text-ink-faint">
             {selectedStudent
               ? `${selectedStudent.number}번 ${selectedStudent.nickname}의 기록`
               : "전체 기록"}{" "}
@@ -192,7 +192,7 @@ export default async function StudentRecordsPage({
             <Link
               href={buildUrl(selectedStudent?.id)}
               className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
-                !category ? "bg-gray-900 text-white" : "border bg-white text-gray-500"
+                !category ? "bg-ink text-paper" : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
               }`}
             >
               전체
@@ -203,8 +203,8 @@ export default async function StudentRecordsPage({
                 href={buildUrl(selectedStudent?.id, c)}
                 className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                   category === c
-                    ? `${CATEGORY_STYLE[c]} ring-1 ring-gray-300`
-                    : "border bg-white text-gray-500 hover:bg-gray-50"
+                    ? `${CATEGORY_STYLE[c]} ring-1 ring-line-strong`
+                    : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
                 }`}
               >
                 {c}
@@ -216,17 +216,17 @@ export default async function StudentRecordsPage({
         {records && records.length > 0 ? (
           <ul className="flex flex-col gap-2">
             {records.map((r) => (
-              <li key={r.id} className="flex flex-col gap-1.5 rounded-xl border bg-white p-4 shadow-sm">
+              <li key={r.id} className="flex flex-col gap-1.5 rounded-xl border border-line bg-paper p-4">
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${CATEGORY_STYLE[r.category]}`}>
                     {r.category}
                   </span>
                   {!selectedStudent && (
-                    <span className="font-semibold">
+                    <span className="font-semibold text-ink">
                       {studentName.get(r.student_id) ?? "(삭제된 학생)"}
                     </span>
                   )}
-                  <span className="text-gray-400 tabular-nums">
+                  <span className="text-ink-faint tabular-nums">
                     {formatKoreanDate(r.record_date)}
                   </span>
                   <form action={deleteRecord} className="ml-auto">
@@ -236,19 +236,19 @@ export default async function StudentRecordsPage({
                     <button
                       type="submit"
                       title="삭제"
-                      className="rounded-md px-2 py-1 text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500"
+                      className="rounded-md px-2 py-1 text-ink-faint transition-colors hover:bg-red-50 hover:text-red-500"
                     >
                       ×
                     </button>
                   </form>
                 </div>
-                <p className="text-sm whitespace-pre-wrap text-gray-700">{r.content}</p>
+                <p className="text-sm whitespace-pre-wrap text-ink">{r.content}</p>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="rounded-xl border-2 border-dashed p-8 text-center text-sm text-gray-400">
-            📇 아직 기록이 없어요.
+          <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-8 text-center font-hand text-base text-ink-soft">
+            아직 기록이 없어요.
           </p>
         )}
       </section>
