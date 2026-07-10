@@ -35,7 +35,7 @@ export function TabNav({
               key={item.href}
               href={item.href}
               aria-current={item.active ? "page" : undefined}
-              className={`group flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-[3px] px-1 text-[15px] transition-colors ${
+              className={`group flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-[3px] px-1 text-base transition-colors ${
                 minTouch ? "min-h-[44px] py-2.5" : "py-3"
               } ${
                 item.active
@@ -45,7 +45,7 @@ export function TabNav({
             >
               <Icon
                 className={item.active ? "text-ink" : "text-ink-faint group-hover:text-ink-soft"}
-                size={17}
+                size={18}
                 strokeWidth={1.75}
                 aria-hidden
               />

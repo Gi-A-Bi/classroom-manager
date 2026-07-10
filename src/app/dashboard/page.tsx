@@ -220,7 +220,12 @@ export default async function DashboardPage({
                 <div className="flex flex-col gap-3 p-5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="text-lg font-bold">
-                      {c.name}{" "}
+                      <Link
+                        href={`/dashboard/classrooms/${c.id}`}
+                        className="hover:underline"
+                      >
+                        {c.name}
+                      </Link>{" "}
                       <span className="text-sm font-normal text-gray-500">
                         학급코드{" "}
                         <code className="rounded-md bg-gray-100 px-1.5 py-0.5 font-mono font-bold">

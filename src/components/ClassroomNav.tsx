@@ -31,7 +31,8 @@ export function ClassroomNav({
   themeColor,
 }: {
   classroomId: string;
-  current: (typeof CLASSROOM_MENU)[number]["key"];
+  // 탭 키 또는 활성 탭이 없는 화면(예: 학급 홈)에서는 "" 등을 넘긴다
+  current: (typeof CLASSROOM_MENU)[number]["key"] | (string & {});
   themeColor?: string | null;
 }) {
   const theme = getTheme(themeColor);
