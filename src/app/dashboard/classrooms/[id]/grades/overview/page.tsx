@@ -155,20 +155,20 @@ export default async function GradeOverviewPage({
       <nav className="-mt-2 flex flex-wrap gap-3 text-sm">
         <Link
           href={`/dashboard/classrooms/${classroom.id}/grades`}
-          className="text-blue-600 underline"
+          className="text-ink-soft underline decoration-line-strong underline-offset-2 hover:text-ink"
         >
           ← 과목·평가 목록
         </Link>
         <Link
           href={`/dashboard/classrooms/${classroom.id}/grades/students`}
-          className="text-blue-600 underline"
+          className="text-ink-soft underline decoration-line-strong underline-offset-2 hover:text-ink"
         >
-          👤 학생별 보기
+          학생별 보기
         </Link>
       </nav>
 
-      <h1 className="text-xl font-extrabold">📊 종합 보기</h1>
-      <p className="-mt-3 text-sm text-gray-500">
+      <h1 className="text-xl font-bold text-ink">종합 보기</h1>
+      <p className="-mt-3 text-sm text-ink-soft">
         칸을 클릭하면 그 학생·과목의 평가 상세가 펼쳐져요. 색이 진할수록 성취도가
         높아요. 점수형은 평균, 단계형은 가장 많은 단계를 보여줍니다.
       </p>
@@ -179,8 +179,8 @@ export default async function GradeOverviewPage({
           grid={grid}
         />
       ) : (
-        <p className="rounded-xl border-2 border-dashed p-8 text-center text-sm text-gray-400">
-          📚 과목과 학생, 평가 결과가 있어야 종합 표가 채워져요.
+        <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-8 text-center font-hand text-base text-ink-soft">
+          과목과 학생, 평가 결과가 있어야 종합 표가 채워져요.
         </p>
       )}
     </main>

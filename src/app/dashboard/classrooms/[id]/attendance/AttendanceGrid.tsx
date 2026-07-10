@@ -80,11 +80,11 @@ export function AttendanceGrid({
           return (
             <li
               key={s.id}
-              className={`rounded-xl border bg-white p-2.5 shadow-sm ${isEditing ? "ring-2 ring-blue-300" : ""}`}
+              className={`rounded-xl border border-line bg-paper p-2.5 ${isEditing ? "ring-2 ring-line-strong" : ""}`}
             >
               <div className="flex items-center gap-2">
-                <span className="w-16 shrink-0 truncate text-sm">
-                  <span className="font-bold tabular-nums text-gray-400">
+                <span className="w-16 shrink-0 truncate text-sm text-ink">
+                  <span className="font-bold tabular-nums text-ink-faint">
                     {s.number}
                   </span>{" "}
                   {s.nickname}
@@ -108,7 +108,7 @@ export function AttendanceGrid({
                       setEditing(null);
                     }}
                     title="출석으로 되돌리기"
-                    className="shrink-0 rounded-md px-2 py-1 text-xs text-gray-400 hover:bg-gray-50"
+                    className="shrink-0 rounded-md px-2 py-1 text-xs text-ink-faint hover:bg-paper-soft"
                   >
                     ↺
                   </button>
@@ -116,7 +116,7 @@ export function AttendanceGrid({
               </div>
 
               {isEditing && (
-                <div className="mt-2 flex flex-col gap-2 border-t pt-2">
+                <div className="mt-2 flex flex-col gap-2 border-t border-line pt-2">
                   <div className="flex flex-wrap gap-1">
                     <button
                       type="button"
@@ -124,7 +124,7 @@ export function AttendanceGrid({
                         save(s.id, "present");
                         setEditing(null);
                       }}
-                      className="rounded-lg border px-2.5 py-1 text-xs font-medium text-gray-500 hover:bg-gray-50"
+                      className="rounded-lg border border-line px-2.5 py-1 text-xs font-medium text-ink-soft hover:bg-paper-soft"
                     >
                       출석
                     </button>
@@ -134,7 +134,7 @@ export function AttendanceGrid({
                         type="button"
                         onClick={() => save(s.id, t, ATTENDANCE_REASONS[t][0], rec?.memo)}
                         className={`rounded-lg border px-2.5 py-1 text-xs font-medium ${
-                          type === t ? ATTENDANCE_TYPES[t].style : "text-gray-500 hover:bg-gray-50"
+                          type === t ? ATTENDANCE_TYPES[t].style : "border-line text-ink-soft hover:bg-paper-soft"
                         }`}
                       >
                         {ATTENDANCE_TYPES[t].label}
@@ -143,7 +143,7 @@ export function AttendanceGrid({
                   </div>
                   {type !== "present" && (
                     <div className="flex flex-wrap items-center gap-1">
-                      <span className="text-xs text-gray-400">사유:</span>
+                      <span className="text-xs text-ink-faint">사유:</span>
                       {ATTENDANCE_REASONS[type].map((r) => (
                         <button
                           key={r}
@@ -151,8 +151,8 @@ export function AttendanceGrid({
                           onClick={() => save(s.id, type, r, rec?.memo)}
                           className={`rounded-full px-2 py-0.5 text-xs transition-colors ${
                             rec?.reason === r
-                              ? "bg-gray-900 text-white"
-                              : "border text-gray-500 hover:bg-gray-50"
+                              ? "bg-ink text-paper"
+                              : "border border-line text-ink-soft hover:bg-paper-soft"
                           }`}
                         >
                           {r}
@@ -170,7 +170,7 @@ export function AttendanceGrid({
                           save(s.id, type, rec?.reason, e.target.value);
                         }
                       }}
-                      className="rounded-lg border p-1.5 text-sm"
+                      className="rounded-lg border border-line bg-paper-soft p-1.5 text-sm text-ink placeholder:text-ink-faint"
                     />
                   )}
                 </div>

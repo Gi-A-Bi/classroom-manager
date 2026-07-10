@@ -94,13 +94,13 @@ export default async function GradesByStudentPage({
       <nav className="-mt-2 text-sm">
         <Link
           href={`/dashboard/classrooms/${classroom.id}/grades`}
-          className="text-blue-600 underline"
+          className="text-ink-soft underline decoration-line-strong underline-offset-2 hover:text-ink"
         >
           ← 과목·평가 목록
         </Link>
       </nav>
 
-      <h1 className="text-xl font-extrabold">👤 학생별 누적 보기</h1>
+      <h1 className="text-xl font-bold text-ink">학생별 누적 보기</h1>
 
       <div className="flex flex-wrap gap-1.5">
         {(students ?? []).map((s) => (
@@ -109,8 +109,8 @@ export default async function GradesByStudentPage({
             href={buildUrl(s.id, selectedSubject?.id)}
             className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
               selectedStudent?.id === s.id
-                ? "bg-gray-900 text-white"
-                : "border bg-white text-gray-600 hover:bg-gray-50"
+                ? "bg-ink text-paper"
+                : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
             }`}
           >
             {s.number} {s.nickname}
@@ -122,7 +122,7 @@ export default async function GradesByStudentPage({
         <Link
           href={buildUrl(selectedStudent?.id)}
           className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
-            !selectedSubject ? "bg-gray-900 text-white" : "border bg-white text-gray-500"
+            !selectedSubject ? "bg-ink text-paper" : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
           }`}
         >
           전 과목
@@ -133,8 +133,8 @@ export default async function GradesByStudentPage({
             href={buildUrl(selectedStudent?.id, s.id)}
             className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
               selectedSubject?.id === s.id
-                ? "bg-gray-900 text-white"
-                : "border bg-white text-gray-500 hover:bg-gray-50"
+                ? "bg-ink text-paper"
+                : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
             }`}
           >
             {s.name}
@@ -144,7 +144,7 @@ export default async function GradesByStudentPage({
 
       {selectedStudent ? (
         <section className="flex flex-col gap-2">
-          <h2 className="text-xs font-bold tracking-wide text-gray-400">
+          <h2 className="text-xs font-bold tracking-wide text-ink-faint">
             {selectedStudent.number}번 {selectedStudent.nickname} ·{" "}
             {selectedSubject ? selectedSubject.name : "전 과목"} · {rows.length}건
             (최신순)
@@ -154,18 +154,18 @@ export default async function GradesByStudentPage({
               {rows.map((a) => (
                 <li
                   key={a.id}
-                  className="flex flex-wrap items-center gap-2 rounded-xl border bg-white p-3.5 text-sm shadow-sm"
+                  className="flex flex-wrap items-center gap-2 rounded-xl border border-line bg-paper p-3.5 text-sm"
                 >
-                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                  <span className="rounded-full bg-paper-soft px-2 py-0.5 text-xs font-medium text-ink-soft">
                     {subjectName.get(a.subject_id)}
                   </span>
                   <Link
                     href={`/dashboard/classrooms/${classroom.id}/grades/${a.id}`}
-                    className="font-medium hover:underline"
+                    className="font-medium text-ink hover:underline"
                   >
                     {a.title}
                   </Link>
-                  <span className="text-xs text-gray-400 tabular-nums">
+                  <span className="text-xs text-ink-faint tabular-nums">
                     {formatKoreanDate(a.assess_date)}
                   </span>
                   <span
@@ -180,13 +180,13 @@ export default async function GradesByStudentPage({
               ))}
             </ul>
           ) : (
-            <p className="rounded-xl border-2 border-dashed p-8 text-center text-sm text-gray-400">
-              📊 아직 입력된 결과가 없어요.
+            <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-8 text-center font-hand text-base text-ink-soft">
+              아직 입력된 결과가 없어요.
             </p>
           )}
         </section>
       ) : (
-        <p className="rounded-xl border-2 border-dashed p-8 text-center text-sm text-gray-400">
+        <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-8 text-center font-hand text-base text-ink-soft">
           먼저 학생 명렬을 등록해주세요.
         </p>
       )}

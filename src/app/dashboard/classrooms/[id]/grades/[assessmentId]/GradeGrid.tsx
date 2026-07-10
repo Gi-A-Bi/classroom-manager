@@ -100,7 +100,7 @@ export function GradeGrid({
           {error}
         </p>
       )}
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-ink-faint">
         입력하면 바로 저장돼요. Enter로 다음 학생,{" "}
         {assessment.kind !== "level" &&
           "엑셀에서 복사한 열을 첫 칸에 붙여넣으면 아래로 한 번에 채워집니다."}
@@ -111,10 +111,10 @@ export function GradeGrid({
           return (
             <li
               key={s.id}
-              className="flex items-center gap-2 rounded-xl border bg-white p-2 pl-3 text-sm shadow-sm"
+              className="flex items-center gap-2 rounded-xl border border-line bg-paper p-2 pl-3 text-sm"
             >
-              <span className="w-20 shrink-0 truncate">
-                <span className="font-bold tabular-nums text-gray-400">
+              <span className="w-20 shrink-0 truncate text-ink">
+                <span className="font-bold tabular-nums text-ink-faint">
                   {s.number}
                 </span>{" "}
                 {s.nickname}

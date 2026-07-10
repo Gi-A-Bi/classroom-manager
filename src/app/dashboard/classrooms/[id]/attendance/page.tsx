@@ -73,7 +73,7 @@ export default async function AttendancePage({
         title="출결"
         themeColor={classroom.theme_color}
       />
-      <p className="-mt-3 text-sm text-gray-500">
+      <p className="-mt-3 text-sm text-ink-soft">
         🔒 나이스 공식 출결이 아닌, 선생님용 학급 관리 보조 기록이에요.
       </p>
 
@@ -81,11 +81,11 @@ export default async function AttendancePage({
         <div className="flex items-center gap-2">
           <Link
             href={`/dashboard/classrooms/${classroom.id}/attendance?date=${shiftDate(date, -1)}`}
-            className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
           >
             ← 어제
           </Link>
-          <span className="text-lg font-bold tabular-nums">
+          <span className="text-lg font-bold tabular-nums text-ink">
             {Number(date.slice(5, 7))}월 {Number(date.slice(8))}일 ({dowLabel})
             {date === today && (
               <span className="ml-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
@@ -95,7 +95,7 @@ export default async function AttendancePage({
           </span>
           <Link
             href={`/dashboard/classrooms/${classroom.id}/attendance?date=${shiftDate(date, 1)}`}
-            className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
           >
             내일 →
           </Link>
@@ -104,27 +104,27 @@ export default async function AttendancePage({
           {date !== today && (
             <Link
               href={`/dashboard/classrooms/${classroom.id}/attendance`}
-              className="rounded-lg border bg-white px-3 py-1.5 text-gray-600 transition-colors hover:bg-gray-50"
+              className="rounded-lg border border-line bg-paper px-3 py-1.5 text-ink-soft transition-colors hover:bg-paper-soft"
             >
               오늘로
             </Link>
           )}
           <Link
             href={`/dashboard/classrooms/${classroom.id}/attendance/monthly`}
-            className="rounded-lg border bg-white px-3 py-1.5 text-gray-600 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-ink-soft transition-colors hover:bg-paper-soft"
           >
-            🗓️ 월별
+            월별
           </Link>
           <Link
             href={`/dashboard/classrooms/${classroom.id}/attendance/summary`}
-            className="rounded-lg border bg-white px-3 py-1.5 text-gray-600 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-ink-soft transition-colors hover:bg-paper-soft"
           >
-            👤 학생별 집계
+            학생별 집계
           </Link>
         </div>
       </div>
 
-      <section className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm">
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
         {students && students.length > 0 ? (
           <AttendanceGrid
             classroomId={classroom.id}
@@ -133,11 +133,11 @@ export default async function AttendancePage({
             initialRecords={initialRecords}
           />
         ) : (
-          <p className="text-sm text-gray-400">먼저 학생 명렬을 등록해주세요.</p>
+          <p className="text-sm text-ink-faint">먼저 학생 명렬을 등록해주세요.</p>
         )}
       </section>
 
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-ink-faint">
         전원 출석이 기본이에요. 결석·지각·조퇴·결과인 학생만 눌러서 상태와 사유를
         정하면 바로 저장돼요.
       </p>

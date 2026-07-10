@@ -77,44 +77,44 @@ export default async function MonthlyAttendancePage({
       <nav className="-mt-2 flex flex-wrap gap-3 text-sm">
         <Link
           href={`/dashboard/classrooms/${classroom.id}/attendance`}
-          className="text-blue-600 underline"
+          className="text-ink-soft underline decoration-line-strong underline-offset-2 hover:text-ink"
         >
           ← 오늘 입력
         </Link>
         <Link
           href={`/dashboard/classrooms/${classroom.id}/attendance/summary`}
-          className="text-blue-600 underline"
+          className="text-ink-soft underline decoration-line-strong underline-offset-2 hover:text-ink"
         >
-          👤 학생별 집계
+          학생별 집계
         </Link>
       </nav>
 
       <div className="flex items-center justify-between">
         <Link
           href={`/dashboard/classrooms/${classroom.id}/attendance/monthly?month=${monthString(prev.year, prev.monthIndex)}`}
-          className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+          className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
         >
           ← {prev.monthIndex + 1}월
         </Link>
-        <h1 className="text-xl font-extrabold tabular-nums">
-          🗓️ {year}년 {monthIndex + 1}월
+        <h1 className="text-2xl font-display tabular-nums text-ink">
+          {year}년 {monthIndex + 1}월
         </h1>
         <Link
           href={`/dashboard/classrooms/${classroom.id}/attendance/monthly?month=${monthString(next.year, next.monthIndex)}`}
-          className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+          className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
         >
           {next.monthIndex + 1}월 →
         </Link>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border bg-white p-3 shadow-sm">
-        <table className="w-full border-collapse text-sm">
+      <div className="overflow-x-auto rounded-2xl border border-line bg-paper p-3">
+        <table className="w-full table-fixed border-collapse text-sm">
           <thead>
             <tr>
               {DAY_NAMES.map((name, i) => (
                 <th
                   key={name}
-                  className={`border bg-gray-50 p-2 ${i === 5 ? "text-blue-600" : i === 6 ? "text-red-500" : ""}`}
+                  className={`border border-line bg-paper-soft p-2 ${i === 5 ? "text-blue-600" : i === 6 ? "text-red-500" : "text-ink"}`}
                 >
                   {name}
                 </th>
@@ -129,7 +129,7 @@ export default async function MonthlyAttendancePage({
                   return (
                     <td
                       key={j}
-                      className={`h-20 w-[14%] border p-1 align-top ${cellDate === today ? "bg-yellow-50" : ""}`}
+                      className={`h-20 w-[14%] border border-line p-1 align-top ${cellDate === today ? "bg-paper-soft" : ""}`}
                     >
                       {cellDate && (
                         <Link
@@ -137,7 +137,7 @@ export default async function MonthlyAttendancePage({
                           className="flex h-full flex-col gap-0.5"
                         >
                           <span
-                            className={`text-xs tabular-nums ${cellDate === today ? "font-bold" : "text-gray-500"}`}
+                            className={`text-xs tabular-nums ${cellDate === today ? "font-bold text-ink" : "text-ink-soft"}`}
                           >
                             {Number(cellDate.slice(8))}
                           </span>
@@ -160,7 +160,7 @@ export default async function MonthlyAttendancePage({
           </tbody>
         </table>
       </div>
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-ink-faint">
         예외가 있는 날에 표시돼요. 날짜를 누르면 그날 입력 화면으로 가요.
       </p>
     </main>

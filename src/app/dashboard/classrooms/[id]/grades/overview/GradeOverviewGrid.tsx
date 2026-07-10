@@ -17,7 +17,7 @@ type Row = {
 
 // intensity(0~1)를 인디고 배경 농도로. 미입력은 회색.
 function cellStyle(intensity: number | null): string {
-  if (intensity === null) return "bg-gray-50 text-gray-300";
+  if (intensity === null) return "bg-paper-soft text-ink-faint";
   if (intensity >= 0.85) return "bg-indigo-600 text-white";
   if (intensity >= 0.7) return "bg-indigo-400 text-white";
   if (intensity >= 0.5) return "bg-indigo-200 text-indigo-900";
@@ -44,15 +44,15 @@ export function GradeOverviewGrid({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="overflow-x-auto rounded-xl border bg-white p-3 shadow-sm">
+      <div className="overflow-x-auto rounded-2xl border border-line bg-paper p-3">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr>
-              <th className="sticky left-0 z-10 border bg-gray-50 p-2 text-left">
+              <th className="sticky left-0 z-10 border border-line bg-paper-soft p-2 text-left text-ink">
                 학생
               </th>
               {subjects.map((s) => (
-                <th key={s.id} className="border bg-gray-50 p-2 text-center">
+                <th key={s.id} className="border border-line bg-paper-soft p-2 text-center text-ink">
                   {s.name}
                 </th>
               ))}
@@ -61,8 +61,8 @@ export function GradeOverviewGrid({
           <tbody>
             {grid.map((row) => (
               <tr key={row.student.id}>
-                <th className="sticky left-0 z-10 whitespace-nowrap border bg-gray-50 p-2 text-left font-medium">
-                  <span className="tabular-nums text-gray-400">
+                <th className="sticky left-0 z-10 whitespace-nowrap border border-line bg-paper-soft p-2 text-left font-medium text-ink">
+                  <span className="tabular-nums text-ink-faint">
                     {row.student.number}
                   </span>{" "}
                   {row.student.nickname}
@@ -72,7 +72,7 @@ export function GradeOverviewGrid({
                     open?.studentId === row.student.id &&
                     open?.subjectId === cell.subjectId;
                   return (
-                    <td key={cell.subjectId} className="border p-0">
+                    <td key={cell.subjectId} className="border border-line p-0">
                       <button
                         type="button"
                         disabled={cell.detail.length === 0}
@@ -89,7 +89,7 @@ export function GradeOverviewGrid({
                         className={`h-11 w-full text-center text-sm font-bold tabular-nums transition-transform ${cellStyle(
                           cell.intensity,
                         )} ${cell.detail.length > 0 ? "cursor-pointer hover:scale-105" : "cursor-default"} ${
-                          isOpen ? "ring-2 ring-inset ring-gray-900" : ""
+                          isOpen ? "ring-2 ring-inset ring-ink" : ""
                         }`}
                       >
                         {cell.label || "·"}
@@ -103,25 +103,25 @@ export function GradeOverviewGrid({
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+      <div className="flex flex-wrap items-center gap-2 text-xs text-ink-soft">
         <span>성취도</span>
         <span className="rounded bg-indigo-50 px-2 py-0.5 text-indigo-700">낮음</span>
         <span className="rounded bg-indigo-200 px-2 py-0.5 text-indigo-900">보통</span>
         <span className="rounded bg-indigo-600 px-2 py-0.5 text-white">높음</span>
-        <span className="rounded bg-gray-50 px-2 py-0.5 text-gray-300">미입력</span>
+        <span className="rounded bg-paper-soft px-2 py-0.5 text-ink-faint">미입력</span>
       </div>
 
       {open && openRow && openCell && openSubject && (
-        <section className="flex flex-col gap-2 rounded-2xl border bg-white p-5 shadow-sm">
+        <section className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-5">
           <div className="flex items-center justify-between">
-            <h2 className="font-bold">
+            <h2 className="font-bold text-ink">
               {openRow.student.number}번 {openRow.student.nickname} ·{" "}
               {openSubject.name}
             </h2>
             <button
               type="button"
               onClick={() => setOpen(null)}
-              className="rounded-md px-2 py-1 text-sm text-gray-400 hover:bg-gray-50"
+              className="rounded-md px-2 py-1 text-sm text-ink-faint hover:bg-paper-soft"
             >
               닫기 ×
             </button>
@@ -131,23 +131,23 @@ export function GradeOverviewGrid({
               {openCell.detail.map((d, i) => (
                 <li
                   key={i}
-                  className="flex items-center gap-2 rounded-xl border bg-gray-50 p-2.5 text-sm"
+                  className="flex items-center gap-2 rounded-xl border border-line bg-paper-soft p-2.5 text-sm"
                 >
-                  <span className="font-medium">{d.title}</span>
-                  <span className="text-xs text-gray-400 tabular-nums">
+                  <span className="font-medium text-ink">{d.title}</span>
+                  <span className="text-xs text-ink-faint tabular-nums">
                     {formatKoreanDate(d.date)}
                   </span>
-                  <span className="ml-auto rounded-lg bg-white px-2.5 py-1 font-bold">
+                  <span className="ml-auto rounded-lg bg-paper px-2.5 py-1 font-bold text-ink">
                     {d.value}
                     {d.max !== null && (
-                      <span className="font-normal text-gray-400">/{d.max}</span>
+                      <span className="font-normal text-ink-faint">/{d.max}</span>
                     )}
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-400">입력된 결과가 없어요.</p>
+            <p className="text-sm text-ink-faint">입력된 결과가 없어요.</p>
           )}
         </section>
       )}

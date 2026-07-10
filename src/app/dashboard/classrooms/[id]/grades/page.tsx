@@ -69,28 +69,28 @@ export default async function GradesPage({
         title="성적 기록"
         themeColor={classroom.theme_color}
       />
-      <div className="-mt-3 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-gray-500">
+      <div className="-mt-2 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-ink-soft">
           🔒 선생님만 볼 수 있어요. 학생 화면에는 나타나지 않습니다.
         </p>
         <div className="flex gap-2 text-sm">
           <Link
             href={`/dashboard/classrooms/${classroom.id}/grades/overview`}
-            className="rounded-lg border bg-white px-3 py-1.5 text-gray-600 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-ink-soft transition-colors hover:bg-paper-soft"
           >
-            📊 종합 보기
+            종합 보기
           </Link>
           <Link
             href={`/dashboard/classrooms/${classroom.id}/grades/students`}
-            className="rounded-lg border bg-white px-3 py-1.5 text-gray-600 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-ink-soft transition-colors hover:bg-paper-soft"
           >
-            👤 학생별 보기
+            학생별 보기
           </Link>
           <a
             href={`/dashboard/classrooms/${classroom.id}/grades/export`}
-            className="rounded-lg border bg-white px-3 py-1.5 text-gray-600 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-ink-soft transition-colors hover:bg-paper-soft"
           >
-            ⬇️ 전체 CSV
+            전체 CSV
           </a>
         </div>
       </div>
@@ -101,8 +101,8 @@ export default async function GradesPage({
         </p>
       )}
 
-      <section className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">📚 과목</h2>
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <h2 className="font-semibold text-ink">과목</h2>
         <div className="flex flex-wrap gap-1.5">
           {(subjects ?? []).map((s) => (
             <Link
@@ -110,8 +110,8 @@ export default async function GradesPage({
               href={`/dashboard/classrooms/${classroom.id}/grades?subject=${s.id}`}
               className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
                 selected?.id === s.id
-                  ? "bg-gray-900 text-white"
-                  : "border bg-white text-gray-600 hover:bg-gray-50"
+                  ? "bg-ink text-paper"
+                  : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
               }`}
             >
               {s.name}
@@ -124,18 +124,18 @@ export default async function GradesPage({
               name="name"
               required
               placeholder="새 과목"
-              className="w-28 rounded-full border px-3 py-1.5 text-sm"
+              className="w-28 rounded-full border border-line bg-paper-soft px-3 py-1.5 text-sm text-ink placeholder:text-ink-faint"
             />
             <button
               type="submit"
-              className="rounded-full bg-blue-600 px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="rounded-full bg-ink px-3.5 py-1.5 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
             >
               + 추가
             </button>
           </form>
         </div>
         {selected && (
-          <div className="flex flex-wrap items-center gap-2 border-t pt-3 text-sm">
+          <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3 text-sm">
             <form action={renameSubject} className="flex items-center gap-1.5">
               <input type="hidden" name="classroom_id" value={classroom.id} />
               <input type="hidden" name="subject_id" value={selected.id} />
@@ -143,11 +143,11 @@ export default async function GradesPage({
                 type="text"
                 name="name"
                 defaultValue={selected.name}
-                className="w-32 rounded-lg border px-2 py-1"
+                className="w-32 rounded-lg border border-line bg-paper-soft px-2 py-1 text-ink"
               />
               <button
                 type="submit"
-                className="rounded-lg border px-2.5 py-1 text-gray-600 transition-colors hover:bg-gray-50"
+                className="rounded-lg border border-line bg-paper px-2.5 py-1 text-ink-soft transition-colors hover:bg-paper-soft"
               >
                 이름 변경
               </button>
@@ -157,18 +157,18 @@ export default async function GradesPage({
               <input type="hidden" name="subject_id" value={selected.id} />
               <button
                 type="submit"
-                className="rounded-lg border border-red-200 px-2.5 py-1 text-red-600 transition-colors hover:bg-red-50"
+                className="rounded-lg border border-red-200 bg-paper px-2.5 py-1 text-red-600 transition-colors hover:bg-red-50"
               >
                 과목 삭제
               </button>
             </form>
             <a
               href={`/dashboard/classrooms/${classroom.id}/grades/export?subject=${selected.id}`}
-              className="rounded-lg border px-2.5 py-1 text-gray-600 transition-colors hover:bg-gray-50"
+              className="rounded-lg border border-line bg-paper px-2.5 py-1 text-ink-soft transition-colors hover:bg-paper-soft"
             >
-              ⬇️ {selected.name} CSV
+              {selected.name} CSV
             </a>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-ink-faint">
               과목을 지우면 그 과목의 평가·결과도 함께 지워져요.
             </span>
           </div>
@@ -177,64 +177,64 @@ export default async function GradesPage({
 
       {selected ? (
         <>
-          <section className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm">
-            <h2 className="font-semibold">✏️ {selected.name} 평가 만들기</h2>
+          <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+            <h2 className="font-semibold text-ink">{selected.name} 평가 만들기</h2>
             <form action={addAssessment} className="flex flex-col gap-3">
               <input type="hidden" name="classroom_id" value={classroom.id} />
               <input type="hidden" name="subject_id" value={selected.id} />
               <div className="flex flex-wrap items-end gap-3">
-                <label className="flex min-w-44 flex-1 flex-col gap-1 text-sm">
+                <label className="flex min-w-44 flex-1 flex-col gap-1 text-sm text-ink-soft">
                   평가 이름
                   <input
                     type="text"
                     name="title"
                     required
                     placeholder="1학기 수행평가 - 받아쓰기 3회"
-                    className="rounded-lg border p-2"
+                    className="rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
                   />
                 </label>
-                <label className="flex flex-col gap-1 text-sm">
+                <label className="flex flex-col gap-1 text-sm text-ink-soft">
                   날짜
                   <input
                     type="date"
                     name="assess_date"
                     required
                     defaultValue={todayString()}
-                    className="rounded-lg border p-2"
+                    className="rounded-lg border border-line bg-paper-soft p-2 text-ink"
                   />
                 </label>
               </div>
               <div className="flex flex-wrap items-end gap-3">
-                <label className="flex flex-col gap-1 text-sm">
+                <label className="flex flex-col gap-1 text-sm text-ink-soft">
                   유형
-                  <select name="kind" defaultValue="score" className="rounded-lg border p-2">
+                  <select name="kind" defaultValue="score" className="rounded-lg border border-line bg-paper-soft p-2 text-ink">
                     <option value="score">점수형</option>
                     <option value="level">단계형</option>
                     <option value="text">서술형</option>
                   </select>
                 </label>
-                <label className="flex flex-col gap-1 text-sm">
-                  만점 <span className="text-xs text-gray-400">(점수형, 선택)</span>
+                <label className="flex flex-col gap-1 text-sm text-ink-soft">
+                  만점 <span className="text-xs text-ink-faint">(점수형, 선택)</span>
                   <input
                     type="number"
                     name="max_score"
                     min={1}
                     placeholder="100"
-                    className="w-24 rounded-lg border p-2"
+                    className="w-24 rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
                   />
                 </label>
-                <label className="flex min-w-52 flex-1 flex-col gap-1 text-sm">
-                  단계 <span className="text-xs text-gray-400">(단계형, 쉼표 구분)</span>
+                <label className="flex min-w-52 flex-1 flex-col gap-1 text-sm text-ink-soft">
+                  단계 <span className="text-xs text-ink-faint">(단계형, 쉼표 구분)</span>
                   <input
                     type="text"
                     name="levels"
                     placeholder="잘함, 보통, 노력요함"
-                    className="rounded-lg border p-2"
+                    className="rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
                   />
                 </label>
                 <button
                   type="submit"
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  className="rounded-lg bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
                 >
                   만들고 입력하기
                 </button>
@@ -243,7 +243,7 @@ export default async function GradesPage({
           </section>
 
           <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold tracking-wide text-gray-400">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-ink-faint">
               {selected.name} 평가 {assessments?.length ?? 0}개
             </h2>
             {assessments && assessments.length > 0 ? (
@@ -251,7 +251,7 @@ export default async function GradesPage({
                 {assessments.map((a) => (
                   <li
                     key={a.id}
-                    className="flex items-center justify-between gap-2 rounded-xl border bg-white p-3.5 text-sm shadow-sm transition-shadow hover:shadow-md"
+                    className="flex items-center justify-between gap-2 rounded-xl border border-line bg-paper p-3.5 text-sm transition-colors hover:bg-paper-soft"
                   >
                     <Link
                       href={`/dashboard/classrooms/${classroom.id}/grades/${a.id}`}
@@ -261,11 +261,11 @@ export default async function GradesPage({
                         {KIND_LABEL[a.kind]}
                         {a.kind === "score" && a.max_score !== null && ` /${a.max_score}`}
                       </span>
-                      <span className="font-semibold">{a.title}</span>
-                      <span className="text-gray-400 tabular-nums">
+                      <span className="font-semibold text-ink">{a.title}</span>
+                      <span className="text-ink-faint tabular-nums">
                         {formatKoreanDate(a.assess_date)}
                       </span>
-                      <span className="ml-auto text-blue-600">입력·보기 →</span>
+                      <span className="ml-auto text-ink-soft">입력·보기 →</span>
                     </Link>
                     <form action={deleteAssessment}>
                       <input type="hidden" name="classroom_id" value={classroom.id} />
@@ -274,7 +274,7 @@ export default async function GradesPage({
                       <button
                         type="submit"
                         title="평가 삭제"
-                        className="rounded-md px-2 py-1 text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500"
+                        className="rounded-md px-2 py-1 text-ink-faint transition-colors hover:bg-red-50 hover:text-red-500"
                       >
                         ×
                       </button>
@@ -283,16 +283,20 @@ export default async function GradesPage({
                 ))}
               </ul>
             ) : (
-              <p className="rounded-xl border-2 border-dashed p-6 text-center text-sm text-gray-400">
-                ✏️ 첫 평가를 만들어보세요.
-              </p>
+              <div className="flex flex-col items-center gap-1 rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-6 text-center">
+                <span className="text-2xl">✏️</span>
+                <p className="font-hand text-base text-ink-soft">첫 평가를 만들어보세요.</p>
+              </div>
             )}
           </section>
         </>
       ) : (
-        <p className="rounded-xl border-2 border-dashed p-8 text-center text-sm text-gray-400">
-          📚 먼저 과목을 추가해주세요. (예: 국어, 수학, 통합교과)
-        </p>
+        <div className="flex flex-col items-center gap-1 rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-8 text-center">
+          <span className="text-2xl">📚</span>
+          <p className="font-hand text-lg text-ink-soft">
+            먼저 과목을 추가해주세요. (예: 국어, 수학, 통합교과)
+          </p>
+        </div>
       )}
     </main>
   );

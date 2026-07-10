@@ -58,7 +58,7 @@ export default async function AttendanceSummaryPage({
     n > 0 ? (
       <span className={`rounded-md px-2 py-0.5 font-bold tabular-nums ${cls}`}>{n}</span>
     ) : (
-      <span className="text-gray-300">·</span>
+      <span className="text-ink-faint">·</span>
     );
 
   return (
@@ -75,33 +75,33 @@ export default async function AttendanceSummaryPage({
       <nav className="-mt-2 flex flex-wrap gap-3 text-sm">
         <Link
           href={`/dashboard/classrooms/${classroom.id}/attendance`}
-          className="text-blue-600 underline"
+          className="text-ink-soft underline decoration-line-strong underline-offset-2 hover:text-ink"
         >
           ← 오늘 입력
         </Link>
         <Link
           href={`/dashboard/classrooms/${classroom.id}/attendance/monthly`}
-          className="text-blue-600 underline"
+          className="text-ink-soft underline decoration-line-strong underline-offset-2 hover:text-ink"
         >
-          🗓️ 월별 현황
+          월별 현황
         </Link>
       </nav>
 
-      <h1 className="text-xl font-extrabold">👤 학생별 누적 집계</h1>
-      <p className="-mt-3 text-sm text-gray-500">
+      <h1 className="text-xl font-bold text-ink">학생별 누적 집계</h1>
+      <p className="-mt-3 text-sm text-ink-soft">
         전체 기간 누적이에요. 체험학습은 결석 중 별도로 일수를 세요.
       </p>
 
-      <div className="overflow-x-auto rounded-xl border bg-white p-3 shadow-sm">
+      <div className="overflow-x-auto rounded-2xl border border-line bg-paper p-3">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="text-gray-500">
-              <th className="border bg-gray-50 p-2 text-left">학생</th>
-              <th className="border bg-gray-50 p-2">결석</th>
-              <th className="border bg-gray-50 p-2">지각</th>
-              <th className="border bg-gray-50 p-2">조퇴</th>
-              <th className="border bg-gray-50 p-2">결과</th>
-              <th className="border bg-gray-50 p-2">체험학습(일)</th>
+            <tr className="text-ink-soft">
+              <th className="border border-line bg-paper-soft p-2 text-left text-ink">학생</th>
+              <th className="border border-line bg-paper-soft p-2 text-ink">결석</th>
+              <th className="border border-line bg-paper-soft p-2 text-ink">지각</th>
+              <th className="border border-line bg-paper-soft p-2 text-ink">조퇴</th>
+              <th className="border border-line bg-paper-soft p-2 text-ink">결과</th>
+              <th className="border border-line bg-paper-soft p-2 text-ink">체험학습(일)</th>
             </tr>
           </thead>
           <tbody>
@@ -109,23 +109,23 @@ export default async function AttendanceSummaryPage({
               const t = tally.get(s.id)!;
               return (
                 <tr key={s.id}>
-                  <th className="whitespace-nowrap border bg-gray-50 p-2 text-left font-medium">
-                    <span className="tabular-nums text-gray-400">{s.number}</span>{" "}
+                  <th className="whitespace-nowrap border border-line bg-paper-soft p-2 text-left font-medium text-ink">
+                    <span className="tabular-nums text-ink-faint">{s.number}</span>{" "}
                     {s.nickname}
                   </th>
-                  <td className="border p-2 text-center">
+                  <td className="border border-line p-2 text-center">
                     {cell(t.absent, "bg-red-100 text-red-700")}
                   </td>
-                  <td className="border p-2 text-center">
+                  <td className="border border-line p-2 text-center">
                     {cell(t.late, "bg-amber-100 text-amber-700")}
                   </td>
-                  <td className="border p-2 text-center">
+                  <td className="border border-line p-2 text-center">
                     {cell(t.early, "bg-orange-100 text-orange-700")}
                   </td>
-                  <td className="border p-2 text-center">
+                  <td className="border border-line p-2 text-center">
                     {cell(t.result, "bg-purple-100 text-purple-700")}
                   </td>
-                  <td className="border p-2 text-center">
+                  <td className="border border-line p-2 text-center">
                     {cell(t.field, "bg-teal-100 text-teal-700")}
                   </td>
                 </tr>

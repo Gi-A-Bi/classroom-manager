@@ -73,9 +73,9 @@ export default async function AssessmentPage({
             ["최저", Math.min(...nums).toLocaleString()],
             ["입력", `${answered}/${total}`],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-xl bg-slate-50 px-4 py-2 text-center">
-              <p className="text-xs text-gray-400">{label}</p>
-              <p className="text-lg font-bold tabular-nums">{value}</p>
+            <div key={label} className="rounded-xl bg-paper-soft px-4 py-2 text-center">
+              <p className="text-xs text-ink-faint">{label}</p>
+              <p className="text-lg font-bold tabular-nums text-ink">{value}</p>
             </div>
           ))}
         </div>
@@ -89,14 +89,14 @@ export default async function AssessmentPage({
     stats = (
       <div className="flex flex-wrap gap-2">
         {(assessment.levels ?? []).map((l) => (
-          <div key={l} className="rounded-xl bg-slate-50 px-4 py-2 text-center">
-            <p className="text-xs text-gray-400">{l}</p>
-            <p className="text-lg font-bold tabular-nums">{counts.get(l) ?? 0}명</p>
+          <div key={l} className="rounded-xl bg-paper-soft px-4 py-2 text-center">
+            <p className="text-xs text-ink-faint">{l}</p>
+            <p className="text-lg font-bold tabular-nums text-ink">{counts.get(l) ?? 0}명</p>
           </div>
         ))}
-        <div className="rounded-xl bg-slate-50 px-4 py-2 text-center">
-          <p className="text-xs text-gray-400">입력</p>
-          <p className="text-lg font-bold tabular-nums">
+        <div className="rounded-xl bg-paper-soft px-4 py-2 text-center">
+          <p className="text-xs text-ink-faint">입력</p>
+          <p className="text-lg font-bold tabular-nums text-ink">
             {answered}/{total}
           </p>
         </div>
@@ -104,8 +104,8 @@ export default async function AssessmentPage({
     );
   } else {
     stats = (
-      <p className="text-sm text-gray-500">
-        입력 <strong className="tabular-nums">{answered}</strong>/{total}명
+      <p className="text-sm text-ink-soft">
+        입력 <strong className="tabular-nums text-ink">{answered}</strong>/{total}명
       </p>
     );
   }
@@ -124,32 +124,32 @@ export default async function AssessmentPage({
       <nav className="-mt-2 text-sm">
         <Link
           href={`/dashboard/classrooms/${classroom.id}/grades?subject=${assessment.subject_id}`}
-          className="text-blue-600 underline"
+          className="text-ink-soft underline decoration-line-strong underline-offset-2 hover:text-ink"
         >
           ← {assessment.subjects?.name} 평가 목록
         </Link>
       </nav>
 
       <header className="flex flex-wrap items-center gap-2">
-        <h1 className="text-xl font-extrabold">{assessment.title}</h1>
-        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+        <h1 className="text-xl font-bold text-ink">{assessment.title}</h1>
+        <span className="rounded-full bg-paper-soft px-2 py-0.5 text-xs font-medium text-ink-soft">
           {KIND_LABEL[assessment.kind]}
           {assessment.kind === "score" && assessment.max_score !== null && ` · 만점 ${assessment.max_score}`}
         </span>
-        <span className="text-sm text-gray-400 tabular-nums">
+        <span className="text-sm text-ink-faint tabular-nums">
           {formatKoreanDate(assessment.assess_date)}
         </span>
       </header>
 
-      <section className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">📊 통계</h2>
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <h2 className="font-semibold text-ink">통계</h2>
         {answered > 0 ? stats : (
-          <p className="text-sm text-gray-400">아직 입력된 결과가 없어요.</p>
+          <p className="text-sm text-ink-faint">아직 입력된 결과가 없어요.</p>
         )}
       </section>
 
-      <section className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">✏️ 입력</h2>
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <h2 className="font-semibold text-ink">입력</h2>
         {students && students.length > 0 ? (
           <GradeGrid
             assessment={{
@@ -163,7 +163,7 @@ export default async function AssessmentPage({
             initialValues={initialValues}
           />
         ) : (
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-ink-faint">
             먼저 학생 명렬을 등록해주세요.
           </p>
         )}
