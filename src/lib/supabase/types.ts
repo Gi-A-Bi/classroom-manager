@@ -327,6 +327,44 @@ export type Database = {
         }
         Relationships: []
       }
+      student_records: {
+        Row: {
+          category: string
+          classroom_id: string
+          content: string
+          created_at: string
+          id: string
+          record_date: string
+          student_id: string
+        }
+        Insert: {
+          category?: string
+          classroom_id: string
+          content: string
+          created_at?: string
+          id?: string
+          record_date?: string
+          student_id: string
+        }
+        Update: {
+          category?: string
+          classroom_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          record_date?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_records_student_id_classroom_id_fkey"
+            columns: ["student_id", "classroom_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id", "classroom_id"]
+          },
+        ]
+      }
       students: {
         Row: {
           classroom_id: string
@@ -513,6 +551,76 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "work_links_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          tags: string[]
+          teacher_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          tags?: string[]
+          teacher_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          tags?: string[]
+          teacher_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_notes_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_snippets: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_snippets_teacher_id_fkey"
             columns: ["teacher_id"]
             isOneToOne: false
             referencedRelation: "profiles"
