@@ -126,27 +126,9 @@ export default async function ClassroomHomePage({
           <span className="text-sm font-medium text-ink-faint">
             {classroom.academic_years?.name ?? ""}
           </span>
-          <div className="relative inline-block pb-2">
-            <h1 className="font-display text-5xl leading-none tracking-tight text-ink">
-              {classroom.name}
-            </h1>
-            {/* 손으로 그은 듯한 밑줄 */}
-            <svg
-              className={`absolute -bottom-0.5 left-0 w-full ${theme.text}`}
-              height="9"
-              viewBox="0 0 200 9"
-              preserveAspectRatio="none"
-              fill="none"
-              aria-hidden
-            >
-              <path
-                d="M3 5.5 Q 45 1.5 90 4.5 T 175 4 T 197 3.5"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
+          <h1 className="font-display text-5xl leading-none tracking-tight text-ink">
+            {classroom.name}
+          </h1>
         </div>
         <CopyCodeChip code={classroom.class_code} />
       </header>

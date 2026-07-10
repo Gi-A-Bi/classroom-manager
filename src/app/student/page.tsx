@@ -92,42 +92,46 @@ export default async function StudentHomePage() {
   const otherPosts = (posts ?? []).filter((p) => p.id !== todayPost?.id);
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col gap-4 p-4">
+    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col gap-3 p-4">
       <StudentNav current="home" themeColor={classroom.theme_color} />
 
+      {/* 히어로 — 테마색 종이 헤더 */}
       <header className={`overflow-hidden rounded-2xl ${theme.soft}`}>
         <div className={`h-1.5 ${theme.topbar}`} />
-        <div className="flex flex-col gap-2 px-4 pt-3 pb-4">
+        <div className="flex flex-col gap-1.5 px-4 pt-3 pb-4">
           <div className="flex items-center justify-between">
-            <p className={`font-bold ${theme.text}`}>
-              {classroom.name} ·{" "}
-              <span className="font-medium">
-                {session.number}번 {session.nickname}
+            <p className={`text-sm font-bold ${theme.text}`}>
+              {classroom.name}
+              <span className="font-medium text-ink-soft">
+                {" "}
+                · {session.number}번 {session.nickname}
               </span>
             </p>
             <form action={studentLogout}>
               <button
                 type="submit"
-                className="rounded-lg bg-white/70 px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-white"
+                className="rounded-lg bg-paper/80 px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper"
               >
                 나가기
               </button>
             </form>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight tabular-nums">
-            {isWeekday ? "☀️" : "🌈"} {Number(today.slice(5, 7))}월{" "}
-            {Number(today.slice(8))}일{" "}
-            <span className="text-xl font-bold text-gray-400">
-              {DAY_NAMES[todayDow - 1]}요일
+          <h1 className="font-display text-4xl leading-none tracking-tight text-ink tabular-nums">
+            <span className="align-middle text-2xl">
+              {isWeekday ? "☀️" : "🌈"}
+            </span>{" "}
+            {Number(today.slice(5, 7))}월 {Number(today.slice(8))}일{" "}
+            <span className="text-xl text-ink-faint">
+              {DAY_NAMES[todayDow - 1]}
             </span>
           </h1>
           {nextEvent && dday !== null && (
             <p className="flex items-center gap-2 text-sm">
-              <span className="rounded-full bg-white/80 px-2.5 py-0.5 font-extrabold tabular-nums text-red-500">
+              <span className="rounded-full bg-paper px-2.5 py-0.5 font-bold tabular-nums text-rose-500">
                 D-{dday}
               </span>
-              <span className="font-medium">{nextEvent.title}</span>
-              <span className="text-gray-500 tabular-nums">
+              <span className="font-medium text-ink">{nextEvent.title}</span>
+              <span className="text-ink-faint tabular-nums">
                 {formatMonthDay(nextEvent.event_date)}
               </span>
             </p>
@@ -135,10 +139,11 @@ export default async function StudentHomePage() {
         </div>
       </header>
 
-      <section className="flex flex-col gap-2 rounded-2xl border bg-white p-4 shadow-sm">
-        <h2 className="font-bold">
+      {/* 오늘 시간표 */}
+      <section className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-4">
+        <h2 className="font-bold text-ink">
           ⏰ 오늘 시간표{" "}
-          <span className="text-sm font-normal text-gray-500">
+          <span className="text-sm font-normal text-ink-faint">
             {DAY_NAMES[todayDow - 1]}요일
           </span>
         </h2>
@@ -155,9 +160,9 @@ export default async function StudentHomePage() {
             ))}
           </ol>
         ) : (
-          <p className="text-sm text-gray-400">
+          <p className="font-hand text-base text-ink-soft">
             {isWeekday
-              ? "📭 오늘 시간표가 아직 없어요."
+              ? "📭 오늘 시간표가 아직 없어요"
               : "🌤️ 오늘은 쉬는 날이에요!"}
           </p>
         )}
@@ -169,7 +174,7 @@ export default async function StudentHomePage() {
                 className={`rounded-lg px-2.5 py-1 text-sm font-medium ${
                   e.layer === "school"
                     ? "bg-orange-100 text-orange-800"
-                    : "bg-blue-100 text-blue-800"
+                    : `${theme.soft} ${theme.text}`
                 }`}
               >
                 오늘 · {e.title}
@@ -179,15 +184,16 @@ export default async function StudentHomePage() {
         )}
       </section>
 
+      {/* 오늘 알림장 — 별표 카드 */}
       {todayPost && (
         <Link
           href={`/student/posts/${todayPost.id}`}
-          className="flex flex-col gap-1 rounded-2xl bg-amber-50 p-4 shadow-sm transition-all hover:shadow-md active:bg-amber-100"
+          className="flex flex-col gap-1 rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 transition-transform active:scale-[0.99]"
         >
           <span className="flex items-center gap-2 text-sm font-bold text-amber-700">
             🔔 오늘 알림장
             {!readSet.has(todayPost.id) && (
-              <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-600">
+              <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-bold text-rose-600">
                 안 읽음
               </span>
             )}
@@ -195,13 +201,16 @@ export default async function StudentHomePage() {
           <span className="text-lg font-bold text-amber-900">
             {todayPost.title}
           </span>
-          <span className="text-sm text-amber-700">눌러서 읽어보세요 →</span>
+          <span className="font-hand text-base text-amber-700">
+            눌러서 읽어보세요 →
+          </span>
         </Link>
       )}
 
+      {/* 우리 반 링크 */}
       {tools && tools.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="px-1 text-sm font-bold text-gray-500">🧰 우리 반 링크</h2>
+          <h2 className="px-1 text-sm font-bold text-ink-soft">🧰 우리 반 링크</h2>
           <div className="flex flex-wrap gap-2">
             {tools.map((t) => {
               const tt = getTheme(t.color);
@@ -211,7 +220,7 @@ export default async function StudentHomePage() {
                   href={t.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`rounded-xl px-3.5 py-2.5 text-sm font-bold shadow-sm transition-transform hover:scale-105 ${tt.soft} ${tt.text}`}
+                  className={`rounded-xl px-3.5 py-2.5 text-sm font-bold transition-transform hover:scale-105 ${tt.soft} ${tt.text}`}
                 >
                   🔗 {t.name} ↗
                 </a>
@@ -221,27 +230,26 @@ export default async function StudentHomePage() {
         </section>
       )}
 
+      {/* 지난 알림장 */}
       <section className="flex flex-col gap-2">
-        <h2 className="px-1 text-sm font-bold text-gray-500">
-          📚 지난 알림장
-        </h2>
+        <h2 className="px-1 text-sm font-bold text-ink-soft">📚 지난 알림장</h2>
         {otherPosts.length > 0 ? (
           <ul className="flex flex-col gap-1.5">
             {otherPosts.map((p) => (
               <li key={p.id}>
                 <Link
                   href={`/student/posts/${p.id}`}
-                  className="flex items-center justify-between gap-2 rounded-xl border bg-white p-3.5 shadow-sm transition-all hover:shadow-md active:bg-gray-50"
+                  className="flex items-center justify-between gap-2 rounded-xl border border-line bg-paper p-3.5 transition-colors active:bg-paper-soft"
                 >
-                  <span className="flex items-center gap-2 font-medium">
+                  <span className="flex items-center gap-2 font-medium text-ink">
                     {p.title}
                     {!readSet.has(p.id) && (
-                      <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-600">
+                      <span className="shrink-0 rounded-full bg-rose-100 px-2 py-0.5 text-xs font-bold text-rose-600">
                         안 읽음
                       </span>
                     )}
                   </span>
-                  <span className="shrink-0 text-sm text-gray-400">
+                  <span className="shrink-0 text-sm text-ink-faint tabular-nums">
                     {formatDate(p.post_date)}
                   </span>
                 </Link>
@@ -250,11 +258,14 @@ export default async function StudentHomePage() {
           </ul>
         ) : (
           !todayPost && (
-            <p className="rounded-xl border-2 border-dashed p-6 text-center text-sm text-gray-400">
-              📮 아직 알림장이 없어요.
-              <br />
-              선생님이 쓰면 여기에 나타나요!
-            </p>
+            <div className="flex flex-col items-center gap-1 rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-6 text-center">
+              <span className="text-2xl">📮</span>
+              <p className="font-hand text-base text-ink-soft">
+                아직 알림장이 없어요.
+                <br />
+                선생님이 쓰면 여기에 나타나요!
+              </p>
+            </div>
           )
         )}
       </section>

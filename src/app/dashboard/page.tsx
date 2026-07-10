@@ -153,29 +153,12 @@ export default async function DashboardPage({
           <span className="text-sm font-medium text-ink-faint">
             {profile?.display_name || "선생님"} 선생님, 안녕하세요
           </span>
-          <div className="relative inline-block pb-2">
-            <h1 className="font-display text-5xl leading-none tracking-tight text-ink tabular-nums">
-              {Number(today.slice(5, 7))}월 {Number(today.slice(8))}일{" "}
-              <span className="text-3xl text-ink-faint">
-                {DAY_NAMES[todayDow - 1]}요일
-              </span>
-            </h1>
-            <svg
-              className="absolute -bottom-0.5 left-0 w-[62%] text-ink-soft"
-              height="9"
-              viewBox="0 0 200 9"
-              preserveAspectRatio="none"
-              fill="none"
-              aria-hidden
-            >
-              <path
-                d="M3 5.5 Q 45 1.5 90 4.5 T 175 4 T 197 3.5"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
+          <h1 className="font-display text-5xl leading-none tracking-tight text-ink tabular-nums">
+            {Number(today.slice(5, 7))}월 {Number(today.slice(8))}일{" "}
+            <span className="text-3xl text-ink-faint">
+              {DAY_NAMES[todayDow - 1]}요일
+            </span>
+          </h1>
         </div>
         <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
           <ModeSwitch current="class" />
