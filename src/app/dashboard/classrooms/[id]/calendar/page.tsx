@@ -97,7 +97,8 @@ export default async function CalendarPage({
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-6">
-      <ClassroomNav classroomId={classroom.id} current="calendar" />
+      <ClassroomNav classroomId={classroom.id} current="calendar"
+        themeColor={classroom.theme_color} />
 
       <ClassroomHeader
         name={classroom.name}

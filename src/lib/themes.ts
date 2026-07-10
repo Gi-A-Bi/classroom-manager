@@ -1,6 +1,6 @@
 // 학급 테마컬러 — Tailwind가 클래스를 인식하도록 전체 클래스명을 리터럴로 둔다.
 // soft: 페이지 헤더 배경, swatch: 색 선택 원, text: 포인트 글자,
-// topbar: 헤더 상단 액센트 줄
+// topbar: 헤더 상단 액센트 줄, underline: 탭 밑줄 border 색
 
 export const THEMES = {
   blue: {
@@ -9,6 +9,7 @@ export const THEMES = {
     soft: "bg-blue-50",
     text: "text-blue-900",
     topbar: "bg-blue-400",
+    underline: "border-blue-500",
   },
   teal: {
     label: "청록",
@@ -16,6 +17,7 @@ export const THEMES = {
     soft: "bg-teal-50",
     text: "text-teal-900",
     topbar: "bg-teal-400",
+    underline: "border-teal-500",
   },
   green: {
     label: "초록",
@@ -23,6 +25,7 @@ export const THEMES = {
     soft: "bg-green-50",
     text: "text-green-900",
     topbar: "bg-green-400",
+    underline: "border-green-500",
   },
   amber: {
     label: "노랑",
@@ -30,6 +33,7 @@ export const THEMES = {
     soft: "bg-amber-50",
     text: "text-amber-900",
     topbar: "bg-amber-300",
+    underline: "border-amber-400",
   },
   orange: {
     label: "주황",
@@ -37,6 +41,7 @@ export const THEMES = {
     soft: "bg-orange-50",
     text: "text-orange-900",
     topbar: "bg-orange-400",
+    underline: "border-orange-500",
   },
   rose: {
     label: "분홍",
@@ -44,6 +49,7 @@ export const THEMES = {
     soft: "bg-rose-50",
     text: "text-rose-900",
     topbar: "bg-rose-300",
+    underline: "border-rose-400",
   },
   purple: {
     label: "보라",
@@ -51,6 +57,7 @@ export const THEMES = {
     soft: "bg-purple-50",
     text: "text-purple-900",
     topbar: "bg-purple-400",
+    underline: "border-purple-500",
   },
   slate: {
     label: "회색",
@@ -58,6 +65,7 @@ export const THEMES = {
     soft: "bg-slate-100",
     text: "text-slate-900",
     topbar: "bg-slate-400",
+    underline: "border-slate-500",
   },
 } as const;
 

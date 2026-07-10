@@ -1,26 +1,41 @@
 @import "tailwindcss";
 
+/* ============================================================
+   종이 다이어리/플래너 디자인 시스템
+   - 배경: 따뜻한 크림, 표면: 밝은 종이색
+   - 구획: 그림자 대신 얇은 테두리 선
+   - 제목: 굵은 디스플레이 타이포
+   - 태그: 파스텔 알약
+   ============================================================ */
+
+@theme {
+  /* 표면 */
+  --color-cream: #f3ead9; /* 페이지 배경 */
+  --color-paper: #fffdf7; /* 카드·표면 */
+  --color-paper-soft: #faf3e4; /* 은은한 표면(입력칸 등) */
+
+  /* 잉크(글자) — 따뜻한 근검정, 순검정 아님 */
+  --color-ink: #2f2a23;
+  --color-ink-soft: #6b6152;
+  --color-ink-faint: #a89d88;
+
+  /* 선 */
+  --color-line: #e4d9c3;
+  --color-line-strong: #cebfa3;
+  --color-line-ink: #2f2a23; /* 강조 밑줄용 */
+
+  /* 폰트 */
+  --font-display: var(--font-black-han), system-ui, sans-serif;
+  --font-hand: var(--font-gaegu), cursive;
+  --font-sans: var(--font-noto-kr), system-ui, sans-serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
 }

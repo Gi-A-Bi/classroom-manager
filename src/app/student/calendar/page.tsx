@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { StudentNav } from "@/components/StudentNav";
 import {
   addMonths,
   DAY_NAMES,
@@ -39,12 +40,19 @@ export default async function StudentCalendarPage({
   const today = todayString();
 
   const supabase = createStudentClient(session.token);
-  const { data: events } = await supabase
-    .from("events")
-    .select("id, title, event_date, end_date, layer")
-    .lte("event_date", monthEnd)
-    .or(`end_date.gte.${monthStart},event_date.gte.${monthStart}`)
-    .order("event_date");
+  const [{ data: classroom }, { data: events }] = await Promise.all([
+    supabase
+      .from("classrooms")
+      .select("theme_color")
+      .eq("id", session.classroomId)
+      .maybeSingle(),
+    supabase
+      .from("events")
+      .select("id, title, event_date, end_date, layer")
+      .lte("event_date", monthEnd)
+      .or(`end_date.gte.${monthStart},event_date.gte.${monthStart}`)
+      .order("event_date"),
+  ]);
 
   // 기간 일정은 해당 기간의 모든 날짜에 표시
   const eventsByDate = new Map<string, NonNullable<typeof events>>();
@@ -61,11 +69,7 @@ export default async function StudentCalendarPage({
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col gap-5 p-5">
-      <nav>
-        <Link href="/student" className="text-blue-600 underline">
-          ← 홈으로
-        </Link>
-      </nav>
+      <StudentNav current="calendar" themeColor={classroom?.theme_color} />
 
       <div className="flex items-center justify-between">
         <Link

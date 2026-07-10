@@ -1,15 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Black_Han_Sans, Gaegu, Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// 본문 — 가독성 우선 (그리드·데이터 화면까지 작은 크기로 잘 읽힘)
+const notoKr = Noto_Sans_KR({
+  weight: ["400", "500", "700"],
   subsets: ["latin"],
+  variable: "--font-noto-kr",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// 디스플레이 — 큰 페이지 제목의 주인공
+const blackHan = Black_Han_Sans({
+  weight: "400",
   subsets: ["latin"],
+  variable: "--font-black-han",
+  display: "swap",
+});
+
+// 손글씨 — 빈 상태·스티커 같은 소량 강조에만
+const gaegu = Gaegu({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-gaegu",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -25,11 +39,9 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${notoKr.variable} ${blackHan.variable} ${gaegu.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-gray-50 text-gray-900">
-        {children}
-      </body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

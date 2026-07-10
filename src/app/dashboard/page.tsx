@@ -228,16 +228,20 @@ export default async function DashboardPage({
                         </code>
                       </span>
                     </h3>
-                    <nav className="flex flex-wrap gap-1.5">
-                      {CLASSROOM_MENU.map((m) => (
-                        <Link
-                          key={m.key}
-                          href={`/dashboard/classrooms/${c.id}/${m.key}`}
-                          className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${m.pill}`}
-                        >
-                          {m.label}
-                        </Link>
-                      ))}
+                    <nav className="flex flex-wrap gap-x-3 gap-y-1.5">
+                      {CLASSROOM_MENU.map((m) => {
+                        const Icon = m.icon;
+                        return (
+                          <Link
+                            key={m.key}
+                            href={`/dashboard/classrooms/${c.id}/${m.key}`}
+                            className="flex items-center gap-1 text-sm font-medium text-ink-soft transition-colors hover:text-ink"
+                          >
+                            <Icon size={15} strokeWidth={1.75} aria-hidden />
+                            {m.label}
+                          </Link>
+                        );
+                      })}
                     </nav>
                   </div>
 

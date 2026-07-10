@@ -112,7 +112,8 @@ export default async function AssessmentPage({
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-6">
-      <ClassroomNav classroomId={classroom.id} current="grades" />
+      <ClassroomNav classroomId={classroom.id} current="grades"
+        themeColor={classroom.theme_color} />
 
       <ClassroomHeader
         name={classroom.name}

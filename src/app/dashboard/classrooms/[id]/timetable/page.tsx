@@ -49,7 +49,8 @@ export default async function TimetablePage({
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <ClassroomNav classroomId={classroom.id} current="timetable" />
+      <ClassroomNav classroomId={classroom.id} current="timetable"
+        themeColor={classroom.theme_color} />
 
       <ClassroomHeader
         name={classroom.name}

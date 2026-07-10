@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { StudentNav } from "@/components/StudentNav";
 import {
   DAY_NAMES,
   dayOfWeekMon1,
@@ -92,6 +93,8 @@ export default async function StudentHomePage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col gap-4 p-4">
+      <StudentNav current="home" themeColor={classroom.theme_color} />
+
       <header className={`overflow-hidden rounded-2xl ${theme.soft}`}>
         <div className={`h-1.5 ${theme.topbar}`} />
         <div className="flex flex-col gap-2 px-4 pt-3 pb-4">
@@ -133,20 +136,12 @@ export default async function StudentHomePage() {
       </header>
 
       <section className="flex flex-col gap-2 rounded-2xl border bg-white p-4 shadow-sm">
-        <div className="flex items-center justify-between">
-          <h2 className="font-bold">
-            ⏰ 오늘 시간표{" "}
-            <span className="text-sm font-normal text-gray-500">
-              {DAY_NAMES[todayDow - 1]}요일
-            </span>
-          </h2>
-          <Link
-            href="/student/calendar"
-            className="text-sm font-medium text-blue-700 underline underline-offset-2"
-          >
-            🗓️ 캘린더
-          </Link>
-        </div>
+        <h2 className="font-bold">
+          ⏰ 오늘 시간표{" "}
+          <span className="text-sm font-normal text-gray-500">
+            {DAY_NAMES[todayDow - 1]}요일
+          </span>
+        </h2>
         {isWeekday && todaySlots && todaySlots.length > 0 ? (
           <ol className="flex flex-wrap gap-1.5">
             {todaySlots.map((s, i) => (

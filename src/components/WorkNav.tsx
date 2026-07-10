@@ -1,42 +1,44 @@
-import Link from "next/link";
+import {
+  CalendarDays,
+  ClipboardList,
+  FileText,
+  LayoutDashboard,
+  Link2,
+  ListChecks,
+  NotebookPen,
+} from "lucide-react";
 import { ModeSwitch } from "./ModeSwitch";
+import { TabNav, type TabItem } from "./TabNav";
 
 const WORK_MENU = [
-  ["", "🗂️ 대시보드"],
-  ["todos", "✅ 할 일"],
-  ["documents", "📄 공문"],
-  ["calendar", "🗓️ 캘린더"],
-  ["notes", "📒 노트"],
-  ["snippets", "📑 스니펫"],
-  ["links", "🔗 링크"],
+  { key: "", label: "대시보드", icon: LayoutDashboard },
+  { key: "todos", label: "할 일", icon: ListChecks },
+  { key: "documents", label: "공문", icon: FileText },
+  { key: "calendar", label: "캘린더", icon: CalendarDays },
+  { key: "notes", label: "노트", icon: NotebookPen },
+  { key: "snippets", label: "스니펫", icon: ClipboardList },
+  { key: "links", label: "링크", icon: Link2 },
 ] as const;
 
-// 업무 모드 공통 헤더 — 학급 모드와 구분되는 차분한 남색 밴드
 export function WorkNav({
   current,
 }: {
-  current: (typeof WORK_MENU)[number][0];
+  current: (typeof WORK_MENU)[number]["key"];
 }) {
+  const items: TabItem[] = WORK_MENU.map((m) => ({
+    href: `/work${m.key ? `/${m.key}` : ""}`,
+    label: m.label,
+    icon: m.icon,
+    active: m.key === current,
+  }));
+
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <ModeSwitch current="work" />
       </div>
-      <nav className="flex flex-wrap items-center gap-1.5 rounded-2xl bg-slate-700 p-2 text-sm font-medium shadow-sm">
-        {WORK_MENU.map(([key, label]) => (
-          <Link
-            key={key}
-            href={`/work${key ? `/${key}` : ""}`}
-            className={`rounded-xl px-3 py-1.5 transition-colors ${
-              key === current
-                ? "bg-white text-slate-800 shadow-sm"
-                : "text-slate-200 hover:bg-slate-600"
-            }`}
-          >
-            {label}
-          </Link>
-        ))}
-      </nav>
+      {/* 업무 모드: 밑줄을 중립 남색으로 해 학급 모드와 구분 */}
+      <TabNav items={items} underlineClass="border-slate-600" />
     </div>
   );
 }

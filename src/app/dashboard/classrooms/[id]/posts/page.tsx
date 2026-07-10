@@ -90,7 +90,8 @@ export default async function ClassroomPostsPage({
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <ClassroomNav classroomId={classroom.id} current="posts" />
+      <ClassroomNav classroomId={classroom.id} current="posts"
+        themeColor={classroom.theme_color} />
 
       <ClassroomHeader
         name={classroom.name}
