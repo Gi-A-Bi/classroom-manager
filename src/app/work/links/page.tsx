@@ -24,8 +24,8 @@ export default async function WorkLinksPage({
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-6">
       <WorkNav current="links" />
 
-      <h1 className="text-2xl font-extrabold tracking-tight">🔗 자주 쓰는 링크</h1>
-      <p className="-mt-3 text-sm text-gray-500">
+      <h1 className="text-2xl font-display text-ink">🔗 자주 쓰는 링크</h1>
+      <p className="-mt-3 text-sm text-ink-soft">
         나이스, 업무포털, 학교 홈페이지처럼 매일 여는 주소를 등록하면 업무
         대시보드에 바로가기 버튼이 생겨요.
       </p>
@@ -36,27 +36,27 @@ export default async function WorkLinksPage({
         </p>
       )}
 
-      <section className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">링크 추가</h2>
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <h2 className="font-semibold text-ink">링크 추가</h2>
         <form action={addLink} className="flex flex-wrap items-end gap-3">
-          <label className="flex flex-col gap-1 text-sm">
+          <label className="flex flex-col gap-1 text-sm text-ink-soft">
             이름
             <input
               type="text"
               name="name"
               required
               placeholder="나이스"
-              className="rounded-lg border p-2"
+              className="rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
             />
           </label>
-          <label className="flex min-w-52 flex-1 flex-col gap-1 text-sm">
+          <label className="flex min-w-52 flex-1 flex-col gap-1 text-sm text-ink-soft">
             주소
             <input
               type="url"
               name="url"
               required
               placeholder="https://..."
-              className="rounded-lg border p-2"
+              className="rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
             />
           </label>
           <button
@@ -69,7 +69,7 @@ export default async function WorkLinksPage({
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-xs font-bold tracking-wide text-gray-400">
+        <h2 className="text-xs font-bold tracking-wide text-ink-faint">
           등록된 링크 {links?.length ?? 0}
         </h2>
         {links && links.length > 0 ? (
@@ -77,7 +77,7 @@ export default async function WorkLinksPage({
             {links.map((l) => (
               <li
                 key={l.id}
-                className="flex items-center justify-between gap-2 rounded-xl border bg-white p-3 text-sm shadow-sm"
+                className="flex items-center justify-between gap-2 rounded-xl border border-line bg-paper p-3 text-sm"
               >
                 <a
                   href={l.url}
@@ -86,7 +86,7 @@ export default async function WorkLinksPage({
                   className="flex min-w-0 items-center gap-2 font-medium text-slate-700 hover:underline"
                 >
                   {l.name} ↗
-                  <span className="truncate text-xs font-normal text-gray-400">
+                  <span className="truncate text-xs font-normal text-ink-faint">
                     {l.url}
                   </span>
                 </a>
@@ -95,7 +95,7 @@ export default async function WorkLinksPage({
                   <button
                     type="submit"
                     title="삭제"
-                    className="rounded-md px-2 py-1 text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500"
+                    className="rounded-md px-2 py-1 text-ink-faint transition-colors hover:bg-red-50 hover:text-red-500"
                   >
                     ×
                   </button>
@@ -104,7 +104,7 @@ export default async function WorkLinksPage({
             ))}
           </ul>
         ) : (
-          <p className="rounded-xl border-2 border-dashed p-6 text-center text-sm text-gray-400">
+          <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-6 text-center text-sm text-ink-soft">
             🔖 아직 등록된 링크가 없어요.
           </p>
         )}

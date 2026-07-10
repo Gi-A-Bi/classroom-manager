@@ -41,7 +41,7 @@ export default async function WorkNotesPage({
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-6">
       <WorkNav current="notes" />
 
-      <h1 className="text-2xl font-extrabold tracking-tight">📒 업무 노트</h1>
+      <h1 className="text-2xl font-display text-ink">📒 업무 노트</h1>
 
       {error && (
         <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
@@ -49,11 +49,11 @@ export default async function WorkNotesPage({
         </p>
       )}
 
-      <section className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <h2 className="font-semibold text-ink">
           {editing ? `"${editing.title}" 수정` : "새 노트"}
           {editing && (
-            <Link href="/work/notes" className="ml-2 text-sm font-normal text-gray-400 underline">
+            <Link href="/work/notes" className="ml-2 text-sm font-normal text-ink-faint underline">
               취소
             </Link>
           )}
@@ -66,14 +66,14 @@ export default async function WorkNotesPage({
             required
             defaultValue={editing?.title ?? ""}
             placeholder="제목"
-            className="rounded-lg border p-2"
+            className="rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
           />
           <textarea
             name="content"
             rows={5}
             defaultValue={editing?.content ?? ""}
             placeholder="내용"
-            className="rounded-lg border p-2 text-sm"
+            className="rounded-lg border border-line bg-paper-soft p-2 text-sm text-ink placeholder:text-ink-faint"
           />
           <TagInput
             existingTags={allTags}
@@ -95,11 +95,11 @@ export default async function WorkNotesPage({
             name="q"
             defaultValue={q ?? ""}
             placeholder="제목·본문 검색"
-            className="min-w-40 flex-1 rounded-xl border bg-white p-2.5 text-sm shadow-sm"
+            className="min-w-40 flex-1 rounded-xl border border-line bg-paper p-2.5 text-sm text-ink placeholder:text-ink-faint"
           />
           <button
             type="submit"
-            className="rounded-xl border bg-white px-4 text-sm text-gray-600 shadow-sm transition-colors hover:bg-gray-50"
+            className="rounded-xl border border-line bg-paper px-4 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
           >
             🔍
           </button>
@@ -120,7 +120,7 @@ export default async function WorkNotesPage({
       </div>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-xs font-bold tracking-wide text-gray-400">
+        <h2 className="text-xs font-bold tracking-wide text-ink-faint">
           {tag ? `#${tag} · ` : ""}
           {q ? `"${q}" 검색 · ` : ""}
           {notes?.length ?? 0}개 (최근 수정순)
@@ -128,14 +128,14 @@ export default async function WorkNotesPage({
         {notes && notes.length > 0 ? (
           <ul className="flex flex-col gap-2">
             {notes.map((n) => (
-              <li key={n.id} className="flex flex-col gap-2 rounded-xl border bg-white p-4 shadow-sm">
+              <li key={n.id} className="flex flex-col gap-2 rounded-xl border border-line bg-paper p-4">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-semibold">{n.title}</h3>
-                  <span className="flex shrink-0 items-center gap-1 text-xs text-gray-400">
+                  <h3 className="font-semibold text-ink">{n.title}</h3>
+                  <span className="flex shrink-0 items-center gap-1 text-xs text-ink-faint">
                     {formatKoreanDate(n.updated_at.slice(0, 10))}
                     <Link
                       href={`/work/notes?edit=${n.id}`}
-                      className="ml-2 rounded-md border px-2 py-1 text-gray-500 transition-colors hover:bg-gray-50"
+                      className="ml-2 rounded-md border border-line px-2 py-1 text-ink-soft transition-colors hover:bg-paper-soft"
                     >
                       수정
                     </Link>
@@ -144,7 +144,7 @@ export default async function WorkNotesPage({
                       <button
                         type="submit"
                         title="삭제"
-                        className="rounded-md px-2 py-1 text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500"
+                        className="rounded-md px-2 py-1 text-ink-faint transition-colors hover:bg-red-50 hover:text-red-500"
                       >
                         ×
                       </button>
@@ -152,7 +152,7 @@ export default async function WorkNotesPage({
                   </span>
                 </div>
                 {n.content && (
-                  <p className="text-sm whitespace-pre-wrap text-gray-700">{n.content}</p>
+                  <p className="text-sm whitespace-pre-wrap text-ink">{n.content}</p>
                 )}
                 {n.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1">
@@ -171,7 +171,7 @@ export default async function WorkNotesPage({
             ))}
           </ul>
         ) : (
-          <p className="rounded-xl border-2 border-dashed p-8 text-center text-sm text-gray-400">
+          <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-8 text-center text-sm text-ink-soft">
             {q || tag ? "🔍 조건에 맞는 노트가 없어요." : "📒 첫 노트를 남겨보세요."}
           </p>
         )}

@@ -120,7 +120,7 @@ export default async function WorkCalendarPage({
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-6">
       <WorkNav current="calendar" />
 
-      <h1 className="text-2xl font-extrabold tracking-tight">🗓️ 업무 캘린더</h1>
+      <h1 className="text-2xl font-display text-ink">🗓️ 업무 캘린더</h1>
 
       {error && (
         <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
@@ -128,37 +128,37 @@ export default async function WorkCalendarPage({
         </p>
       )}
 
-      <section className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">일정 등록</h2>
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <h2 className="font-semibold text-ink">일정 등록</h2>
         <form action={addWorkEvent} className="flex flex-wrap items-end gap-3">
           <input type="hidden" name="month" value={thisMonth} />
-          <label className="flex flex-col gap-1 text-sm">
+          <label className="flex flex-col gap-1 text-sm text-ink-soft">
             날짜
             <input
               type="date"
               name="event_date"
               required
               defaultValue={today}
-              className="rounded-lg border p-2"
+              className="rounded-lg border border-line bg-paper-soft p-2 text-ink"
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm">
-            종료일 <span className="text-xs text-gray-400">(기간)</span>
-            <input type="date" name="end_date" className="rounded-lg border p-2" />
+          <label className="flex flex-col gap-1 text-sm text-ink-soft">
+            종료일 <span className="text-xs text-ink-faint">(기간)</span>
+            <input type="date" name="end_date" className="rounded-lg border border-line bg-paper-soft p-2 text-ink" />
           </label>
-          <label className="flex min-w-40 flex-1 flex-col gap-1 text-sm">
+          <label className="flex min-w-40 flex-1 flex-col gap-1 text-sm text-ink-soft">
             제목
             <input
               type="text"
               name="title"
               required
               placeholder="1정 연수"
-              className="rounded-lg border p-2"
+              className="rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm">
+          <label className="flex flex-col gap-1 text-sm text-ink-soft">
             구분
-            <select name="category" defaultValue="기타" className="rounded-lg border p-2">
+            <select name="category" defaultValue="기타" className="rounded-lg border border-line bg-paper-soft p-2 text-ink">
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
                   {c}
@@ -179,16 +179,16 @@ export default async function WorkCalendarPage({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Link
             href={baseUrl(monthString(prev.year, prev.monthIndex), showClass)}
-            className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
           >
             ← {prev.monthIndex + 1}월
           </Link>
-          <h2 className="text-xl font-bold tabular-nums">
+          <h2 className="text-2xl font-display tabular-nums text-ink">
             {year}년 {monthIndex + 1}월
           </h2>
           <Link
             href={baseUrl(monthString(next.year, next.monthIndex), showClass)}
-            className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
           >
             {next.monthIndex + 1}월 →
           </Link>
@@ -206,22 +206,22 @@ export default async function WorkCalendarPage({
             className={`ml-auto rounded-full border px-3 py-1.5 font-medium transition-colors ${
               showClass
                 ? "border-blue-300 bg-blue-50 text-blue-700"
-                : "bg-white text-gray-500 hover:bg-gray-50"
+                : "border-line bg-paper text-ink-soft hover:bg-paper-soft"
             }`}
           >
             {showClass ? "✓ 학급 일정 겹쳐보기" : "학급 일정 겹쳐보기"}
           </Link>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border bg-white p-3 shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-line bg-paper p-3">
           <table className="w-full table-fixed border-collapse text-sm">
             <thead>
               <tr>
                 {DAY_NAMES.map((name, i) => (
                   <th
                     key={name}
-                    className={`border bg-slate-50 p-2 ${
-                      i === 5 ? "text-blue-600" : i === 6 ? "text-red-500" : "text-slate-600"
+                    className={`border border-line bg-paper-soft p-2 ${
+                      i === 5 ? "text-blue-600" : i === 6 ? "text-red-500" : "text-ink"
                     }`}
                   >
                     {name}
@@ -235,14 +235,14 @@ export default async function WorkCalendarPage({
                   {week.map((date, j) => (
                     <td
                       key={j}
-                      className={`h-24 w-[14%] border p-1 align-top ${
-                        date === today ? "bg-yellow-50" : ""
+                      className={`h-24 w-[14%] border border-line p-1 align-top ${
+                        date === today ? "bg-paper-soft" : ""
                       }`}
                     >
                       {date && (
                         <div className="flex flex-col gap-1">
                           <span
-                            className={`text-xs tabular-nums ${date === today ? "font-bold" : "text-gray-500"}`}
+                            className={`text-xs tabular-nums ${date === today ? "font-bold text-ink" : "text-ink-soft"}`}
                           >
                             {Number(date.slice(8))}
                           </span>
@@ -287,7 +287,7 @@ export default async function WorkCalendarPage({
             </tbody>
           </table>
         </div>
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-ink-faint">
           업무 일정 위에 마우스를 올리면 × 로 삭제할 수 있어요. 공문 기한은
           공문 트래커에서 자동으로 표시됩니다.
         </p>

@@ -28,7 +28,7 @@ export function TagInput({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="#연구부 #생활지도 (띄어쓰기로 구분)"
-        className="rounded-lg border p-2"
+        className="rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
       />
       {existingTags.length > 0 && (
         <div className="flex flex-wrap gap-1">

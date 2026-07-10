@@ -63,19 +63,19 @@ export default async function WorkDashboardPage() {
       <WorkNav current="" />
 
       <header>
-        <h1 className="text-3xl font-extrabold tracking-tight tabular-nums">
+        <h1 className="text-3xl font-display tabular-nums text-ink">
           💼 {Number(today.slice(5, 7))}월 {Number(today.slice(8))}일{" "}
-          <span className="text-xl font-bold text-gray-400">
+          <span className="text-xl font-bold text-ink-faint">
             {DAY_NAMES[todayDow - 1]}요일
           </span>
         </h1>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <section className="flex flex-col gap-2 rounded-2xl border bg-white p-5 shadow-sm">
+        <section className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-5">
           <div className="flex items-center justify-between">
-            <h2 className="font-bold">✅ 오늘 할 일</h2>
-            <Link href="/work/todos" className="text-sm text-slate-500 underline">
+            <h2 className="font-bold text-ink">오늘 할 일</h2>
+            <Link href="/work/todos" className="text-sm text-slate-600 underline">
               전체 보기
             </Link>
           </div>
@@ -91,20 +91,20 @@ export default async function WorkDashboardPage() {
                       <input type="hidden" name="back" value="/work" />
                       <button
                         type="submit"
-                        className={`flex w-full items-center gap-2 rounded-xl border p-2.5 text-left text-sm transition-colors ${
-                          done ? "bg-slate-50 text-gray-400" : "hover:bg-slate-50"
+                        className={`flex w-full items-center gap-2 rounded-xl border border-line p-2.5 text-left text-sm transition-colors ${
+                          done ? "bg-paper-soft text-ink-faint" : "hover:bg-paper-soft"
                         }`}
                       >
                         <span
                           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 text-xs font-bold transition-colors ${
                             done
                               ? "border-slate-500 bg-slate-500 text-white"
-                              : "border-gray-300"
+                              : "border-line-strong"
                           }`}
                         >
                           {done ? "✓" : ""}
                         </span>
-                        <span className={done ? "line-through" : "font-medium"}>
+                        <span className={done ? "line-through" : "font-medium text-ink"}>
                           {PRIORITY_BADGE[t.priority]} {t.title}
                         </span>
                         {t.repeat_dow && (
@@ -124,18 +124,18 @@ export default async function WorkDashboardPage() {
               })}
             </ul>
           ) : (
-            <p className="rounded-xl border-2 border-dashed p-5 text-center text-sm text-gray-400">
+            <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-5 text-center text-sm text-ink-soft">
               ☕ 오늘 할 일이 없어요.
             </p>
           )}
         </section>
 
-        <section className="flex flex-col gap-2 rounded-2xl border bg-white p-5 shadow-sm">
+        <section className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-5">
           <div className="flex items-center justify-between">
-            <h2 className="font-bold">📄 기한 임박 공문</h2>
+            <h2 className="font-bold text-ink">기한 임박 공문</h2>
             <Link
               href="/work/documents"
-              className="text-sm text-slate-500 underline"
+              className="text-sm text-slate-600 underline"
             >
               전체 보기
             </Link>
@@ -148,10 +148,10 @@ export default async function WorkDashboardPage() {
                   <li
                     key={d.id}
                     className={`flex items-center justify-between gap-2 rounded-xl border p-2.5 text-sm ${
-                      dday < 0 ? "border-red-200 bg-red-50" : ""
+                      dday < 0 ? "border-red-200 bg-red-50" : "border-line"
                     }`}
                   >
-                    <span className="font-medium">{d.title}</span>
+                    <span className="font-medium text-ink">{d.title}</span>
                     <span
                       className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-bold tabular-nums ${
                         dday < 0
@@ -168,18 +168,18 @@ export default async function WorkDashboardPage() {
               })}
             </ul>
           ) : (
-            <p className="rounded-xl border-2 border-dashed p-5 text-center text-sm text-gray-400">
+            <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-5 text-center text-sm text-ink-soft">
               📭 3일 안에 처리할 공문이 없어요.
             </p>
           )}
         </section>
 
-        <section className="flex flex-col gap-2 rounded-2xl border bg-white p-5 shadow-sm">
+        <section className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-5">
           <div className="flex items-center justify-between">
-            <h2 className="font-bold">🗓️ 오늘 업무 일정</h2>
+            <h2 className="font-bold text-ink">오늘 업무 일정</h2>
             <Link
               href="/work/calendar"
-              className="text-sm text-slate-500 underline"
+              className="text-sm text-slate-600 underline"
             >
               캘린더
             </Link>
@@ -189,14 +189,14 @@ export default async function WorkDashboardPage() {
               {events.map((e) => (
                 <li
                   key={e.id}
-                  className="flex items-center gap-2 rounded-xl bg-slate-50 p-2.5 text-sm"
+                  className="flex items-center gap-2 rounded-xl bg-paper-soft p-2.5 text-sm"
                 >
                   <span className="shrink-0 rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-700">
                     {e.category}
                   </span>
-                  <span className="font-medium">{e.title}</span>
+                  <span className="font-medium text-ink">{e.title}</span>
                   {e.end_date && (
-                    <span className="ml-auto text-xs text-gray-400">
+                    <span className="ml-auto text-xs text-ink-faint">
                       ~{formatKoreanDate(e.end_date)}
                     </span>
                   )}
@@ -204,16 +204,16 @@ export default async function WorkDashboardPage() {
               ))}
             </ul>
           ) : (
-            <p className="rounded-xl border-2 border-dashed p-5 text-center text-sm text-gray-400">
+            <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-5 text-center text-sm text-ink-soft">
               🍃 오늘은 업무 일정이 없어요.
             </p>
           )}
         </section>
 
-        <section className="flex flex-col gap-2 rounded-2xl border bg-white p-5 shadow-sm">
+        <section className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-5">
           <div className="flex items-center justify-between">
-            <h2 className="font-bold">🔗 자주 쓰는 링크</h2>
-            <Link href="/work/links" className="text-sm text-slate-500 underline">
+            <h2 className="font-bold text-ink">자주 쓰는 링크</h2>
+            <Link href="/work/links" className="text-sm text-slate-600 underline">
               관리
             </Link>
           </div>
@@ -232,7 +232,7 @@ export default async function WorkDashboardPage() {
               ))}
             </div>
           ) : (
-            <p className="rounded-xl border-2 border-dashed p-5 text-center text-sm text-gray-400">
+            <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-5 text-center text-sm text-ink-soft">
               🔖 나이스, 업무포털 같은 링크를 등록해보세요.
             </p>
           )}

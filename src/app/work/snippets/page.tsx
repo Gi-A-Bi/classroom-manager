@@ -30,8 +30,8 @@ export default async function WorkSnippetsPage({
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-6">
       <WorkNav current="snippets" />
 
-      <h1 className="text-2xl font-extrabold tracking-tight">📑 문서 스니펫</h1>
-      <p className="-mt-3 text-sm text-gray-500">
+      <h1 className="text-2xl font-display text-ink">📑 문서 스니펫</h1>
+      <p className="-mt-3 text-sm text-ink-soft">
         가정통신문 상용구, 학기초 안내문처럼 자주 쓰는 문구를 저장해두고 복사
         버튼 한 번으로 붙여넣으세요.
       </p>
@@ -42,22 +42,22 @@ export default async function WorkSnippetsPage({
         </p>
       )}
 
-      <section className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">새 스니펫</h2>
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <h2 className="font-semibold text-ink">새 스니펫</h2>
         <form action={addSnippet} className="flex flex-col gap-3">
           <input
             type="text"
             name="title"
             required
             placeholder="가정통신문 인사말"
-            className="rounded-lg border p-2"
+            className="rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
           />
           <textarea
             name="content"
             required
             rows={4}
             placeholder={"학부모님, 안녕하십니까?\n항상 본교 교육활동에 관심을 가져주셔서 감사합니다."}
-            className="rounded-lg border p-2 text-sm"
+            className="rounded-lg border border-line bg-paper-soft p-2 text-sm text-ink placeholder:text-ink-faint"
           />
           <button
             type="submit"
@@ -74,18 +74,18 @@ export default async function WorkSnippetsPage({
           name="q"
           defaultValue={q ?? ""}
           placeholder="검색"
-          className="flex-1 rounded-xl border bg-white p-2.5 text-sm shadow-sm"
+          className="flex-1 rounded-xl border border-line bg-paper p-2.5 text-sm text-ink placeholder:text-ink-faint"
         />
         <button
           type="submit"
-          className="rounded-xl border bg-white px-4 text-sm text-gray-600 shadow-sm transition-colors hover:bg-gray-50"
+          className="rounded-xl border border-line bg-paper px-4 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
         >
           🔍
         </button>
       </form>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-xs font-bold tracking-wide text-gray-400">
+        <h2 className="text-xs font-bold tracking-wide text-ink-faint">
           {q ? `"${q}" 검색 결과 ` : ""}
           {snippets?.length ?? 0}개
         </h2>
@@ -94,23 +94,23 @@ export default async function WorkSnippetsPage({
             {snippets.map((s) => (
               <li
                 key={s.id}
-                className="flex items-start justify-between gap-3 rounded-xl border bg-white p-4 shadow-sm"
+                className="flex items-start justify-between gap-3 rounded-xl border border-line bg-paper p-4"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1">
-                    <h3 className="font-semibold">{s.title}</h3>
+                    <h3 className="font-semibold text-ink">{s.title}</h3>
                     <form action={deleteSnippet}>
                       <input type="hidden" name="snippet_id" value={s.id} />
                       <button
                         type="submit"
                         title="삭제"
-                        className="rounded-md px-2 py-1 text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500"
+                        className="rounded-md px-2 py-1 text-ink-faint transition-colors hover:bg-red-50 hover:text-red-500"
                       >
                         ×
                       </button>
                     </form>
                   </div>
-                  <p className="mt-1 text-sm whitespace-pre-wrap text-gray-600">
+                  <p className="mt-1 text-sm whitespace-pre-wrap text-ink-soft">
                     {s.content}
                   </p>
                 </div>
@@ -119,7 +119,7 @@ export default async function WorkSnippetsPage({
             ))}
           </ul>
         ) : (
-          <p className="rounded-xl border-2 border-dashed p-8 text-center text-sm text-gray-400">
+          <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-8 text-center text-sm text-ink-soft">
             {q ? "🔍 검색 결과가 없어요." : "📑 첫 스니펫을 저장해보세요."}
           </p>
         )}
