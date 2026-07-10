@@ -96,6 +96,10 @@ M2 — 학급 페이지 완성 ✅ 완료 (2026-07-09) → 다음: M3 교사 비
 - 이 Supabase 버전은 API 역할에 DML grant 자동 부여 안 함 → 마이그레이션에 명시적 grant 필요
 - Windows 제약: analytics 비활성화(config.toml), `supabase start --ignore-health-check` 사용,
   `db reset` 실패 시 `stop --no-backup` 후 재시작으로 대체
+- **재부팅 후 "미리보기 안 열림/가입 실패" 증상**: Docker·Supabase·개발 서버가
+  자동 시작되지 않아서 발생. 복구 순서 — ① Docker Desktop 실행 →
+  ② `npx supabase start --ignore-health-check` → ③ `npm run dev -- -p 3300`
+  (데이터는 Docker 볼륨에 보존되므로 사라지지 않음)
 - 로컬 키는 `.env.local`(gitignore됨), service_role 키는 NEXT_PUBLIC_ 접두사 금지
 - WSL2 설치 후 Windows가 3000번대 포트를 예약 → 개발 서버는 3300 포트 사용
 - 명렬 붙여넣기의 이름은 nickname 컬럼에 저장 (개인정보 최소화 — 실명 필수 아님)
