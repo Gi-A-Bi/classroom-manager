@@ -15,6 +15,7 @@ import {
   todayString,
 } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
+import { getTheme } from "@/lib/themes";
 import {
   bulkCreateEvents,
   createEvent,
@@ -72,6 +73,7 @@ export default async function CalendarPage({
 
   if (!classroom) notFound();
 
+  const theme = getTheme(classroom.theme_color);
   const academicYear = classroom.academic_years?.year ?? year;
 
   // 기간 일정은 달력의 해당 날짜마다 펼쳐서 표시
@@ -117,33 +119,37 @@ export default async function CalendarPage({
         </p>
       )}
 
-      <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">📌 일정 등록</h2>
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <h2 className="font-semibold text-ink">일정 등록</h2>
         <form action={createEvent} className="flex flex-wrap items-end gap-3">
           <input type="hidden" name="classroom_id" value={classroom.id} />
           <input type="hidden" name="month" value={thisMonth} />
-          <label className="flex flex-col gap-1 text-sm">
+          <label className="flex flex-col gap-1 text-sm text-ink-soft">
             날짜
             <input
               type="date"
               name="event_date"
               required
               defaultValue={today}
-              className="rounded-lg border p-2"
+              className="rounded-lg border border-line bg-paper-soft p-2 text-ink"
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm">
-            종료일 <span className="text-xs text-gray-400">(기간일 때만)</span>
-            <input type="date" name="end_date" className="rounded-lg border p-2" />
+          <label className="flex flex-col gap-1 text-sm text-ink-soft">
+            종료일 <span className="text-xs text-ink-faint">(기간일 때만)</span>
+            <input
+              type="date"
+              name="end_date"
+              className="rounded-lg border border-line bg-paper-soft p-2 text-ink"
+            />
           </label>
-          <label className="flex min-w-36 flex-1 flex-col gap-1 text-sm">
+          <label className="flex min-w-36 flex-1 flex-col gap-1 text-sm text-ink-soft">
             제목
             <input
               type="text"
               name="title"
               required
               placeholder="현장체험학습"
-              className="rounded-lg border p-2"
+              className="rounded-lg border border-line bg-paper-soft p-2 text-ink placeholder:text-ink-faint"
             />
           </label>
           <fieldset className="flex items-center gap-3 text-sm">
@@ -162,7 +168,7 @@ export default async function CalendarPage({
           </fieldset>
           <button
             type="submit"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="rounded-lg bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
           >
             등록
           </button>
@@ -175,11 +181,11 @@ export default async function CalendarPage({
         month={thisMonth}
       />
 
-      <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-semibold">
-            🔗 학부모 공유 링크{" "}
-            <span className="text-sm font-normal text-gray-500">
+          <h2 className="font-semibold text-ink">
+            학부모 공유 링크{" "}
+            <span className="text-sm font-normal text-ink-faint">
               로그인 없이 캘린더만 볼 수 있는 읽기 전용 주소
             </span>
           </h2>
@@ -191,7 +197,7 @@ export default async function CalendarPage({
                   <input type="hidden" name="month" value={thisMonth} />
                   <button
                     type="submit"
-                    className="rounded-lg border px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+                    className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
                   >
                     재발급
                   </button>
@@ -201,7 +207,7 @@ export default async function CalendarPage({
                   <input type="hidden" name="month" value={thisMonth} />
                   <button
                     type="submit"
-                    className="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-600 transition-colors hover:bg-red-50"
+                    className="rounded-lg border border-red-200 bg-paper px-3 py-1.5 text-sm text-red-600 transition-colors hover:bg-red-50"
                   >
                     공유 끄기
                   </button>
@@ -213,7 +219,7 @@ export default async function CalendarPage({
                 <input type="hidden" name="month" value={thisMonth} />
                 <button
                   type="submit"
-                  className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  className="rounded-lg bg-ink px-4 py-1.5 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
                 >
                   공유 켜기
                 </button>
@@ -226,12 +232,11 @@ export default async function CalendarPage({
             type="text"
             readOnly
             value={shareUrl}
-            onFocus={undefined}
-            className="w-full rounded-lg border bg-gray-50 p-2 font-mono text-xs text-gray-700"
+            className="w-full rounded-lg border border-line bg-paper-soft p-2 font-mono text-xs text-ink-soft"
           />
         )}
         {shareUrl && (
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-ink-faint">
             이 주소를 아는 사람은 누구나 캘린더를 볼 수 있어요. 주소를 바꾸려면
             재발급, 공유를 멈추려면 공유 끄기를 누르세요.
           </p>
@@ -242,30 +247,43 @@ export default async function CalendarPage({
         <div className="flex items-center justify-between">
           <Link
             href={`/dashboard/classrooms/${classroom.id}/calendar?month=${monthString(prev.year, prev.monthIndex)}`}
-            className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
           >
             ← {prev.monthIndex + 1}월
           </Link>
-          <h2 className="text-xl font-bold tabular-nums">
-            {year}년 {monthIndex + 1}월
+          <h2 className="font-display text-3xl leading-none text-ink">
+            <span className="relative inline-block">
+              <span
+                aria-hidden
+                className={`absolute inset-x-[-2px] bottom-0.5 -z-10 h-3 -rotate-1 rounded-sm ${theme.soft}`}
+              />
+              {monthIndex + 1}월
+            </span>
+            <span className="ml-2 font-sans text-sm font-normal text-ink-faint">
+              {year}
+            </span>
           </h2>
           <Link
             href={`/dashboard/classrooms/${classroom.id}/calendar?month=${monthString(next.year, next.monthIndex)}`}
-            className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
           >
             {next.monthIndex + 1}월 →
           </Link>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border bg-white p-3 shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-line bg-paper p-3">
           <table className="w-full table-fixed border-collapse text-sm">
             <thead>
               <tr>
                 {DAY_NAMES.map((name, i) => (
                   <th
                     key={name}
-                    className={`border bg-gray-50 p-2 ${
-                      i === 5 ? "text-blue-600" : i === 6 ? "text-red-500" : ""
+                    className={`border border-line bg-paper-soft py-2 font-medium ${
+                      i === 5
+                        ? "text-blue-500"
+                        : i === 6
+                          ? "text-rose-400"
+                          : "text-ink-faint"
                     }`}
                   >
                     {name}
@@ -276,53 +294,62 @@ export default async function CalendarPage({
             <tbody>
               {weeks.map((week, i) => (
                 <tr key={i}>
-                  {week.map((date, j) => (
-                    <td
-                      key={j}
-                      className={`h-24 w-[14%] border p-1 align-top ${
-                        date === today ? "bg-yellow-50" : ""
-                      }`}
-                    >
-                      {date && (
-                        <div className="flex flex-col gap-1">
-                          <span
-                            className={`text-xs tabular-nums ${date === today ? "font-bold" : "text-gray-500"}`}
-                          >
-                            {Number(date.slice(8))}
-                          </span>
-                          {(eventsByDate.get(date) ?? []).map((e) => (
-                            <form
-                              key={e.id}
-                              action={deleteEvent}
-                              className={`group flex items-start justify-between gap-1 rounded px-1 py-0.5 text-xs transition-opacity ${LAYER_STYLE[e.layer as keyof typeof LAYER_STYLE]}`}
+                  {week.map((date, j) => {
+                    const isToday = date === today;
+                    return (
+                      <td
+                        key={j}
+                        className={`h-24 border border-line p-1 align-top ${
+                          isToday ? theme.soft : ""
+                        }`}
+                      >
+                        {date && (
+                          <div className="flex flex-col gap-1">
+                            <span
+                              className={`text-xs tabular-nums ${
+                                isToday
+                                  ? `inline-flex h-5 w-5 items-center justify-center rounded-full bg-ink font-bold text-paper`
+                                  : "text-ink-soft"
+                              }`}
                             >
-                              <input
-                                type="hidden"
-                                name="classroom_id"
-                                value={classroom.id}
-                              />
-                              <input type="hidden" name="event_id" value={e.id} />
-                              <input type="hidden" name="month" value={thisMonth} />
-                              <span className="min-w-0 break-words">{e.title}</span>
-                              <button
-                                type="submit"
-                                title="일정 삭제"
-                                className="hidden shrink-0 font-bold group-hover:inline"
+                              {Number(date.slice(8))}
+                            </span>
+                            {(eventsByDate.get(date) ?? []).map((e) => (
+                              <form
+                                key={e.id}
+                                action={deleteEvent}
+                                className={`group flex items-start justify-between gap-1 rounded px-1 py-0.5 text-xs ${LAYER_STYLE[e.layer as keyof typeof LAYER_STYLE]}`}
                               >
-                                ×
-                              </button>
-                            </form>
-                          ))}
-                        </div>
-                      )}
-                    </td>
-                  ))}
+                                <input
+                                  type="hidden"
+                                  name="classroom_id"
+                                  value={classroom.id}
+                                />
+                                <input type="hidden" name="event_id" value={e.id} />
+                                <input type="hidden" name="month" value={thisMonth} />
+                                <span className="min-w-0 break-words">
+                                  {e.title}
+                                </span>
+                                <button
+                                  type="submit"
+                                  title="일정 삭제"
+                                  className="hidden shrink-0 font-bold group-hover:inline"
+                                >
+                                  ×
+                                </button>
+                              </form>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-ink-faint">
           일정 위에 마우스를 올리면 × 버튼으로 삭제할 수 있습니다. 기간 일정
           (예: {formatMonthDay(monthStart)}~)은 해당 기간의 모든 날짜에
           표시됩니다.

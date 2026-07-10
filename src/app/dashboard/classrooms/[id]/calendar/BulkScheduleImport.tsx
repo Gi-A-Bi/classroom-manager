@@ -32,10 +32,10 @@ export function BulkScheduleImport({
   const pendingRows = (rows ?? []).filter((r) => !r.start || !r.title.trim());
 
   return (
-    <details className="rounded-xl border bg-white shadow-sm open:pb-5">
-      <summary className="cursor-pointer px-5 py-4 font-semibold transition-colors hover:bg-gray-50">
-        📎 학사일정 붙여넣기{" "}
-        <span className="text-sm font-normal text-gray-500">
+    <details className="rounded-2xl border border-line bg-paper open:pb-5">
+      <summary className="cursor-pointer px-5 py-4 font-semibold text-ink transition-colors hover:bg-paper-soft">
+        학사일정 붙여넣기{" "}
+        <span className="text-sm font-normal text-ink-faint">
           한글·엑셀 표를 복사해서 한 번에 등록
         </span>
       </summary>
@@ -48,17 +48,17 @@ export function BulkScheduleImport({
               onChange={(e) => setText(e.target.value)}
               rows={8}
               placeholder={"3/2 입학식\n3월 5일 학부모 총회\n7/21~8/24 여름방학"}
-              className="rounded-lg border p-3 font-mono text-sm"
+              className="rounded-lg border border-line bg-paper-soft p-3 font-mono text-sm text-ink placeholder:text-ink-faint"
             />
             <button
               type="button"
               onClick={() => setRows(parseScheduleText(text, academicYear))}
               disabled={text.trim().length === 0}
-              className="self-start rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-40"
+              className="self-start rounded-lg bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink/85 disabled:opacity-40"
             >
               날짜 인식하기
             </button>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-ink-faint">
               지원 형식: 3/2 · 3월 2일 · 3.2.(월) · 기간 7/21~8/24 (연도는{" "}
               {academicYear}학년도 기준, 1~2월은 {academicYear + 1}년으로 인식)
             </p>
@@ -163,7 +163,7 @@ export function BulkScheduleImport({
                 <button
                   type="submit"
                   disabled={readyRows.length === 0}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-40"
+                  className="rounded-lg bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink/85 disabled:opacity-40"
                 >
                   {readyRows.length}건 일괄 등록
                 </button>
@@ -171,7 +171,7 @@ export function BulkScheduleImport({
               <button
                 type="button"
                 onClick={() => setRows(null)}
-                className="rounded-lg border px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+                className="rounded-lg border border-line px-4 py-2 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
               >
                 다시 붙여넣기
               </button>

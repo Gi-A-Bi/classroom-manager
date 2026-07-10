@@ -1,17 +1,6 @@
 import { getTheme } from "@/lib/themes";
 
-const TITLE_EMOJI: Record<string, string> = {
-  알림장: "📝",
-  "학생 명렬": "🧑‍🏫",
-  시간표: "⏰",
-  캘린더: "🗓️",
-  "기록 카드": "🔒",
-  "성적 기록": "💯",
-  출결: "📅",
-  도구: "🧰",
-};
-
-// 학급 페이지 공통 헤더 — 테마컬러를 상단 줄과 배경에 은은하게 적용
+// 학급 서브 페이지 공통 헤더 — 종이 톤. 섹션 제목을 디스플레이로, 테마색 액센트 바.
 export function ClassroomHeader({
   name,
   title,
@@ -26,22 +15,25 @@ export function ClassroomHeader({
   const theme = getTheme(themeColor);
 
   return (
-    <header className={`overflow-hidden rounded-xl ${theme.soft}`}>
-      <div className={`h-1.5 ${theme.topbar}`} />
-      <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4">
-        <h1 className={`text-xl font-bold ${theme.text}`}>
-          {TITLE_EMOJI[title] ?? ""} {name}{" "}
-          <span className="font-medium">{title}</span>
-        </h1>
-        {classCode && (
-          <span className="text-sm text-gray-600">
-            학급코드{" "}
-            <code className="rounded-md bg-white/80 px-2 py-1 font-mono font-bold">
-              {classCode}
-            </code>
-          </span>
-        )}
+    <header className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex items-center gap-2.5">
+        <span
+          className={`h-9 w-1.5 shrink-0 rounded-full ${theme.topbar}`}
+          aria-hidden
+        />
+        <div className="flex flex-col">
+          <span className="text-sm font-medium text-ink-faint">{name}</span>
+          <h1 className="font-display text-3xl leading-none text-ink">{title}</h1>
+        </div>
       </div>
+      {classCode && (
+        <span className="text-sm text-ink-soft">
+          학급코드{" "}
+          <code className="rounded-md border border-line bg-paper px-2 py-1 font-mono font-bold tracking-wider text-ink">
+            {classCode}
+          </code>
+        </span>
+      )}
     </header>
   );
 }
