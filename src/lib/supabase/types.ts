@@ -308,18 +308,21 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          last_mode: string
           role: string
         }
         Insert: {
           created_at?: string
           display_name?: string
           id: string
+          last_mode?: string
           role?: string
         }
         Update: {
           created_at?: string
           display_name?: string
           id?: string
+          last_mode?: string
           role?: string
         }
         Relationships: []
@@ -396,6 +399,167 @@ export type Database = {
             columns: ["classroom_id"]
             isOneToOne: false
             referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_documents: {
+        Row: {
+          created_at: string
+          due_date: string | null
+          id: string
+          link: string | null
+          memo: string
+          received_date: string
+          status: string
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          link?: string | null
+          memo?: string
+          received_date?: string
+          status?: string
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          link?: string | null
+          memo?: string
+          received_date?: string
+          status?: string
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_documents_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_events: {
+        Row: {
+          category: string
+          created_at: string
+          end_date: string | null
+          event_date: string
+          id: string
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          end_date?: string | null
+          event_date: string
+          id?: string
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          end_date?: string | null
+          event_date?: string
+          id?: string
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_events_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_links: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          position: number
+          teacher_id: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+          teacher_id: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+          teacher_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_links_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_todos: {
+        Row: {
+          created_at: string
+          done_at: string | null
+          due_date: string | null
+          id: string
+          last_done_date: string | null
+          priority: number
+          repeat_dow: number | null
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          done_at?: string | null
+          due_date?: string | null
+          id?: string
+          last_done_date?: string | null
+          priority?: number
+          repeat_dow?: number | null
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          done_at?: string | null
+          due_date?: string | null
+          id?: string
+          last_done_date?: string | null
+          priority?: number
+          repeat_dow?: number | null
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_todos_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
