@@ -133,7 +133,7 @@ export default async function SharedCalendarPage({
       </div>
 
       <div className="rounded-2xl border bg-white p-2 shadow-sm">
-        <table className="w-full border-collapse text-sm">
+        <table className="w-full table-fixed border-collapse text-sm">
           <thead>
             <tr>
               {DAY_NAMES.map((name, i) => (
@@ -169,7 +169,7 @@ export default async function SharedCalendarPage({
                           <span
                             key={e.id}
                             title={e.title}
-                            className={`truncate rounded px-0.5 text-[10px] leading-tight ${LAYER_STYLE[e.layer]}`}
+                            className={`break-words rounded px-0.5 text-[10px] leading-tight ${LAYER_STYLE[e.layer]}`}
                           >
                             {e.title}
                           </span>

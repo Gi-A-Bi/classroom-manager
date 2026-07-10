@@ -214,7 +214,7 @@ export default async function WorkCalendarPage({
         </div>
 
         <div className="overflow-x-auto rounded-xl border bg-white p-3 shadow-sm">
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full table-fixed border-collapse text-sm">
             <thead>
               <tr>
                 {DAY_NAMES.map((name, i) => (
@@ -251,7 +251,7 @@ export default async function WorkCalendarPage({
                               <form
                                 key={chip.key}
                                 action={deleteWorkEvent}
-                                className={`group flex items-center justify-between gap-1 rounded px-1 py-0.5 text-xs ${chip.style}`}
+                                className={`group flex items-start justify-between gap-1 rounded px-1 py-0.5 text-xs ${chip.style}`}
                               >
                                 <input
                                   type="hidden"
@@ -259,7 +259,7 @@ export default async function WorkCalendarPage({
                                   value={chip.deletableId}
                                 />
                                 <input type="hidden" name="month" value={thisMonth} />
-                                <span className="truncate">{chip.label}</span>
+                                <span className="min-w-0 break-words">{chip.label}</span>
                                 <button
                                   type="submit"
                                   title="일정 삭제"
@@ -272,7 +272,7 @@ export default async function WorkCalendarPage({
                               <span
                                 key={chip.key}
                                 title={chip.label}
-                                className={`truncate rounded px-1 py-0.5 text-xs ${chip.style}`}
+                                className={`break-words rounded px-1 py-0.5 text-xs ${chip.style}`}
                               >
                                 {chip.label}
                               </span>

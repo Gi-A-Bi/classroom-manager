@@ -99,7 +99,7 @@ export default async function StudentCalendarPage({
       </div>
 
       <div className="rounded-2xl border bg-white p-2 shadow-sm">
-      <table className="w-full border-collapse text-sm">
+      <table className="w-full table-fixed border-collapse text-sm">
         <thead>
           <tr>
             {DAY_NAMES.map((name, i) => (
@@ -134,7 +134,7 @@ export default async function StudentCalendarPage({
                       {(eventsByDate.get(date) ?? []).map((e) => (
                         <span
                           key={e.id}
-                          className={`truncate rounded px-0.5 text-[10px] leading-tight ${LAYER_STYLE[e.layer as keyof typeof LAYER_STYLE]}`}
+                          className={`break-words rounded px-0.5 text-[10px] leading-tight ${LAYER_STYLE[e.layer as keyof typeof LAYER_STYLE]}`}
                           title={e.title}
                         >
                           {e.title}

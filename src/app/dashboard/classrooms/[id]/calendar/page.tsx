@@ -258,7 +258,7 @@ export default async function CalendarPage({
         </div>
 
         <div className="overflow-x-auto rounded-xl border bg-white p-3 shadow-sm">
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full table-fixed border-collapse text-sm">
             <thead>
               <tr>
                 {DAY_NAMES.map((name, i) => (
@@ -294,7 +294,7 @@ export default async function CalendarPage({
                             <form
                               key={e.id}
                               action={deleteEvent}
-                              className={`group flex items-center justify-between gap-1 rounded px-1 py-0.5 text-xs transition-opacity ${LAYER_STYLE[e.layer as keyof typeof LAYER_STYLE]}`}
+                              className={`group flex items-start justify-between gap-1 rounded px-1 py-0.5 text-xs transition-opacity ${LAYER_STYLE[e.layer as keyof typeof LAYER_STYLE]}`}
                             >
                               <input
                                 type="hidden"
@@ -303,7 +303,7 @@ export default async function CalendarPage({
                               />
                               <input type="hidden" name="event_id" value={e.id} />
                               <input type="hidden" name="month" value={thisMonth} />
-                              <span className="truncate">{e.title}</span>
+                              <span className="min-w-0 break-words">{e.title}</span>
                               <button
                                 type="submit"
                                 title="일정 삭제"

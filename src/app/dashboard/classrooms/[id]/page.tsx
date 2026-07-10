@@ -253,7 +253,7 @@ export default async function ClassroomHomePage({
             </Link>
           </div>
           <div className="overflow-hidden rounded-2xl border border-line bg-paper">
-            <table className="w-full border-collapse text-sm">
+            <table className="w-full table-fixed border-collapse text-sm">
               <thead>
                 <tr>
                   {DAY_NAMES.map((d, i) => (
@@ -294,7 +294,7 @@ export default async function ClassroomHomePage({
                                 <span
                                   key={e.id}
                                   title={e.title}
-                                  className={`truncate rounded px-1 text-[10px] leading-tight ${
+                                  className={`break-words rounded px-1 text-[10px] leading-tight ${
                                     e.layer === "school"
                                       ? "bg-orange-100 text-orange-800"
                                       : `${theme.soft} ${theme.text}`
