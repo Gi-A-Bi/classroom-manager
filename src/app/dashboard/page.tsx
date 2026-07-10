@@ -1,16 +1,25 @@
+import {
+  CalendarDays,
+  ExternalLink,
+  ListChecks,
+  LogOut,
+  NotebookPen,
+  Settings,
+} from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { CLASSROOM_MENU } from "@/components/ClassroomNav";
+import { ModeSwitch } from "@/components/ModeSwitch";
 import {
   DAY_NAMES,
   dayOfWeekMon1,
   daysBetween,
   formatKoreanDate,
+  formatMonthDay,
   todayString,
 } from "@/lib/dates";
-import { CLASSROOM_MENU } from "@/components/ClassroomNav";
-import { ModeSwitch } from "@/components/ModeSwitch";
 import { createClient } from "@/lib/supabase/server";
-import { getTheme, pastelChip } from "@/lib/themes";
+import { getTheme } from "@/lib/themes";
 import { logout } from "../login/actions";
 
 export default async function DashboardPage({
@@ -26,16 +35,21 @@ export default async function DashboardPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: profile }, { data: years }] = await Promise.all([
-    supabase.from("profiles").select("display_name").eq("id", user.id).single(),
-    supabase
-      .from("academic_years")
-      .select("id, year, name, classrooms(id, name, class_code, theme_color)")
-      .order("year", { ascending: false }),
-  ]);
+  const [{ data: profile }, { data: years }, { data: todos }] =
+    await Promise.all([
+      supabase.from("profiles").select("display_name").eq("id", user.id).single(),
+      supabase
+        .from("academic_years")
+        .select("id, year, name, classrooms(id, name, class_code, theme_color)")
+        .order("year", { ascending: false }),
+      supabase
+        .from("work_todos")
+        .select("id, title, due_date, repeat_dow, done_at, last_done_date")
+        .order("priority")
+        .order("due_date", { nullsFirst: false }),
+    ]);
 
   const availableYears = years ?? [];
-  // 학년도 선택: ?year= 파라미터, 없으면 가장 최근 학년도
   const selectedYear =
     availableYears.find((y) => String(y.year) === yearParam) ??
     availableYears[0] ??
@@ -52,7 +66,12 @@ export default async function DashboardPage({
   const todayDow = dayOfWeekMon1();
   const isWeekday = todayDow <= 5;
 
-  const [{ data: todaySlots }, { data: recentPosts }, { data: todayEvents }] =
+  const [
+    { data: todaySlots },
+    { data: recentPosts },
+    { data: todayEvents },
+    { data: todayPosts },
+  ] =
     classroomIds.length > 0
       ? await Promise.all([
           isWeekday
@@ -82,15 +101,19 @@ export default async function DashboardPage({
             .in("classroom_id", classroomIds)
             .lte("event_date", today)
             .or(`end_date.gte.${today},event_date.eq.${today}`),
+          supabase
+            .from("posts")
+            .select("classroom_id")
+            .in("classroom_id", classroomIds)
+            .eq("post_date", today),
         ])
-      : [{ data: [] }, { data: [] }, { data: [] }];
+      : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }];
 
-  // 히어로 D-day: 가장 가까운 다가오는 일정 (오늘 이후 시작)
   const { data: nextEvents } =
     classroomIds.length > 0
       ? await supabase
           .from("events")
-          .select("title, event_date, layer")
+          .select("title, event_date")
           .in("classroom_id", classroomIds)
           .gt("event_date", today)
           .order("event_date")
@@ -99,52 +122,76 @@ export default async function DashboardPage({
   const nextEvent = nextEvents?.[0] ?? null;
   const dday = nextEvent ? daysBetween(today, nextEvent.event_date) : null;
 
-  // 즐겨찾기 도구 (교사 개인 소유, 최대 2개 바로가기)
   const { data: favTools } = await supabase
     .from("class_tools")
     .select("id, name, url, color")
     .eq("is_favorite", true)
     .order("position")
-    .limit(2);
+    .limit(3);
+
+  // 오늘 할 일 (반복은 오늘 요일, 단발성은 마감이 오늘이거나 지난 미완료)
+  const todoDone = (t: NonNullable<typeof todos>[number]) =>
+    t.repeat_dow ? t.last_done_date === today : t.done_at !== null;
+  const todayTodos = (todos ?? []).filter((t) =>
+    t.repeat_dow
+      ? t.repeat_dow === todayDow
+      : !t.done_at && t.due_date !== null && t.due_date <= today,
+  );
+  const remainingTodos = todayTodos.filter((t) => !todoDone(t));
+
+  // 오늘 알림장 작성 현황
+  const writtenClassrooms = new Set(
+    (todayPosts ?? []).map((p) => p.classroom_id),
+  );
+  const firstClassroom = classrooms[0];
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
-      <header className="flex items-start justify-between gap-4">
-        <div className="flex flex-col gap-1.5">
-          <p className="text-sm font-medium text-gray-500">
-            👋 {profile?.display_name || "선생님"} 선생님, 안녕하세요
-          </p>
-          <h1 className="text-4xl font-extrabold tracking-tight tabular-nums">
-            {Number(today.slice(5, 7))}월 {Number(today.slice(8))}일{" "}
-            <span className="text-2xl font-bold text-gray-400">
-              {DAY_NAMES[todayDow - 1]}요일
-            </span>
-          </h1>
-          {nextEvent && dday !== null && (
-            <p className="flex items-center gap-2 text-sm">
-              <span className="rounded-lg bg-gray-900 px-2 py-0.5 font-bold tabular-nums text-white">
-                D-{dday}
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-5 p-6">
+      {/* 헤더 — 큰 날짜 제목 + 손그림 밑줄 */}
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <span className="text-sm font-medium text-ink-faint">
+            {profile?.display_name || "선생님"} 선생님, 안녕하세요
+          </span>
+          <div className="relative inline-block pb-2">
+            <h1 className="font-display text-5xl leading-none tracking-tight text-ink tabular-nums">
+              {Number(today.slice(5, 7))}월 {Number(today.slice(8))}일{" "}
+              <span className="text-3xl text-ink-faint">
+                {DAY_NAMES[todayDow - 1]}요일
               </span>
-              <span className="font-medium">{nextEvent.title}</span>
-              <span className="text-gray-400">
-                {formatKoreanDate(nextEvent.event_date)}
-              </span>
-            </p>
-          )}
+            </h1>
+            <svg
+              className="absolute -bottom-0.5 left-0 w-[62%] text-ink-soft"
+              height="9"
+              viewBox="0 0 200 9"
+              preserveAspectRatio="none"
+              fill="none"
+              aria-hidden
+            >
+              <path
+                d="M3 5.5 Q 45 1.5 90 4.5 T 175 4 T 197 3.5"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
         </div>
         <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
           <ModeSwitch current="class" />
           <Link
             href="/dashboard/settings"
-            className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
           >
-            ⚙️ 설정
+            <Settings size={15} strokeWidth={1.75} aria-hidden />
+            설정
           </Link>
           <form action={logout}>
             <button
               type="submit"
-              className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
             >
+              <LogOut size={15} strokeWidth={1.75} aria-hidden />
               로그아웃
             </button>
           </form>
@@ -157,6 +204,7 @@ export default async function DashboardPage({
         </p>
       )}
 
+      {/* 즐겨찾기 도구 */}
       {favTools && favTools.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {favTools.map((t) => {
@@ -167,15 +215,115 @@ export default async function DashboardPage({
                 href={t.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`rounded-xl px-3.5 py-2 text-sm font-semibold shadow-sm transition-transform hover:scale-105 ${tt.soft} ${tt.text}`}
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold transition-transform hover:scale-105 ${tt.soft} ${tt.text}`}
               >
-                🔗 {t.name} ↗
+                <ExternalLink size={15} strokeWidth={2} aria-hidden />
+                {t.name}
               </a>
             );
           })}
         </div>
       )}
 
+      {/* 오늘 요약 카드 3장 */}
+      <section className="grid gap-3 sm:grid-cols-3">
+        {/* 할 일 */}
+        <Link
+          href="/work/todos"
+          className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-4 transition-colors hover:bg-paper-soft"
+        >
+          <span className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-ink-faint">
+            <ListChecks size={15} strokeWidth={1.75} aria-hidden />
+            오늘 할 일
+          </span>
+          {remainingTodos.length > 0 ? (
+            <ul className="flex flex-col gap-1">
+              {remainingTodos.slice(0, 3).map((t) => (
+                <li key={t.id} className="line-clamp-1 text-sm text-ink">
+                  · {t.title}
+                </li>
+              ))}
+              {remainingTodos.length > 3 && (
+                <li className="text-xs text-ink-faint">
+                  외 {remainingTodos.length - 3}개
+                </li>
+              )}
+            </ul>
+          ) : (
+            <span className="mt-auto font-hand text-base text-ink-soft">
+              {todayTodos.length > 0 ? "다 했어요! 👏" : "할 일이 없어요"}
+            </span>
+          )}
+        </Link>
+
+        {/* 알림장 쓰기 */}
+        <Link
+          href={
+            firstClassroom
+              ? `/dashboard/classrooms/${firstClassroom.id}/posts`
+              : "/dashboard/settings"
+          }
+          className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-4 transition-colors hover:bg-paper-soft"
+        >
+          <span className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-ink-faint">
+            <NotebookPen size={15} strokeWidth={1.75} aria-hidden />
+            오늘 알림장
+          </span>
+          {classrooms.length > 0 ? (
+            <span className="mt-auto text-sm text-ink-soft">
+              작성{" "}
+              <strong className="tabular-nums text-ink">
+                {writtenClassrooms.size}
+              </strong>
+              <span className="text-ink-faint">/{classrooms.length} 반</span>
+              {writtenClassrooms.size < classrooms.length && (
+                <span className="ml-1 font-hand text-ink-soft">— 쓰러 가기</span>
+              )}
+            </span>
+          ) : (
+            <span className="mt-auto font-hand text-base text-ink-soft">
+              먼저 학급을 만들어요
+            </span>
+          )}
+        </Link>
+
+        {/* 오늘 일정 */}
+        <Link
+          href={
+            firstClassroom
+              ? `/dashboard/classrooms/${firstClassroom.id}/calendar`
+              : "/dashboard/settings"
+          }
+          className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-4 transition-colors hover:bg-paper-soft"
+        >
+          <span className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-ink-faint">
+            <CalendarDays size={15} strokeWidth={1.75} aria-hidden />
+            오늘 일정
+          </span>
+          {todayEvents && todayEvents.length > 0 ? (
+            <ul className="flex flex-col gap-1">
+              {todayEvents.slice(0, 3).map((e) => (
+                <li key={e.id} className="line-clamp-1 text-sm text-ink">
+                  · {e.title}
+                </li>
+              ))}
+            </ul>
+          ) : nextEvent && dday !== null ? (
+            <span className="mt-auto flex items-center gap-2 text-sm">
+              <span className="rounded-lg bg-ink px-2 py-0.5 font-bold tabular-nums text-paper">
+                D-{dday}
+              </span>
+              <span className="truncate text-ink-soft">{nextEvent.title}</span>
+            </span>
+          ) : (
+            <span className="mt-auto font-hand text-base text-ink-soft">
+              오늘 일정이 없어요
+            </span>
+          )}
+        </Link>
+      </section>
+
+      {/* 학년도 탭 */}
       {availableYears.length > 1 && (
         <nav className="flex flex-wrap gap-1.5">
           {availableYears.map((y) => (
@@ -184,8 +332,8 @@ export default async function DashboardPage({
               href={`/dashboard?year=${y.year}`}
               className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
                 y.id === selectedYear?.id
-                  ? "bg-gray-900 text-white"
-                  : "border bg-white text-gray-600 hover:bg-gray-50"
+                  ? "bg-ink text-paper"
+                  : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
               }`}
             >
               {y.name}
@@ -194,10 +342,11 @@ export default async function DashboardPage({
         </nav>
       )}
 
+      {/* 오늘의 학급 */}
       {classrooms.length > 0 ? (
         <section className="flex flex-col gap-3">
-          <h2 className="text-xs font-bold tracking-wide text-gray-400">
-            🏫 {selectedYear?.name}의 학급
+          <h2 className="text-xs font-bold uppercase tracking-widest text-ink-faint">
+            {selectedYear?.name}의 학급
           </h2>
           {classrooms.map((c) => {
             const theme = getTheme(c.theme_color);
@@ -214,24 +363,21 @@ export default async function DashboardPage({
             return (
               <div
                 key={c.id}
-                className="overflow-hidden rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-md"
+                className="overflow-hidden rounded-2xl border border-line bg-paper"
               >
                 <div className={`h-1.5 ${theme.topbar}`} />
                 <div className="flex flex-col gap-3 p-5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h3 className="text-lg font-bold">
+                    <h3 className="text-lg font-bold text-ink">
                       <Link
                         href={`/dashboard/classrooms/${c.id}`}
                         className="hover:underline"
                       >
                         {c.name}
                       </Link>{" "}
-                      <span className="text-sm font-normal text-gray-500">
-                        학급코드{" "}
-                        <code className="rounded-md bg-gray-100 px-1.5 py-0.5 font-mono font-bold">
-                          {c.class_code}
-                        </code>
-                      </span>
+                      <code className="ml-1 rounded-md bg-paper-soft px-1.5 py-0.5 font-mono text-sm font-bold tracking-wider text-ink-soft">
+                        {c.class_code}
+                      </code>
                     </h3>
                     <nav className="flex flex-wrap gap-x-3 gap-y-1.5">
                       {CLASSROOM_MENU.map((m) => {
@@ -258,7 +404,7 @@ export default async function DashboardPage({
                           className={`rounded-lg px-2.5 py-1 text-sm font-medium ${
                             e.layer === "school"
                               ? "bg-orange-100 text-orange-800"
-                              : "bg-blue-100 text-blue-800"
+                              : `${theme.soft} ${theme.text}`
                           }`}
                         >
                           오늘 · {e.title}
@@ -268,15 +414,15 @@ export default async function DashboardPage({
                   )}
 
                   <div className="flex flex-col gap-1 text-sm">
-                    <span className="font-semibold text-gray-600">
+                    <span className="font-semibold text-ink-soft">
                       오늘 시간표{isWeekday && ` (${DAY_NAMES[todayDow - 1]})`}
                     </span>
                     {isWeekday && slots.length > 0 ? (
                       <ol className="flex flex-wrap gap-1.5">
-                        {slots.map((s, i) => (
+                        {slots.map((s) => (
                           <li
                             key={s.period}
-                            className={`rounded-xl px-2.5 py-1 ${pastelChip(i)}`}
+                            className={`rounded-lg px-2.5 py-1 ${theme.soft} ${theme.text}`}
                           >
                             <span className="font-bold tabular-nums">
                               {s.period}
@@ -286,16 +432,16 @@ export default async function DashboardPage({
                         ))}
                       </ol>
                     ) : (
-                      <span className="text-gray-400">
+                      <span className="font-hand text-base text-ink-soft">
                         {isWeekday
-                          ? "✏️ 아직 시간표가 없어요 — 시간표 탭에서 입력해보세요"
-                          : "🌤️ 주말이에요"}
+                          ? "아직 시간표가 없어요"
+                          : "주말이에요 🌤️"}
                       </span>
                     )}
                   </div>
 
                   <div className="flex flex-col gap-1 text-sm">
-                    <span className="font-semibold text-gray-600">
+                    <span className="font-semibold text-ink-soft">
                       최근 알림장
                     </span>
                     {posts.length > 0 ? (
@@ -304,19 +450,19 @@ export default async function DashboardPage({
                           <li key={p.id}>
                             <Link
                               href={`/dashboard/classrooms/${c.id}/posts`}
-                              className="text-blue-700 underline underline-offset-2"
+                              className="font-medium text-ink underline decoration-line-strong underline-offset-2 hover:decoration-ink"
                             >
                               {p.title}
                             </Link>{" "}
-                            <span className="text-gray-400">
-                              {formatKoreanDate(p.post_date)}
+                            <span className="text-ink-faint tabular-nums">
+                              {formatMonthDay(p.post_date)}
                             </span>
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <span className="text-gray-400">
-                        📝 아직 알림장이 없어요 — 오늘 첫 알림장을 써보세요
+                      <span className="font-hand text-base text-ink-soft">
+                        아직 알림장이 없어요 — 첫 알림장을 써보세요
                       </span>
                     )}
                   </div>
@@ -326,18 +472,19 @@ export default async function DashboardPage({
           })}
         </section>
       ) : (
-        <section className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed p-10 text-center">
+        <section className="flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-10 text-center">
           <p className="text-3xl">🏫</p>
-          <p className="text-gray-500">
+          <p className="font-hand text-lg text-ink-soft">
             {selectedYear
               ? `${selectedYear.name}에 아직 학급이 없어요.`
               : "아직 학년도가 없어요."}
           </p>
           <Link
             href="/dashboard/settings"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
           >
-            ⚙️ 설정에서 만들기
+            <Settings size={15} strokeWidth={1.75} aria-hidden />
+            설정에서 만들기
           </Link>
         </section>
       )}
