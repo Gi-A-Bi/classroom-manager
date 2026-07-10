@@ -66,6 +66,92 @@ export type Database = {
           },
         ]
       }
+      assessment_results: {
+        Row: {
+          assessment_id: string
+          classroom_id: string
+          id: string
+          student_id: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          assessment_id: string
+          classroom_id: string
+          id?: string
+          student_id: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          assessment_id?: string
+          classroom_id?: string
+          id?: string
+          student_id?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_results_assessment_id_classroom_id_fkey"
+            columns: ["assessment_id", "classroom_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id", "classroom_id"]
+          },
+          {
+            foreignKeyName: "assessment_results_student_id_classroom_id_fkey"
+            columns: ["student_id", "classroom_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id", "classroom_id"]
+          },
+        ]
+      }
+      assessments: {
+        Row: {
+          assess_date: string
+          classroom_id: string
+          created_at: string
+          id: string
+          kind: string
+          levels: string[] | null
+          max_score: number | null
+          subject_id: string
+          title: string
+        }
+        Insert: {
+          assess_date?: string
+          classroom_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          levels?: string[] | null
+          max_score?: number | null
+          subject_id: string
+          title: string
+        }
+        Update: {
+          assess_date?: string
+          classroom_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          levels?: string[] | null
+          max_score?: number | null
+          subject_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessments_subject_id_classroom_id_fkey"
+            columns: ["subject_id", "classroom_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id", "classroom_id"]
+          },
+        ]
+      }
       classrooms: {
         Row: {
           academic_year_id: string
@@ -399,6 +485,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "students_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subjects: {
+        Row: {
+          classroom_id: string
+          created_at: string
+          id: string
+          name: string
+          position: number
+        }
+        Insert: {
+          classroom_id: string
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+        }
+        Update: {
+          classroom_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subjects_classroom_id_fkey"
             columns: ["classroom_id"]
             isOneToOne: false
             referencedRelation: "classrooms"
