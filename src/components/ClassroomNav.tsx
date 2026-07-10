@@ -32,6 +32,12 @@ export const CLASSROOM_MENU = [
     pill: "bg-slate-100 text-slate-700 hover:bg-slate-200",
     active: "bg-slate-300 text-slate-900",
   },
+  {
+    key: "grades",
+    label: "💯 성적",
+    pill: "bg-indigo-50 text-indigo-800 hover:bg-indigo-100",
+    active: "bg-indigo-200 text-indigo-900",
+  },
 ] as const;
 
 export function ClassroomNav({
