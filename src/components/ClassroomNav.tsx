@@ -38,6 +38,12 @@ export const CLASSROOM_MENU = [
     pill: "bg-indigo-50 text-indigo-800 hover:bg-indigo-100",
     active: "bg-indigo-200 text-indigo-900",
   },
+  {
+    key: "attendance",
+    label: "📅 출결",
+    pill: "bg-rose-50 text-rose-800 hover:bg-rose-100",
+    active: "bg-rose-200 text-rose-900",
+  },
 ] as const;
 
 export function ClassroomNav({

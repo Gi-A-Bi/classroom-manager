@@ -152,6 +152,50 @@ export type Database = {
           },
         ]
       }
+      attendance_records: {
+        Row: {
+          classroom_id: string
+          created_at: string
+          id: string
+          memo: string
+          reason: string
+          record_date: string
+          student_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          classroom_id: string
+          created_at?: string
+          id?: string
+          memo?: string
+          reason: string
+          record_date: string
+          student_id: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          classroom_id?: string
+          created_at?: string
+          id?: string
+          memo?: string
+          reason?: string
+          record_date?: string
+          student_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_records_student_id_classroom_id_fkey"
+            columns: ["student_id", "classroom_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id", "classroom_id"]
+          },
+        ]
+      }
       classrooms: {
         Row: {
           academic_year_id: string
