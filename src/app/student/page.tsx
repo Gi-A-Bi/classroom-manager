@@ -76,6 +76,13 @@ export default async function StudentHomePage() {
   const nextEvent = nextEvents?.[0] ?? null;
   const dday = nextEvent ? daysBetween(today, nextEvent.event_date) : null;
 
+  // 담임 선생님이 학생에게 공개한 도구 링크 (RLS로 공개분만)
+  const { data: tools } = await supabase
+    .from("class_tools")
+    .select("id, name, url, color")
+    .eq("is_student_visible", true)
+    .order("position");
+
   const theme = getTheme(classroom.theme_color);
   const readSet = new Set((myReads ?? []).map((r) => r.post_id));
 
@@ -195,6 +202,28 @@ export default async function StudentHomePage() {
           </span>
           <span className="text-sm text-amber-700">눌러서 읽어보세요 →</span>
         </Link>
+      )}
+
+      {tools && tools.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h2 className="px-1 text-sm font-bold text-gray-500">🧰 우리 반 링크</h2>
+          <div className="flex flex-wrap gap-2">
+            {tools.map((t) => {
+              const tt = getTheme(t.color);
+              return (
+                <a
+                  key={t.id}
+                  href={t.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`rounded-xl px-3.5 py-2.5 text-sm font-bold shadow-sm transition-transform hover:scale-105 ${tt.soft} ${tt.text}`}
+                >
+                  🔗 {t.name} ↗
+                </a>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       <section className="flex flex-col gap-2">

@@ -99,6 +99,14 @@ export default async function DashboardPage({
   const nextEvent = nextEvents?.[0] ?? null;
   const dday = nextEvent ? daysBetween(today, nextEvent.event_date) : null;
 
+  // 즐겨찾기 도구 (교사 개인 소유, 최대 2개 바로가기)
+  const { data: favTools } = await supabase
+    .from("class_tools")
+    .select("id, name, url, color")
+    .eq("is_favorite", true)
+    .order("position")
+    .limit(2);
+
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
       <header className="flex items-start justify-between gap-4">
@@ -147,6 +155,25 @@ export default async function DashboardPage({
         <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error}
         </p>
+      )}
+
+      {favTools && favTools.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {favTools.map((t) => {
+            const tt = getTheme(t.color);
+            return (
+              <a
+                key={t.id}
+                href={t.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`rounded-xl px-3.5 py-2 text-sm font-semibold shadow-sm transition-transform hover:scale-105 ${tt.soft} ${tt.text}`}
+              >
+                🔗 {t.name} ↗
+              </a>
+            );
+          })}
+        </div>
       )}
 
       {availableYears.length > 1 && (

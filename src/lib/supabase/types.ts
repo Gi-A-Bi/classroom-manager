@@ -196,6 +196,56 @@ export type Database = {
           },
         ]
       }
+      class_tools: {
+        Row: {
+          color: string
+          created_at: string
+          description: string
+          id: string
+          is_favorite: boolean
+          is_student_visible: boolean
+          name: string
+          position: number
+          teacher_id: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_favorite?: boolean
+          is_student_visible?: boolean
+          name: string
+          position?: number
+          teacher_id: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_favorite?: boolean
+          is_student_visible?: boolean
+          name?: string
+          position?: number
+          teacher_id?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_tools_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classrooms: {
         Row: {
           academic_year_id: string
