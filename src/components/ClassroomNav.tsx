@@ -26,6 +26,12 @@ export const CLASSROOM_MENU = [
     pill: "bg-pink-50 text-pink-800 hover:bg-pink-100",
     active: "bg-pink-200 text-pink-900",
   },
+  {
+    key: "records",
+    label: "🔒 기록 카드",
+    pill: "bg-slate-100 text-slate-700 hover:bg-slate-200",
+    active: "bg-slate-300 text-slate-900",
+  },
 ] as const;
 
 export function ClassroomNav({
