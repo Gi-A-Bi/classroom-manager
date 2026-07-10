@@ -37,7 +37,7 @@ export default async function StudentsPage({
   if (!classroom) notFound();
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+    <main className="mx-auto flex max-w-2xl flex-col gap-5 p-6">
       <ClassroomNav classroomId={classroom.id} current="students"
         themeColor={classroom.theme_color} />
 
@@ -47,22 +47,24 @@ export default async function StudentsPage({
         classCode={classroom.class_code}
         themeColor={classroom.theme_color}
       />
-      <p className="-mt-3 text-sm text-gray-500">
+      <p className="-mt-2 text-sm text-ink-soft">
         학생들은 학급코드와 출석번호, PIN으로 접속합니다.
       </p>
 
       {error && (
-        <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>
+        <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </p>
       )}
       {success && (
-        <p className="rounded-md bg-green-50 p-3 text-sm text-green-700">
+        <p className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700">
           {success}
         </p>
       )}
 
-      <section className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold">📋 명렬 일괄 등록</h2>
-        <p className="text-sm text-gray-600">
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <h2 className="font-semibold text-ink">명렬 일괄 등록</h2>
+        <p className="text-sm text-ink-soft">
           한 줄에 한 명씩 「번호 이름」 형식으로 붙여넣어 주세요. 이름 대신
           별명을 써도 됩니다.
         </p>
@@ -73,9 +75,9 @@ export default async function StudentsPage({
             required
             rows={8}
             placeholder={"1 김하늘\n2 이바다\n3 박구름"}
-            className="rounded-md border p-2 font-mono text-sm"
+            className="rounded-lg border border-line bg-paper-soft p-2 font-mono text-sm text-ink placeholder:text-ink-faint"
           />
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm text-ink-soft">
             초기 PIN (숫자 4자리, 전체 공통)
             <input
               type="text"
@@ -84,12 +86,12 @@ export default async function StudentsPage({
               pattern="\d{4}"
               maxLength={4}
               defaultValue="0000"
-              className="w-20 rounded-md border p-2 text-center font-mono"
+              className="w-20 rounded-lg border border-line bg-paper-soft p-2 text-center font-mono text-ink"
             />
           </label>
           <button
             type="submit"
-            className="self-start rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="self-start rounded-lg bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
           >
             일괄 등록
           </button>
@@ -97,9 +99,9 @@ export default async function StudentsPage({
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">
-          🧑‍🏫 등록된 학생{" "}
-          <span className="tabular-nums text-blue-700">
+        <h2 className="font-semibold text-ink">
+          등록된 학생{" "}
+          <span className="tabular-nums text-ink-soft">
             {students?.length ?? 0}
           </span>
           명
@@ -109,10 +111,10 @@ export default async function StudentsPage({
             {students.map((s) => (
               <li
                 key={s.id}
-                className="flex items-center justify-between rounded-lg border bg-white p-2.5 text-sm shadow-sm"
+                className="flex items-center justify-between rounded-xl border border-line bg-paper p-2.5 text-sm"
               >
-                <span>
-                  <span className="mr-2 font-mono text-gray-500">
+                <span className="text-ink">
+                  <span className="mr-2 font-mono text-ink-faint">
                     {s.number}번
                   </span>
                   {s.nickname}
@@ -135,7 +137,7 @@ export default async function StudentsPage({
                   />
                   <button
                     type="submit"
-                    className="rounded-md border px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
+                    className="rounded-lg border border-line px-2 py-1 text-xs text-ink-soft transition-colors hover:bg-paper-soft"
                   >
                     PIN 초기화
                   </button>
@@ -144,7 +146,9 @@ export default async function StudentsPage({
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-gray-500">아직 등록된 학생이 없습니다.</p>
+          <p className="font-hand text-base text-ink-soft">
+            아직 등록된 학생이 없습니다.
+          </p>
         )}
       </section>
     </main>

@@ -48,7 +48,7 @@ export default async function TimetablePage({
   );
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+    <main className="mx-auto flex max-w-2xl flex-col gap-5 p-6">
       <ClassroomNav classroomId={classroom.id} current="timetable"
         themeColor={classroom.theme_color} />
 
@@ -57,22 +57,24 @@ export default async function TimetablePage({
         title="시간표"
         themeColor={classroom.theme_color}
       />
-      <p className="-mt-3 text-sm text-gray-500">
+      <p className="-mt-2 text-sm text-ink-soft">
         과목을 입력하고 저장하세요. 비워두면 해당 교시는 지워집니다.
       </p>
 
       {error && (
-        <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>
+        <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </p>
       )}
       {success && (
-        <p className="rounded-md bg-green-50 p-3 text-sm text-green-700">
+        <p className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700">
           {success}
         </p>
       )}
 
       <form
         action={setPeriodsPerDay}
-        className="flex flex-wrap items-center gap-2 rounded-xl border bg-white p-3.5 text-sm shadow-sm"
+        className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-paper p-3.5 text-sm text-ink-soft"
       >
         <input type="hidden" name="classroom_id" value={classroom.id} />
         <label className="flex items-center gap-2">
@@ -80,7 +82,7 @@ export default async function TimetablePage({
           <select
             name="periods_per_day"
             defaultValue={classroom.periods_per_day}
-            className="rounded-md border p-1.5"
+            className="rounded-lg border border-line bg-paper-soft p-1.5 text-ink"
           >
             {Array.from(
               { length: MAX_PERIODS - MIN_PERIODS + 1 },
@@ -94,28 +96,28 @@ export default async function TimetablePage({
         </label>
         <button
           type="submit"
-          className="rounded-md border px-3 py-1.5 hover:bg-gray-50"
+          className="rounded-lg border border-line bg-paper px-3 py-1.5 text-ink-soft transition-colors hover:bg-paper-soft"
         >
           변경
         </button>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-ink-faint">
           교시 수를 줄이면 그 아래 교시의 시간표는 지워집니다.
         </span>
       </form>
 
       <form action={saveTimetable} className="flex flex-col gap-4">
         <input type="hidden" name="classroom_id" value={classroom.id} />
-        <div className="overflow-x-auto rounded-xl border bg-white p-3 shadow-sm">
-          <table className="w-full border-collapse text-sm">
+        <div className="overflow-x-auto rounded-2xl border border-line bg-paper p-3">
+          <table className="w-full table-fixed border-collapse text-sm">
             <thead>
               <tr>
-                <th className={`w-14 border p-2 ${theme.soft} ${theme.text}`}>
+                <th className={`w-12 border border-line p-2 ${theme.soft} ${theme.text}`}>
                   교시
                 </th>
                 {DAYS.map((day) => (
                   <th
                     key={day}
-                    className={`border p-2 ${theme.soft} ${theme.text}`}
+                    className={`border border-line p-2 ${theme.soft} ${theme.text}`}
                   >
                     {DAY_NAMES[day - 1]}
                   </th>
@@ -126,18 +128,18 @@ export default async function TimetablePage({
               {periods.map((period) => (
                 <tr key={period}>
                   <th
-                    className={`border bg-gray-50 p-2 font-bold tabular-nums ${theme.text}`}
+                    className={`border border-line bg-paper-soft p-2 font-bold tabular-nums ${theme.text}`}
                   >
                     {period}
                   </th>
                   {DAYS.map((day) => (
-                    <td key={day} className="border p-1">
+                    <td key={day} className="border border-line p-1">
                       <input
                         type="text"
                         name={`slot_${day}_${period}`}
                         maxLength={20}
                         defaultValue={subjectOf.get(`${day}-${period}`) ?? ""}
-                        className="w-full min-w-16 rounded p-1.5 text-center focus:bg-blue-50"
+                        className="w-full min-w-16 rounded p-1.5 text-center text-ink focus:bg-paper-soft focus:outline-none"
                       />
                     </td>
                   ))}
@@ -148,7 +150,7 @@ export default async function TimetablePage({
         </div>
         <button
           type="submit"
-          className="self-start rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="self-start rounded-lg bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
         >
           시간표 저장
         </button>
