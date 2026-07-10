@@ -8,6 +8,7 @@ import {
   todayString,
 } from "@/lib/dates";
 import { CLASSROOM_MENU } from "@/components/ClassroomNav";
+import { ModeSwitch } from "@/components/ModeSwitch";
 import { createClient } from "@/lib/supabase/server";
 import { getTheme, pastelChip } from "@/lib/themes";
 import { logout } from "../login/actions";
@@ -123,7 +124,8 @@ export default async function DashboardPage({
             </p>
           )}
         </div>
-        <div className="flex shrink-0 gap-2">
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+          <ModeSwitch current="class" />
           <Link
             href="/dashboard/settings"
             className="rounded-lg border bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"

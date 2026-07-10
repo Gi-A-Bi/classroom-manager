@@ -13,14 +13,24 @@ export async function login(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
   if (error) {
     redirect("/login?error=" + encodeURIComponent("이메일 또는 비밀번호가 올바르지 않습니다."));
   }
 
+  // 마지막 사용 모드로 진입
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("last_mode")
+    .eq("id", data!.user.id)
+    .single();
+
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  redirect(profile?.last_mode === "work" ? "/work" : "/dashboard");
 }
 
 export async function signup(formData: FormData) {

@@ -7,5 +7,13 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  redirect(user ? "/dashboard" : "/login");
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("last_mode")
+    .eq("id", user.id)
+    .single();
+
+  redirect(profile?.last_mode === "work" ? "/work" : "/dashboard");
 }
