@@ -44,12 +44,6 @@ export const CLASSROOM_MENU = [
     pill: "bg-rose-50 text-rose-800 hover:bg-rose-100",
     active: "bg-rose-200 text-rose-900",
   },
-  {
-    key: "tools",
-    label: "🧰 도구",
-    pill: "bg-green-50 text-green-800 hover:bg-green-100",
-    active: "bg-green-200 text-green-900",
-  },
 ] as const;
 
 export function ClassroomNav({
