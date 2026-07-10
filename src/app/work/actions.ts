@@ -229,3 +229,82 @@ export async function deleteLink(formData: FormData) {
   revalidatePath("/work/links");
   redirect("/work/links");
 }
+
+// --- 업무 노트 ---
+
+// "#연구부, 생활지도" → ['연구부','생활지도'] (# 제거, 중복 제거, 최대 10개)
+function parseTags(raw: string): string[] {
+  return [
+    ...new Set(
+      raw
+        .split(/[\s,]+/)
+        .map((t) => t.replace(/^#+/, "").trim())
+        .filter((t) => t.length > 0 && t.length <= 20),
+    ),
+  ].slice(0, 10);
+}
+
+export async function saveNote(formData: FormData) {
+  const noteId = String(formData.get("note_id") ?? "");
+  const title = String(formData.get("title") ?? "").trim().slice(0, 100);
+  const content = String(formData.get("content") ?? "").trim().slice(0, 5000);
+  const tags = parseTags(String(formData.get("tags") ?? ""));
+
+  if (!title) {
+    redirect("/work/notes?error=" + encodeURIComponent("제목을 입력해주세요."));
+  }
+
+  const { supabase, user } = await requireUser();
+  const { error } = noteId
+    ? await supabase
+        .from("work_notes")
+        .update({ title, content, tags })
+        .eq("id", noteId)
+    : await supabase
+        .from("work_notes")
+        .insert({ teacher_id: user.id, title, content, tags });
+
+  if (error) {
+    redirect("/work/notes?error=" + encodeURIComponent("저장에 실패했습니다."));
+  }
+  revalidatePath("/work/notes");
+  redirect("/work/notes");
+}
+
+export async function deleteNote(formData: FormData) {
+  const noteId = String(formData.get("note_id") ?? "");
+  const { supabase } = await requireUser();
+  await supabase.from("work_notes").delete().eq("id", noteId);
+  revalidatePath("/work/notes");
+  redirect("/work/notes");
+}
+
+// --- 문서 스니펫 ---
+
+export async function addSnippet(formData: FormData) {
+  const title = String(formData.get("title") ?? "").trim().slice(0, 100);
+  const content = String(formData.get("content") ?? "").trim().slice(0, 5000);
+
+  if (!title || !content) {
+    redirect("/work/snippets?error=" + encodeURIComponent("제목과 내용을 입력해주세요."));
+  }
+
+  const { supabase, user } = await requireUser();
+  const { error } = await supabase
+    .from("work_snippets")
+    .insert({ teacher_id: user.id, title, content });
+
+  if (error) {
+    redirect("/work/snippets?error=" + encodeURIComponent("저장에 실패했습니다."));
+  }
+  revalidatePath("/work/snippets");
+  redirect("/work/snippets");
+}
+
+export async function deleteSnippet(formData: FormData) {
+  const snippetId = String(formData.get("snippet_id") ?? "");
+  const { supabase } = await requireUser();
+  await supabase.from("work_snippets").delete().eq("id", snippetId);
+  revalidatePath("/work/snippets");
+  redirect("/work/snippets");
+}

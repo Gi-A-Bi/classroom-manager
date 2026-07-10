@@ -6,6 +6,8 @@ const WORK_MENU = [
   ["todos", "✅ 할 일"],
   ["documents", "📄 공문"],
   ["calendar", "🗓️ 캘린더"],
+  ["notes", "📒 노트"],
+  ["snippets", "📑 스니펫"],
   ["links", "🔗 링크"],
 ] as const;
 
