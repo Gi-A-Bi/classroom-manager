@@ -1,20 +1,23 @@
-import { CalendarDays, ChevronRight, Clock, NotebookText } from "lucide-react";
+import { CalendarDays, Clock, NotebookText } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ClassroomNav } from "@/components/ClassroomNav";
 import { CopyCodeChip } from "@/components/CopyCodeChip";
 import {
   DAY_NAMES,
+  dateRange,
   dayOfWeekMon1,
   daysBetween,
   formatMonthDay,
+  monthEndString,
+  monthGrid,
+  parseMonth,
   todayString,
 } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { getTheme } from "@/lib/themes";
 
-// 학급 메인 화면 — 교사가 학급을 열면 처음 보는 화면.
-// 헤더(학년도·학급명·코드칩) + 탭 + 오늘 요약 카드 3장.
+// 학급 메인 화면 — 헤더 + 탭 + 오늘 요약 카드 3장 + 이번 달 달력(주인공) + 최근 알림장.
 export default async function ClassroomHomePage({
   params,
 }: {
@@ -38,12 +41,17 @@ export default async function ClassroomHomePage({
   const today = todayString();
   const todayDow = dayOfWeekMon1();
   const isWeekday = todayDow <= 5;
+  const { year, monthIndex } = parseMonth();
+  const monthStart = `${year}-${String(monthIndex + 1).padStart(2, "0")}-01`;
+  const monthEnd = monthEndString(year, monthIndex);
+  const weeks = monthGrid(year, monthIndex);
 
   const [
     { data: todayPost },
     { data: students },
     { data: slots },
-    { data: nextEvents },
+    { data: monthEvents },
+    { data: recentPosts },
   ] = await Promise.all([
     supabase
       .from("posts")
@@ -67,11 +75,17 @@ export default async function ClassroomHomePage({
       : Promise.resolve({ data: [] as { period: number; subject: string }[] }),
     supabase
       .from("events")
-      .select("title, event_date")
+      .select("id, title, event_date, end_date, layer")
       .eq("classroom_id", id)
-      .gt("event_date", today)
-      .order("event_date")
-      .limit(1),
+      .lte("event_date", monthEnd)
+      .or(`end_date.gte.${monthStart},event_date.gte.${monthStart}`),
+    supabase
+      .from("posts")
+      .select("id, title, post_date")
+      .eq("classroom_id", id)
+      .order("post_date", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(5),
   ]);
 
   const totalStudents = students?.length ?? 0;
@@ -82,14 +96,30 @@ export default async function ClassroomHomePage({
         .eq("post_id", todayPost.id)
     : { count: 0 };
 
-  const nextEvent = nextEvents?.[0] ?? null;
-  const dday = nextEvent ? daysBetween(today, nextEvent.event_date) : null;
-
   const theme = getTheme(classroom.theme_color);
   const base = `/dashboard/classrooms/${id}`;
 
+  // 다음 일정 (오늘 이후 첫 일정)
+  const upcoming = (monthEvents ?? [])
+    .filter((e) => e.event_date > today)
+    .sort((a, b) => a.event_date.localeCompare(b.event_date));
+  const nextEvent = upcoming[0] ?? null;
+  const dday = nextEvent ? daysBetween(today, nextEvent.event_date) : null;
+
+  // 달력 날짜별 일정 (기간 일정은 매일 펼침)
+  const eventsByDate = new Map<string, NonNullable<typeof monthEvents>>();
+  for (const e of monthEvents ?? []) {
+    const from = e.event_date < monthStart ? monthStart : e.event_date;
+    const to = (e.end_date ?? e.event_date) > monthEnd ? monthEnd : e.end_date ?? e.event_date;
+    for (const d of dateRange(from, to)) {
+      const list = eventsByDate.get(d) ?? [];
+      list.push(e);
+      eventsByDate.set(d, list);
+    }
+  }
+
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-5 p-6">
       {/* 헤더 */}
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
@@ -103,17 +133,16 @@ export default async function ClassroomHomePage({
         <CopyCodeChip code={classroom.class_code} />
       </header>
 
-      {/* 탭 (활성 탭 없음 — 홈) */}
+      {/* 탭 (활성 없음 — 홈) */}
       <ClassroomNav classroomId={id} current="" themeColor={classroom.theme_color} />
 
       {/* 오늘 요약 카드 3장 */}
       <section className="grid gap-3 sm:grid-cols-3">
-        {/* 오늘 알림장 */}
         <Link
           href={`${base}/posts`}
-          className="group flex flex-col gap-2 rounded-2xl border border-line bg-paper p-4 transition-colors hover:bg-paper-soft"
+          className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-4 transition-colors hover:bg-paper-soft"
         >
-          <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-faint">
+          <span className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-ink-faint">
             <NotebookText size={15} strokeWidth={1.75} aria-hidden />
             오늘 알림장
           </span>
@@ -137,15 +166,14 @@ export default async function ClassroomHomePage({
           )}
         </Link>
 
-        {/* 오늘 시간표 */}
         <Link
           href={`${base}/timetable`}
-          className="group flex flex-col gap-2 rounded-2xl border border-line bg-paper p-4 transition-colors hover:bg-paper-soft"
+          className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-4 transition-colors hover:bg-paper-soft"
         >
-          <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-faint">
+          <span className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-ink-faint">
             <Clock size={15} strokeWidth={1.75} aria-hidden />
             오늘 시간표
-            <span className="font-normal normal-case text-ink-faint">
+            <span className="font-normal text-ink-faint">
               {DAY_NAMES[todayDow - 1]}
             </span>
           </span>
@@ -168,12 +196,11 @@ export default async function ClassroomHomePage({
           )}
         </Link>
 
-        {/* 다음 일정 */}
         <Link
           href={`${base}/calendar`}
-          className="group flex flex-col gap-2 rounded-2xl border border-line bg-paper p-4 transition-colors hover:bg-paper-soft"
+          className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-4 transition-colors hover:bg-paper-soft"
         >
-          <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-faint">
+          <span className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-ink-faint">
             <CalendarDays size={15} strokeWidth={1.75} aria-hidden />
             다음 일정
           </span>
@@ -201,13 +228,133 @@ export default async function ClassroomHomePage({
         </Link>
       </section>
 
-      <Link
-        href={`${base}/posts`}
-        className="flex items-center justify-center gap-1 text-sm text-ink-soft transition-colors hover:text-ink"
-      >
-        학급 운영 시작하기
-        <ChevronRight size={15} strokeWidth={2} aria-hidden />
-      </Link>
+      {/* 본문: 이번 달 달력(주인공) + 최근 알림장 */}
+      <section className="grid gap-4 md:grid-cols-3">
+        {/* 이번 달 달력 */}
+        <div className="flex flex-col gap-2 md:col-span-2">
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-display text-xl text-ink">
+              {monthIndex + 1}월
+              <span className="ml-1.5 font-sans text-sm font-normal text-ink-faint">
+                {year}
+              </span>
+            </h2>
+            <Link
+              href={`${base}/calendar`}
+              className="text-sm text-ink-soft transition-colors hover:text-ink"
+            >
+              전체 캘린더 →
+            </Link>
+          </div>
+          <div className="overflow-hidden rounded-2xl border border-line bg-paper">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr>
+                  {DAY_NAMES.map((d, i) => (
+                    <th
+                      key={d}
+                      className={`border-b border-line py-1.5 font-medium ${
+                        i === 5 ? "text-blue-500" : i === 6 ? "text-rose-400" : "text-ink-faint"
+                      }`}
+                    >
+                      {d}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {weeks.map((week, wi) => (
+                  <tr key={wi}>
+                    {week.map((date, di) => {
+                      const dayEvents = date ? eventsByDate.get(date) ?? [] : [];
+                      const isToday = date === today;
+                      return (
+                        <td
+                          key={di}
+                          className="h-16 w-[14.28%] border border-line/60 align-top"
+                        >
+                          {date && (
+                            <div className="flex h-full flex-col gap-0.5 p-1">
+                              <span
+                                className={`text-[11px] tabular-nums ${
+                                  isToday
+                                    ? `inline-flex h-5 w-5 items-center justify-center rounded-full ${theme.soft} font-bold ${theme.text}`
+                                    : "text-ink-soft"
+                                }`}
+                              >
+                                {Number(date.slice(8))}
+                              </span>
+                              {dayEvents.slice(0, 2).map((e) => (
+                                <span
+                                  key={e.id}
+                                  title={e.title}
+                                  className={`truncate rounded px-1 text-[10px] leading-tight ${
+                                    e.layer === "school"
+                                      ? "bg-orange-100 text-orange-800"
+                                      : `${theme.soft} ${theme.text}`
+                                  }`}
+                                >
+                                  {e.title}
+                                </span>
+                              ))}
+                              {dayEvents.length > 2 && (
+                                <span className="px-1 text-[10px] text-ink-faint">
+                                  +{dayEvents.length - 2}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* 최근 알림장 */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-display text-xl text-ink">최근 알림장</h2>
+            <Link
+              href={`${base}/posts`}
+              className="text-sm text-ink-soft transition-colors hover:text-ink"
+            >
+              더보기 →
+            </Link>
+          </div>
+          <div className="flex flex-1 flex-col gap-2 rounded-2xl border border-line bg-paper p-3">
+            {recentPosts && recentPosts.length > 0 ? (
+              <ul className="flex flex-col divide-y divide-line">
+                {recentPosts.map((p) => (
+                  <li key={p.id}>
+                    <Link
+                      href={`${base}/posts`}
+                      className="flex items-center justify-between gap-2 py-2.5 transition-colors hover:text-ink"
+                    >
+                      <span className="line-clamp-1 text-sm font-medium text-ink">
+                        {p.title}
+                      </span>
+                      <span className="shrink-0 text-xs text-ink-faint tabular-nums">
+                        {formatMonthDay(p.post_date)}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="flex flex-1 flex-col items-center justify-center gap-1 py-8 text-center">
+                <span className="text-2xl">📮</span>
+                <span className="font-hand text-base text-ink-soft">
+                  첫 알림장을 써보세요!
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
