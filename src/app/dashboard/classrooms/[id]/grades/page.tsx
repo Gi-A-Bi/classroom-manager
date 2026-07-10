@@ -74,6 +74,12 @@ export default async function GradesPage({
         </p>
         <div className="flex gap-2 text-sm">
           <Link
+            href={`/dashboard/classrooms/${classroom.id}/grades/overview`}
+            className="rounded-lg border bg-white px-3 py-1.5 text-gray-600 transition-colors hover:bg-gray-50"
+          >
+            📊 종합 보기
+          </Link>
+          <Link
             href={`/dashboard/classrooms/${classroom.id}/grades/students`}
             className="rounded-lg border bg-white px-3 py-1.5 text-gray-600 transition-colors hover:bg-gray-50"
           >
