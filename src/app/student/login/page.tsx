@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getStudentSession } from "@/lib/student-auth";
 import { studentLogin } from "./actions";
@@ -85,6 +86,15 @@ export default async function StudentLoginPage({
         처음 들어온다면 PIN은 선생님이 알려준 번호(보통 0000)예요.
         <br />
         PIN을 잊었다면 선생님께 말씀드리세요.
+      </p>
+
+      <p className="text-center text-sm">
+        <Link
+          href="/"
+          className="text-ink-faint underline decoration-line-strong underline-offset-2 transition-colors hover:text-ink-soft"
+        >
+          ← 처음 화면으로
+        </Link>
       </p>
     </main>
   );

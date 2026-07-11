@@ -63,6 +63,15 @@ export default async function LoginPage({
           회원가입
         </Link>
       </p>
+
+      <p className="text-center text-sm">
+        <Link
+          href="/"
+          className="text-ink-faint underline decoration-line-strong underline-offset-2 transition-colors hover:text-ink-soft"
+        >
+          ← 처음 화면으로
+        </Link>
+      </p>
     </main>
   );
 }
