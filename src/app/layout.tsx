@@ -41,7 +41,20 @@ export default function RootLayout({
       lang="ko"
       className={`${notoKr.variable} ${blackHan.variable} ${gaegu.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <div className="flex-1">{children}</div>
+        <footer className="border-t border-line py-4 text-center text-xs text-ink-faint">
+          © 학급운영 플랫폼 · 개발:{" "}
+          <span className="font-semibold text-ink-soft">김민성</span> · 오류
+          문의:{" "}
+          <a
+            href="mailto:healthydol@gmail.com"
+            className="underline decoration-line-strong underline-offset-2 hover:text-ink-soft"
+          >
+            healthydol@gmail.com
+          </a>
+        </footer>
+      </body>
     </html>
   );
 }
