@@ -10,10 +10,12 @@ export default async function LoginPage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 p-6">
-      <div className="text-center">
-        <p className="text-5xl">🏫</p>
-        <h1 className="mt-2 text-2xl font-extrabold">교사 로그인</h1>
-        <p className="mt-1 text-sm text-gray-500">
+      <div className="flex flex-col items-center text-center">
+        <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-paper-soft text-4xl ring-1 ring-line">
+          🏫
+        </span>
+        <h1 className="mt-4 text-3xl font-display text-ink">교사 로그인</h1>
+        <p className="mt-2 font-hand text-lg text-ink-soft">
           우리 반을 만들고 운영하는 공간이에요.
         </p>
       </div>
@@ -26,38 +28,38 @@ export default async function LoginPage({
 
       <form
         action={login}
-        className="flex flex-col gap-3 rounded-xl border bg-white p-5 shadow-sm"
+        className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-6"
       >
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm text-ink-soft">
           이메일
           <input
             type="email"
             name="email"
             required
-            className="rounded-md border p-2"
+            className="rounded-lg border border-line bg-paper-soft p-2.5 text-ink placeholder:text-ink-faint focus:border-line-strong focus:outline-none"
             placeholder="teacher@example.com"
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm text-ink-soft">
           비밀번호
           <input
             type="password"
             name="password"
             required
-            className="rounded-md border p-2"
+            className="rounded-lg border border-line bg-paper-soft p-2.5 text-ink placeholder:text-ink-faint focus:border-line-strong focus:outline-none"
           />
         </label>
         <button
           type="submit"
-          className="mt-2 rounded-md bg-blue-600 p-2 font-medium text-white hover:bg-blue-700"
+          className="mt-2 rounded-lg bg-ink p-2.5 font-medium text-paper transition-colors hover:bg-ink/85"
         >
           로그인
         </button>
       </form>
 
-      <p className="text-sm text-gray-600">
+      <p className="text-center text-sm text-ink-soft">
         아직 계정이 없으신가요?{" "}
-        <Link href="/signup" className="text-blue-600 underline">
+        <Link href="/signup" className="font-medium text-ink underline decoration-line-strong underline-offset-2">
           회원가입
         </Link>
       </p>

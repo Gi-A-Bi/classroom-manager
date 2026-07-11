@@ -176,7 +176,7 @@ export function GradeGrid({
               )}
               <span className="w-5 shrink-0 text-center text-xs">
                 {state === "saving" ? (
-                  <span className="text-gray-300">…</span>
+                  <span className="text-ink-faint">…</span>
                 ) : state === "ok" ? (
                   <span className="font-bold text-green-500">✓</span>
                 ) : null}

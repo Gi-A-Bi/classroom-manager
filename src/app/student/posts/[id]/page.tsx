@@ -57,23 +57,23 @@ export default async function StudentPostPage({
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col gap-5 p-5">
       <nav>
-        <Link href="/student" className="text-blue-600 underline">
+        <Link href="/student" className="text-ink-soft underline decoration-line-strong underline-offset-2 hover:text-ink">
           ← 알림장 목록
         </Link>
       </nav>
 
       <article className="flex flex-col gap-3">
-        <p className="text-sm text-gray-500">{formatDate(post.post_date)}</p>
-        <h1 className="text-2xl font-bold">{post.title}</h1>
-        <div className="rounded-2xl border bg-white p-4 leading-relaxed whitespace-pre-wrap shadow-sm">
+        <p className="text-sm text-ink-soft">{formatDate(post.post_date)}</p>
+        <h1 className="text-2xl font-display text-ink">{post.title}</h1>
+        <div className="rounded-2xl border border-line bg-paper p-4 leading-relaxed whitespace-pre-wrap text-ink">
           {post.content}
         </div>
       </article>
 
       {items && items.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="text-lg font-bold">🎒 준비물 체크</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-lg font-bold text-ink">🎒 준비물 체크</h2>
+          <p className="text-sm text-ink-soft">
             준비한 것을 눌러서 체크해요. 다시 누르면 해제돼요.
           </p>
           <ul className="flex flex-col gap-2">
@@ -86,10 +86,10 @@ export default async function StudentPostPage({
                     <input type="hidden" name="post_id" value={post.id} />
                     <button
                       type="submit"
-                      className={`flex w-full items-center gap-3 rounded-xl border-2 bg-white p-3.5 text-left text-base shadow-sm transition-all duration-200 ${
+                      className={`flex w-full items-center gap-3 rounded-xl border-2 p-3.5 text-left text-base transition-all duration-200 ${
                         checked
                           ? "border-green-500 bg-green-50"
-                          : "border-gray-200 hover:border-gray-300 active:bg-gray-50"
+                          : "border-line bg-paper hover:border-line-strong active:bg-paper-soft"
                       }`}
                     >
                       <span
@@ -97,12 +97,12 @@ export default async function StudentPostPage({
                         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 text-sm font-bold transition-colors duration-200 ${
                           checked
                             ? "border-green-500 bg-green-500 text-white"
-                            : "border-gray-300"
+                            : "border-line-strong"
                         }`}
                       >
                         {checked ? "✓" : ""}
                       </span>
-                      <span className={checked ? "font-medium" : ""}>
+                      <span className={checked ? "font-medium text-ink" : "text-ink"}>
                         {item.label}
                       </span>
                     </button>

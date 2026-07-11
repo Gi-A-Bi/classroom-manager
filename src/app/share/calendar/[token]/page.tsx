@@ -101,23 +101,23 @@ export default async function SharedCalendarPage({
           <h1 className={`text-xl font-bold ${theme.text}`}>
             {shared.classroom_name} 캘린더
           </h1>
-          <p className="text-sm text-gray-600">학부모 공유용 · 보기 전용</p>
+          <p className="text-sm text-ink-soft">학부모 공유용 · 보기 전용</p>
         </div>
       </header>
 
       <div className="flex items-center justify-between">
         <Link
           href={`?month=${monthString(prev.year, prev.monthIndex)}`}
-          className="rounded-xl border bg-white px-3.5 py-2 text-sm shadow-sm transition-colors hover:bg-gray-50"
+          className="rounded-xl border border-line bg-paper px-3.5 py-2 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
         >
           ←
         </Link>
-        <h2 className="text-lg font-bold tabular-nums">
+        <h2 className="text-2xl font-display tabular-nums text-ink">
           {year}년 {monthIndex + 1}월
         </h2>
         <Link
           href={`?month=${monthString(next.year, next.monthIndex)}`}
-          className="rounded-xl border bg-white px-3.5 py-2 text-sm shadow-sm transition-colors hover:bg-gray-50"
+          className="rounded-xl border border-line bg-paper px-3.5 py-2 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
         >
           →
         </Link>
@@ -132,15 +132,15 @@ export default async function SharedCalendarPage({
         </span>
       </div>
 
-      <div className="rounded-2xl border bg-white p-2 shadow-sm">
+      <div className="rounded-2xl border border-line bg-paper p-2">
         <table className="w-full table-fixed border-collapse text-sm">
           <thead>
             <tr>
               {DAY_NAMES.map((name, i) => (
                 <th
                   key={name}
-                  className={`border bg-gray-50 p-1 text-xs ${
-                    i === 5 ? "text-blue-600" : i === 6 ? "text-red-500" : ""
+                  className={`border border-line bg-paper-soft p-1 text-xs ${
+                    i === 5 ? "text-blue-600" : i === 6 ? "text-red-500" : "text-ink"
                   }`}
                 >
                   {name}
@@ -154,14 +154,14 @@ export default async function SharedCalendarPage({
                 {week.map((date, j) => (
                   <td
                     key={j}
-                    className={`h-16 w-[14%] border p-0.5 align-top ${
-                      date === today ? "bg-yellow-50" : ""
+                    className={`h-16 w-[14%] border border-line p-0.5 align-top ${
+                      date === today ? "bg-paper-soft" : ""
                     }`}
                   >
                     {date && (
                       <div className="flex flex-col gap-0.5">
                         <span
-                          className={`text-[10px] tabular-nums ${date === today ? "font-bold" : "text-gray-500"}`}
+                          className={`text-[10px] tabular-nums ${date === today ? "font-bold text-ink" : "text-ink-soft"}`}
                         >
                           {Number(date.slice(8))}
                         </span>
@@ -185,15 +185,15 @@ export default async function SharedCalendarPage({
       </div>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-sm font-bold text-gray-500">이번 달 일정</h2>
+        <h2 className="text-sm font-bold text-ink-faint">이번 달 일정</h2>
         {events.length > 0 ? (
           <ul className="flex flex-col gap-1.5">
             {events.map((e) => (
               <li
                 key={e.id}
-                className="flex items-center gap-2 rounded-xl border bg-white p-3 text-sm shadow-sm"
+                className="flex items-center gap-2 rounded-xl border border-line bg-paper p-3 text-sm text-ink"
               >
-                <span className="shrink-0 font-bold tabular-nums text-gray-600">
+                <span className="shrink-0 font-bold tabular-nums text-ink-soft">
                   {formatMonthDay(e.event_date)}
                   {e.end_date && `~${formatMonthDay(e.end_date)}`}
                 </span>
@@ -207,13 +207,13 @@ export default async function SharedCalendarPage({
             ))}
           </ul>
         ) : (
-          <p className="rounded-2xl border-2 border-dashed p-6 text-center text-sm text-gray-400">
+          <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-6 text-center font-hand text-base text-ink-soft">
             🗓️ 이번 달에는 등록된 일정이 없어요.
           </p>
         )}
       </section>
 
-      <p className="pb-4 text-center text-xs text-gray-400">
+      <p className="pb-4 text-center text-xs text-ink-faint">
         이 페이지는 캘린더만 보여주는 공유 화면입니다.
       </p>
     </main>

@@ -65,7 +65,7 @@ export function BulkScheduleImport({
           </>
         ) : (
           <>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-ink-soft">
               <strong className="text-blue-700">{readyRows.length}건</strong>{" "}
               인식됨
               {pendingRows.length > 0 && (
@@ -87,7 +87,7 @@ export function BulkScheduleImport({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-xs text-gray-400">
+                  <tr className="border-b border-line text-left text-xs text-ink-faint">
                     <th className="p-2">시작일</th>
                     <th className="p-2">종료일(기간)</th>
                     <th className="p-2">행사명</th>
@@ -98,7 +98,7 @@ export function BulkScheduleImport({
                   {rows.map((r, i) => (
                     <tr
                       key={i}
-                      className={`border-b transition-colors ${!r.start || !r.title.trim() ? "bg-amber-50" : ""}`}
+                      className={`border-b border-line transition-colors ${!r.start || !r.title.trim() ? "bg-amber-50" : ""}`}
                     >
                       <td className="p-1.5">
                         <input
@@ -107,7 +107,7 @@ export function BulkScheduleImport({
                           onChange={(e) =>
                             updateRow(i, { start: e.target.value || null })
                           }
-                          className="rounded-md border p-1.5"
+                          className="rounded-md border border-line bg-paper-soft p-1.5 text-ink"
                         />
                       </td>
                       <td className="p-1.5">
@@ -117,7 +117,7 @@ export function BulkScheduleImport({
                           onChange={(e) =>
                             updateRow(i, { end: e.target.value || null })
                           }
-                          className="rounded-md border p-1.5"
+                          className="rounded-md border border-line bg-paper-soft p-1.5 text-ink"
                         />
                       </td>
                       <td className="p-1.5">
@@ -126,7 +126,7 @@ export function BulkScheduleImport({
                           value={r.title}
                           onChange={(e) => updateRow(i, { title: e.target.value })}
                           placeholder="행사명"
-                          className="w-full min-w-40 rounded-md border p-1.5"
+                          className="w-full min-w-40 rounded-md border border-line bg-paper-soft p-1.5 text-ink placeholder:text-ink-faint"
                         />
                       </td>
                       <td className="p-1.5 text-center">
@@ -134,7 +134,7 @@ export function BulkScheduleImport({
                           type="button"
                           onClick={() => removeRow(i)}
                           title="이 줄 빼기"
-                          className="rounded-md px-2 py-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                          className="rounded-md px-2 py-1 text-ink-faint transition-colors hover:bg-red-50 hover:text-red-600"
                         >
                           ×
                         </button>

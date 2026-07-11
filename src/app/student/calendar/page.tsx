@@ -74,16 +74,16 @@ export default async function StudentCalendarPage({
       <div className="flex items-center justify-between">
         <Link
           href={`/student/calendar?month=${monthString(prev.year, prev.monthIndex)}`}
-          className="rounded-lg border-2 px-3 py-1.5 text-sm"
+          className="rounded-lg border-2 border-line px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
         >
           ←
         </Link>
-        <h1 className="text-xl font-bold">
+        <h1 className="text-2xl font-display tabular-nums text-ink">
           {year}년 {monthIndex + 1}월
         </h1>
         <Link
           href={`/student/calendar?month=${monthString(next.year, next.monthIndex)}`}
-          className="rounded-lg border-2 px-3 py-1.5 text-sm"
+          className="rounded-lg border-2 border-line px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
         >
           →
         </Link>
@@ -98,15 +98,15 @@ export default async function StudentCalendarPage({
         </span>
       </div>
 
-      <div className="rounded-2xl border bg-white p-2 shadow-sm">
+      <div className="rounded-2xl border border-line bg-paper p-2">
       <table className="w-full table-fixed border-collapse text-sm">
         <thead>
           <tr>
             {DAY_NAMES.map((name, i) => (
               <th
                 key={name}
-                className={`border bg-gray-50 p-1 text-xs ${
-                  i === 5 ? "text-blue-600" : i === 6 ? "text-red-500" : ""
+                className={`border border-line bg-paper-soft p-1 text-xs ${
+                  i === 5 ? "text-blue-600" : i === 6 ? "text-red-500" : "text-ink"
                 }`}
               >
                 {name}
@@ -120,14 +120,14 @@ export default async function StudentCalendarPage({
               {week.map((date, j) => (
                 <td
                   key={j}
-                  className={`h-16 w-[14%] border p-0.5 align-top ${
-                    date === today ? "bg-yellow-50" : ""
+                  className={`h-16 w-[14%] border border-line p-0.5 align-top ${
+                    date === today ? "bg-paper-soft" : ""
                   }`}
                 >
                   {date && (
                     <div className="flex flex-col gap-0.5">
                       <span
-                        className={`text-[10px] ${date === today ? "font-bold" : "text-gray-500"}`}
+                        className={`text-[10px] ${date === today ? "font-bold text-ink" : "text-ink-soft"}`}
                       >
                         {Number(date.slice(8))}
                       </span>
@@ -151,15 +151,15 @@ export default async function StudentCalendarPage({
       </div>
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold">이번 달 일정</h2>
+        <h2 className="font-semibold text-ink">이번 달 일정</h2>
         {events && events.length > 0 ? (
           <ul className="flex flex-col gap-1.5">
             {events.map((e) => (
               <li
                 key={e.id}
-                className="flex items-center gap-2 rounded-xl border bg-white p-3 text-sm shadow-sm"
+                className="flex items-center gap-2 rounded-xl border border-line bg-paper p-3 text-sm text-ink"
               >
-                <span className="shrink-0 font-bold tabular-nums text-gray-600">
+                <span className="shrink-0 font-bold tabular-nums text-ink-soft">
                   {formatMonthDay(e.event_date)}
                   {e.end_date && `~${formatMonthDay(e.end_date)}`}
                 </span>
@@ -173,7 +173,7 @@ export default async function StudentCalendarPage({
             ))}
           </ul>
         ) : (
-          <p className="rounded-xl border-2 border-dashed p-6 text-center text-sm text-gray-400">
+          <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-6 text-center font-hand text-base text-ink-soft">
             🗓️ 이번 달 일정이 없어요.
           </p>
         )}
