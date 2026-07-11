@@ -46,7 +46,7 @@ export async function signup(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: { data: { display_name: displayName } },
@@ -58,6 +58,16 @@ export async function signup(formData: FormData) {
         ? "이미 가입된 이메일입니다."
         : "가입에 실패했습니다. 잠시 후 다시 시도해주세요.";
     redirect("/signup?error=" + encodeURIComponent(message));
+  }
+
+  // 이메일 확인이 켜진 환경: 가입은 됐지만 세션이 없다 → 안내 화면으로
+  if (!data.session) {
+    redirect(
+      "/signup?notice=" +
+        encodeURIComponent(
+          "확인 메일을 보냈어요. 메일함에서 링크를 눌러 가입을 완료한 뒤 로그인해주세요.",
+        ),
+    );
   }
 
   revalidatePath("/", "layout");

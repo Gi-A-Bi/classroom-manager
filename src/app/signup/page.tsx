@@ -4,9 +4,9 @@ import { signup } from "../login/actions";
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; notice?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, notice } = await searchParams;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 p-6">
@@ -23,6 +23,11 @@ export default async function SignupPage({
       {error && (
         <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error}
+        </p>
+      )}
+      {notice && (
+        <p className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+          {notice}
         </p>
       )}
 
