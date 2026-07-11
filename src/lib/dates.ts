@@ -66,6 +66,18 @@ export function formatMonthDay(dateString: string) {
   return `${Number(dateString.slice(5, 7))}/${Number(dateString.slice(8))}`;
 }
 
+// 날짜에 일수 더하기 (YYYY-MM-DD)
+export function addDaysString(dateString: string, delta: number) {
+  const d = new Date(dateString + "T00:00:00");
+  d.setDate(d.getDate() + delta);
+  return toDateString(d);
+}
+
+// 해당 날짜가 속한 주의 월요일 (YYYY-MM-DD)
+export function weekStartString(dateString: string) {
+  return addDaysString(dateString, -(dayOfWeekMon1(new Date(dateString + "T00:00:00")) - 1));
+}
+
 // from~to 사이의 모든 날짜 (YYYY-MM-DD 배열, 양 끝 포함)
 export function dateRange(from: string, to: string): string[] {
   const out: string[] = [];

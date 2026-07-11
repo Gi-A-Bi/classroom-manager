@@ -7,6 +7,7 @@ import {
   daysBetween,
   formatKoreanDate,
   todayString,
+  weekStartString,
 } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { toggleTodo } from "./actions";
@@ -58,6 +59,64 @@ export default async function WorkDashboardPage() {
     (d) => d.due_date && daysBetween(today, d.due_date) <= 3,
   );
 
+  // 오늘 수업: 시간표(오늘 요일) 배경 + 오늘 저장된 계획을 학급별로 합친다
+  const [{ data: classes }, { data: todaySlots }, { data: todayPlans }] =
+    await Promise.all([
+      supabase
+        .from("classrooms")
+        .select("id, name")
+        .order("created_at", { ascending: false }),
+      todayDow <= 5
+        ? supabase
+            .from("timetable_slots")
+            .select("classroom_id, period, subject")
+            .eq("day_of_week", todayDow)
+        : Promise.resolve({ data: [] as { classroom_id: string; period: number; subject: string }[] }),
+      supabase
+        .from("lesson_plans")
+        .select("classroom_id, period, unit, done")
+        .eq("plan_date", today),
+    ]);
+
+  type LessonRow = { period: number; subject: string | null; unit: string; done: boolean; hasPlan: boolean };
+  const byClass = new Map<string, Map<number, LessonRow>>();
+  const rowMap = (cid: string) => {
+    let m = byClass.get(cid);
+    if (!m) {
+      m = new Map<number, LessonRow>();
+      byClass.set(cid, m);
+    }
+    return m;
+  };
+  for (const s of todaySlots ?? []) {
+    rowMap(s.classroom_id).set(s.period, {
+      period: s.period,
+      subject: s.subject,
+      unit: "",
+      done: false,
+      hasPlan: false,
+    });
+  }
+  for (const p of todayPlans ?? []) {
+    const m = rowMap(p.classroom_id);
+    const existing = m.get(p.period);
+    m.set(p.period, {
+      period: p.period,
+      subject: existing?.subject ?? null,
+      unit: p.unit,
+      done: p.done,
+      hasPlan: true,
+    });
+  }
+  const todayLessons = (classes ?? [])
+    .map((c) => ({
+      id: c.id,
+      name: c.name,
+      rows: [...(byClass.get(c.id)?.values() ?? [])].sort((a, b) => a.period - b.period),
+    }))
+    .filter((c) => c.rows.length > 0);
+  const weekMon = weekStartString(today);
+
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-6">
       <WorkNav current="" />
@@ -70,6 +129,47 @@ export default async function WorkDashboardPage() {
           </span>
         </h1>
       </header>
+
+      {todayLessons.length > 0 && (
+        <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-ink">오늘 수업</h2>
+            <Link href={`/work/lessons?week=${weekMon}`} className="text-sm text-slate-600 underline">
+              수업 그리드
+            </Link>
+          </div>
+          <div className="flex flex-col gap-3">
+            {todayLessons.map((c) => (
+              <div key={c.id} className="flex flex-col gap-1.5">
+                {todayLessons.length > 1 && (
+                  <p className="text-xs font-bold tracking-wide text-ink-faint">{c.name}</p>
+                )}
+                <ul className="flex flex-wrap gap-1.5">
+                  {c.rows.map((r) => (
+                    <li key={r.period}>
+                      <Link
+                        href={`/work/lessons?class=${c.id}&week=${weekMon}`}
+                        className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-sm transition-colors ${
+                          r.done
+                            ? "border-slate-200 bg-slate-50 text-ink-soft"
+                            : "border-line bg-paper hover:bg-paper-soft"
+                        }`}
+                      >
+                        <span className="tabular-nums text-xs font-bold text-ink-faint">
+                          {r.period}
+                        </span>
+                        <span className="font-medium text-ink">{r.subject ?? "수업"}</span>
+                        {r.unit && <span className="text-xs text-ink-soft">· {r.unit}</span>}
+                        {r.done && <span className="text-xs text-slate-500">✓</span>}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <section className="flex flex-col gap-2 rounded-2xl border border-line bg-paper p-5">

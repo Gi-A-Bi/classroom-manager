@@ -1,4 +1,5 @@
 import {
+  BookOpen,
   CalendarDays,
   ClipboardList,
   FileText,
@@ -12,6 +13,7 @@ import { TabNav, type TabItem } from "./TabNav";
 
 const WORK_MENU = [
   { key: "", label: "대시보드", icon: LayoutDashboard },
+  { key: "lessons", label: "수업", icon: BookOpen },
   { key: "todos", label: "할 일", icon: ListChecks },
   { key: "documents", label: "공문", icon: FileText },
   { key: "calendar", label: "캘린더", icon: CalendarDays },

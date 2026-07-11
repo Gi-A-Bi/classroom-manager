@@ -374,6 +374,66 @@ export type Database = {
           },
         ]
       }
+      lesson_plans: {
+        Row: {
+          classroom_id: string
+          created_at: string
+          done: boolean
+          done_at: string | null
+          id: string
+          note: string
+          period: number
+          plan: string
+          plan_date: string
+          subject_id: string | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          classroom_id: string
+          created_at?: string
+          done?: boolean
+          done_at?: string | null
+          id?: string
+          note?: string
+          period: number
+          plan?: string
+          plan_date: string
+          subject_id?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          classroom_id?: string
+          created_at?: string
+          done?: boolean
+          done_at?: string | null
+          id?: string
+          note?: string
+          period?: number
+          plan?: string
+          plan_date?: string
+          subject_id?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_plans_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_plans_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_items: {
         Row: {
           classroom_id: string
