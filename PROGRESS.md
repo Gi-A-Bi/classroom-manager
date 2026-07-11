@@ -5,9 +5,10 @@
 > 예: "오늘 작업 내용을 PROGRESS.md에 정리해줘"
 
 ## 현재 마일스톤
-배포 진행 중 (2026-07-11) — 클라우드 Supabase 준비 완료, Vercel 연결 남음
-- 완료: 클라우드 마이그레이션 14개 적용 + RLS 29개 시나리오 검증(클라우드/로컬 모두 통과)
-- 다음: Vercel GitHub 연결(사용자 브라우저 작업) → 실주소 점검 목록 수행
+**배포 완료 (2026-07-11)** — https://classroom-manager-gi-a-bis-projects.vercel.app
+- 완료: 클라우드 Supabase + Vercel 배포 + 실주소 E2E 점검(서버측 전 항목)
+- 남음: 폰(외부망) 확인, Supabase Site URL 설정, 테스트 데이터 정리
+- 다음: 파일럿 패키지 진행(PWA → 급식 → 온보딩 → 주간학습안내)
 
 ## 완료한 것
 - 2026-07-09: git 저장소 초기화, GitHub(Gi-A-Bi/classroom-manager) 연결 및 첫 푸시
@@ -251,6 +252,19 @@
   프로덕션 빌드 통과. 남은 것: Vercel GitHub 연결+환경변수 4개(사용자 브라우저),
   실주소 점검 목록. 로컬 개발은 계속 로컬 Docker 스택 사용(.env.local),
   클라우드 값은 .env.cloud(gitignore)에 보관
+
+- 2026-07-11 (배포 2단계·완료): Vercel Hobby에 GitHub 연결 배포 —
+  https://classroom-manager-gi-a-bis-projects.vercel.app (환경변수 4개,
+  service_role·JWT secret은 서버 전용). **Vercel Authentication(배포 보호)이
+  기본 켜짐 → 전 접속이 Vercel 로그인으로 튕김 → Settings → Deployment
+  Protection에서 Disabled로 해제** (공개 서비스 필수, 무료). 실주소 E2E 점검
+  통과: 교사 로그인 → 학년도·학급 생성(XTZ72F) → 명렬 2명 → 알림장+준비물 →
+  학생 초기 PIN 로그인 → 새 PIN 강제 설정 → 알림장 읽음·필통 체크 → 교사 화면
+  읽음 1/2·필통 1/2 반영 → 새 PIN 재로그인 OK. 공유 링크 켜기→비로그인 200,
+  끄기→즉시 404. 미인증 보호 경로 307, 404 페이지 정상.
+  남은 수동 확인: 폰 외부망 접속(테스트 데이터 XTZ72F·2번·PIN 0000 유지 중,
+  확인 후 테스트 계정 삭제 예정), Supabase Auth Site URL을 배포 주소로 설정
+  (기본 localhost:3000 → 교사 가입 확인 메일 링크 깨짐 방지)
 
 ## 다음 할 것 (디자인 개편 순서)
 1. 캘린더 화면 개편 (스타일 확정)
