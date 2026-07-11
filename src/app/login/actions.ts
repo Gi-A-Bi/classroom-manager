@@ -56,7 +56,11 @@ export async function signup(formData: FormData) {
     const message =
       error.code === "user_already_exists"
         ? "이미 가입된 이메일입니다."
-        : "가입에 실패했습니다. 잠시 후 다시 시도해주세요.";
+        : error.code === "over_email_send_rate_limit"
+          ? "확인 메일 발송 한도에 걸렸어요. 1시간 뒤 다시 시도해주세요."
+          : error.code === "email_address_invalid"
+            ? "사용할 수 없는 이메일 주소예요."
+            : "가입에 실패했습니다. 잠시 후 다시 시도해주세요.";
     redirect("/signup?error=" + encodeURIComponent(message));
   }
 
