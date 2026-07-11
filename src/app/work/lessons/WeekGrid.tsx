@@ -115,7 +115,9 @@ export function WeekGrid({
                               {subjectText}
                             </span>
                           ) : (
-                            <span className="text-xs text-ink-faint">＋</span>
+                            !hasPlan && (
+                              <span className="text-xs text-ink-faint">＋</span>
+                            )
                           )}
                           {cell.plan?.unit && (
                             <span className="break-words text-[11px] leading-tight text-ink-soft">
