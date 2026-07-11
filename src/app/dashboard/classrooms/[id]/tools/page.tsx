@@ -282,7 +282,7 @@ export default async function ToolsDrawerPage({
           </p>
         )}
         <p className="text-xs text-ink-faint">
-          즐겨찾기한 카드는 대시보드 투데이 뷰에 바로가기로 나와요(최대 2개).
+          등록한 카드는 모두 대시보드에 바로가기로 나와요(즐겨찾기 ★는 맨 앞).
           학생에게 보이기를 켜면 학생 홈에 버튼이 생겨요.
         </p>
       </section>

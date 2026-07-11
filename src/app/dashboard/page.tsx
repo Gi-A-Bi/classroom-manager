@@ -122,12 +122,12 @@ export default async function DashboardPage({
   const nextEvent = nextEvents?.[0] ?? null;
   const dday = nextEvent ? daysBetween(today, nextEvent.event_date) : null;
 
-  const { data: favTools } = await supabase
+  // 등록한 도구 전부 — 즐겨찾기 먼저, 그다음 서랍 순서
+  const { data: myTools } = await supabase
     .from("class_tools")
-    .select("id, name, url, color")
-    .eq("is_favorite", true)
-    .order("position")
-    .limit(3);
+    .select("id, name, url, color, is_favorite")
+    .order("is_favorite", { ascending: false })
+    .order("position");
 
   // 오늘 할 일 (반복은 오늘 요일, 단발성은 마감이 오늘이거나 지난 미완료)
   const todoDone = (t: NonNullable<typeof todos>[number]) =>
@@ -187,10 +187,10 @@ export default async function DashboardPage({
         </p>
       )}
 
-      {/* 즐겨찾기 도구 */}
-      {favTools && favTools.length > 0 && (
+      {/* 도구 바로가기 — 도구 서랍에 등록한 카드 전부 (즐겨찾기 먼저) */}
+      {myTools && myTools.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {favTools.map((t) => {
+          {myTools.map((t) => {
             const tt = getTheme(t.color);
             return (
               <a
@@ -200,7 +200,13 @@ export default async function DashboardPage({
                 rel="noopener noreferrer"
                 className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold transition-transform hover:scale-105 ${tt.soft} ${tt.text}`}
               >
-                <ExternalLink size={15} strokeWidth={2} aria-hidden />
+                {t.is_favorite ? (
+                  <span aria-hidden className="text-xs">
+                    ★
+                  </span>
+                ) : (
+                  <ExternalLink size={15} strokeWidth={2} aria-hidden />
+                )}
                 {t.name}
               </a>
             );
