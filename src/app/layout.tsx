@@ -38,6 +38,10 @@ export const metadata: Metadata = {
     title: "학교수첩",
     statusBarStyle: "default",
   },
+  // 구형 iOS도 홈 화면 앱(주소창 없는 standalone)으로 열리도록 레거시 메타 병기
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+  },
 };
 
 export const viewport: Viewport = {
