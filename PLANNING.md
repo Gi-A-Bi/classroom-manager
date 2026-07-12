@@ -1,4 +1,6 @@
-# PLANNING.md — 학급운영 플랫폼 설계 문서
+# PLANNING.md — 학교수첩 설계 문서
+
+> 서비스명: **학교수첩** (2026-07-12 확정, 배포 주소 classroom-manager-gi-a-bis-projects.vercel.app)
 
 ## 1. 비전
 전국의 교사들이 회원가입 후 5분 안에 학급 페이지를 개설하고,

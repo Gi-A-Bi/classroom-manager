@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { StudentNav } from "@/components/StudentNav";
+import { Wordmark } from "@/components/Wordmark";
 import {
   DAY_NAMES,
   dayOfWeekMon1,
@@ -86,6 +87,7 @@ export default async function StudentHomePage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col gap-3 p-4">
+      <Wordmark size="sm" className="self-center opacity-60" />
       <StudentNav current="home" themeColor={classroom.theme_color} />
 
       {/* 히어로 — 테마색 종이 헤더 */}

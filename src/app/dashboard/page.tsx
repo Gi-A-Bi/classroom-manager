@@ -10,6 +10,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CLASSROOM_MENU } from "@/components/ClassroomNav";
 import { ModeSwitch } from "@/components/ModeSwitch";
+import { Wordmark } from "@/components/Wordmark";
 import {
   DAY_NAMES,
   dayOfWeekMon1,
@@ -150,6 +151,7 @@ export default async function DashboardPage({
       {/* 헤더 — 큰 날짜 제목 + 손그림 밑줄 */}
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
+          <Wordmark size="sm" className="opacity-60" />
           <span className="text-sm font-medium text-ink-faint">
             {profile?.display_name || "선생님"} 선생님, 안녕하세요
           </span>

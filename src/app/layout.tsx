@@ -27,8 +27,8 @@ const gaegu = Gaegu({
 });
 
 export const metadata: Metadata = {
-  title: "학급운영 플랫폼",
-  description: "교사와 학생을 위한 학급운영 플랫폼",
+  title: "학교수첩",
+  description: "우리 반의 하루가 한곳에 — 교사와 학생을 위한 학교수첩",
 };
 
 export default function RootLayout({
@@ -44,7 +44,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <div className="flex-1">{children}</div>
         <footer className="border-t border-line py-4 text-center text-xs text-ink-faint">
-          © 학급운영 플랫폼 · 개발:{" "}
+          © 학교수첩 · 개발:{" "}
           <span className="font-semibold text-ink-soft">김민성</span> · 오류
           문의:{" "}
           <a

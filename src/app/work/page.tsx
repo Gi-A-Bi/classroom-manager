@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { WorkNav } from "@/components/WorkNav";
+import { Wordmark } from "@/components/Wordmark";
 import {
   DAY_NAMES,
   dayOfWeekMon1,
@@ -121,7 +122,8 @@ export default async function WorkDashboardPage() {
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-6">
       <WorkNav current="" />
 
-      <header>
+      <header className="flex flex-col gap-1">
+        <Wordmark size="sm" className="opacity-60" />
         <h1 className="text-3xl font-display tabular-nums text-ink">
           💼 {Number(today.slice(5, 7))}월 {Number(today.slice(8))}일{" "}
           <span className="text-xl font-bold text-ink-faint">

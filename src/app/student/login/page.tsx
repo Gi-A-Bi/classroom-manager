@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Wordmark } from "@/components/Wordmark";
 import { getStudentSession } from "@/lib/student-auth";
 import { studentLogin } from "./actions";
 
@@ -16,6 +17,7 @@ export default async function StudentLoginPage({
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 p-5">
       <div className="flex flex-col items-center text-center">
+        <Wordmark size="sm" className="mb-3 opacity-60" />
         <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-paper-soft text-4xl ring-1 ring-line">
           🏫
         </span>

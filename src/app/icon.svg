@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 학교수첩 파비콘 — 종이 수첩 -->
+  <rect width="64" height="64" rx="14" fill="#f3ead9"/>
+  <!-- 수첩 몸통 -->
+  <rect x="16" y="10" width="36" height="44" rx="6" fill="#fffdf7" stroke="#2f2a23" stroke-width="3.5"/>
+  <!-- 스프링 링 -->
+  <circle cx="16" cy="20" r="3.2" fill="#f3ead9" stroke="#2f2a23" stroke-width="2.5"/>
+  <circle cx="16" cy="32" r="3.2" fill="#f3ead9" stroke="#2f2a23" stroke-width="2.5"/>
+  <circle cx="16" cy="44" r="3.2" fill="#f3ead9" stroke="#2f2a23" stroke-width="2.5"/>
+  <!-- 글줄 -->
+  <line x1="26" y1="24" x2="44" y2="24" stroke="#cebfa3" stroke-width="3" stroke-linecap="round"/>
+  <line x1="26" y1="33" x2="44" y2="33" stroke="#cebfa3" stroke-width="3" stroke-linecap="round"/>
+  <line x1="26" y1="42" x2="37" y2="42" stroke="#cebfa3" stroke-width="3" stroke-linecap="round"/>
+</svg>

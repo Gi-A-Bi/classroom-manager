@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Wordmark } from "@/components/Wordmark";
 import { getStudentSession } from "@/lib/student-auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -26,9 +27,11 @@ export default async function Home() {
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-8 p-6">
       <div className="flex flex-col items-center text-center">
         <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-paper-soft text-4xl ring-1 ring-line">
-          🏫
+          📓
         </span>
-        <h1 className="mt-4 text-3xl font-display text-ink">학급운영 플랫폼</h1>
+        <h1 className="mt-4">
+          <Wordmark size="lg" className="text-4xl" />
+        </h1>
         <p className="mt-2 font-hand text-lg text-ink-soft">
           우리 반의 하루가 한곳에 모여요.
         </p>
