@@ -549,6 +549,7 @@ export type Database = {
           display_name: string
           id: string
           last_mode: string
+          onboarded_at: string | null
           role: string
         }
         Insert: {
@@ -556,6 +557,7 @@ export type Database = {
           display_name?: string
           id: string
           last_mode?: string
+          onboarded_at?: string | null
           role?: string
         }
         Update: {
@@ -563,6 +565,7 @@ export type Database = {
           display_name?: string
           id?: string
           last_mode?: string
+          onboarded_at?: string | null
           role?: string
         }
         Relationships: []

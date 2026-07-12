@@ -20,10 +20,13 @@ import { getTheme } from "@/lib/themes";
 // 학급 메인 화면 — 헤더 + 탭 + 오늘 요약 카드 3장 + 이번 달 달력(주인공) + 최근 알림장.
 export default async function ClassroomHomePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ tip?: string }>;
 }) {
   const { id } = await params;
+  const { tip } = await searchParams;
 
   const supabase = await createClient();
   const {
@@ -132,6 +135,20 @@ export default async function ClassroomHomePage({
         </div>
         <CopyCodeChip code={classroom.class_code} />
       </header>
+
+      {tip === "sample" && (
+        <p className="rounded-xl border border-line bg-paper-soft p-3 text-sm text-ink-soft">
+          👋 둘러보기용 <strong className="text-ink">예시 학급</strong>이에요. 탭을
+          눌러 알림장·시간표·캘린더를 자유롭게 써 보고, 다 보면{" "}
+          <Link
+            href="/dashboard/settings"
+            className="underline decoration-line-strong underline-offset-2 hover:text-ink"
+          >
+            설정
+          </Link>
+          에서 지우면 됩니다.
+        </p>
+      )}
 
       {/* 탭 (활성 없음 — 홈) */}
       <ClassroomNav classroomId={id} current="" themeColor={classroom.theme_color} />

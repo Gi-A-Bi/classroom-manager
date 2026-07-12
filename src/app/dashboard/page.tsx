@@ -38,7 +38,11 @@ export default async function DashboardPage({
 
   const [{ data: profile }, { data: years }, { data: todos }] =
     await Promise.all([
-      supabase.from("profiles").select("display_name").eq("id", user.id).single(),
+      supabase
+        .from("profiles")
+        .select("display_name, onboarded_at")
+        .eq("id", user.id)
+        .single(),
       supabase
         .from("academic_years")
         .select("id, year, name, classrooms(id, name, class_code, theme_color)")
@@ -51,6 +55,16 @@ export default async function DashboardPage({
     ]);
 
   const availableYears = years ?? [];
+
+  // 첫 가입 교사(온보딩 전 + 학급 0개)는 환영 안내로
+  const totalClassrooms = availableYears.reduce(
+    (n, y) => n + y.classrooms.length,
+    0,
+  );
+  if (!profile?.onboarded_at && totalClassrooms === 0) {
+    redirect("/welcome");
+  }
+
   const selectedYear =
     availableYears.find((y) => String(y.year) === yearParam) ??
     availableYears[0] ??
