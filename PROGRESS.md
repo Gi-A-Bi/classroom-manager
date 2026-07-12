@@ -6,7 +6,7 @@
 
 ## 현재 마일스톤
 **파일럿 운영 준비 (2026-07-13)** — https://classroom-manager-gi-a-bis-projects.vercel.app
-- 완료: 배포·PWA·온보딩·주간학습안내·서비스명·랜딩, **개학 준비(PIN 일괄·알림장 템플릿·예약 게시)**
+- 완료: 배포·PWA(설치+**자동 업데이트 배너**)·온보딩·주간학습안내·서비스명·랜딩, **개학 준비(PIN 일괄·템플릿·예약)**
 - **중요 버그 수정**: root loading.tsx가 페이지 콘텐츠 하이드레이션을 막던 문제 해결
   (그간 폼/링크 외 모든 클라이언트 상호작용이 죽어 있었음 — 이제 복구)
 - 급식은 제외(학교 설정 부담 대비 효용 낮음) — 사용자 결정
@@ -336,6 +336,21 @@
   경계 안(main·페이지 콘텐츠)은 fiber 없음. **loading.tsx 제거로 복구**(로컬·
   프로덕션 모두 main 하이드레이션 확인). 교훈: 이 Next 빌드에선 root loading.tsx
   금지. 스피너가 필요하면 다른 방식 검토.
+
+- 2026-07-13 (PWA 자동 업데이트): 설치한 앱이 새 배포를 감지해 "새 버전이
+  나왔어요 · 새로고침" 배너를 띄우고, 누르면 즉시 갱신. 문제였던 것: 정적
+  public/sw.js는 배포마다 내용이 같아 브라우저가 갱신을 감지 못 함 →
+  **sw를 /sw.js 라우트(app/sw.js/route.ts)로 서빙, VERSION에 VERCEL_GIT_COMMIT_SHA
+  주입**해 배포마다 바이트가 달라지게. install에서 skipWaiting 제거(새 워커 대기),
+  message 'SKIP_WAITING'로만 교체. PwaUpdater(구 ServiceWorker 대체): 대기 워커
+  감지 시 종이 톤 배너(하단 고정, "나중에"/"새로고침"), focus·visibilitychange에서
+  registration.update()로 확인, 새로고침→postMessage→controllerchange→reload
+  (refreshing 가드로 중복 리로드 방지). sw.js는 Cache-Control no-cache로 즉시 재검증.
+  - 검증(2회 배포 E2E, 프로덕션): SW 등록·활성·제어 확인 → 배포2로 버전 변경
+    (442e8234f13c→f0b26582d267) → update() 트리거 시 대기 워커+배너 노출 →
+    "새로고침" 클릭 → 리로드 후 활성 SW가 새 버전으로 교체·배너 사라짐 전 과정 통과.
+  - 주의: loading.tsx 제거 배포 이전에 설치·방문한 기기는 구 SW(정적 v1)를 물고
+    있어, 이번 배포에서 새 route SW로 넘어갈 때 한 번은 배너가 뜬다(정상).
 
 ## 다음 할 것 (디자인 개편 순서)
 1. 캘린더 화면 개편 (스타일 확정)
