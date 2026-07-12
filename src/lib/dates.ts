@@ -78,6 +78,25 @@ export function weekStartString(dateString: string) {
   return addDaysString(dateString, -(dayOfWeekMon1(new Date(dateString + "T00:00:00")) - 1));
 }
 
+// timestamptz(ISO/UTC) → 한국 시각 "M월 D일 오전/오후 H:MM"
+export function formatKstDateTime(iso: string) {
+  const parts = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(iso));
+  return parts;
+}
+
+// timestamptz(ISO/UTC) → datetime-local 입력값 "YYYY-MM-DDTHH:MM" (KST 기준)
+export function isoToKstLocalInput(iso: string) {
+  const d = new Date(iso);
+  const kst = new Date(d.getTime() + 9 * 3600 * 1000);
+  return kst.toISOString().slice(0, 16);
+}
+
 // from~to 사이의 모든 날짜 (YYYY-MM-DD 배열, 양 끝 포함)
 export function dateRange(from: string, to: string): string[] {
   const out: string[] = [];

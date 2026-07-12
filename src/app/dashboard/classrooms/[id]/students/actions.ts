@@ -125,3 +125,33 @@ export async function resetStudentPin(formData: FormData) {
       ),
   );
 }
+
+// 학급 전체 PIN을 0000으로 초기화 (개학 준비용). 다음 로그인 때 재설정 강제.
+export async function resetAllPins(formData: FormData) {
+  const classroomId = String(formData.get("classroom_id") ?? "");
+  const base = `/dashboard/classrooms/${classroomId}/students`;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const pinHash = await hash("0000", 10);
+  const { data, error } = await supabase
+    .from("students")
+    .update({ pin_hash: pinHash, pin_is_initial: true })
+    .eq("classroom_id", classroomId)
+    .select("id");
+
+  if (error) {
+    redirect(base + "?error=" + encodeURIComponent("전체 PIN 초기화에 실패했습니다."));
+  }
+
+  revalidatePath(base);
+  redirect(
+    base +
+      "?success=" +
+      encodeURIComponent(`전체 ${data?.length ?? 0}명의 PIN을 0000으로 초기화했습니다.`),
+  );
+}

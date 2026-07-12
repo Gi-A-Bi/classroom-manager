@@ -1,8 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import { ClassroomHeader } from "@/components/ClassroomHeader";
 import { ClassroomNav } from "@/components/ClassroomNav";
+import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { createClient } from "@/lib/supabase/server";
-import { addStudentsBulk, resetStudentPin } from "./actions";
+import { addStudentsBulk, resetAllPins, resetStudentPin } from "./actions";
 
 export default async function StudentsPage({
   params,
@@ -99,13 +100,43 @@ export default async function StudentsPage({
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold text-ink">
-          등록된 학생{" "}
-          <span className="tabular-nums text-ink-soft">
-            {students?.length ?? 0}
-          </span>
-          명
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-semibold text-ink">
+            등록된 학생{" "}
+            <span className="tabular-nums text-ink-soft">
+              {students?.length ?? 0}
+            </span>
+            명
+          </h2>
+          {students && students.length > 0 && (
+            <div className="flex items-center gap-2">
+              {(() => {
+                const initialN = students.filter((s) => s.pin_is_initial).length;
+                const setN = students.length - initialN;
+                return (
+                  <span className="text-xs text-ink-soft">
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-800">
+                      초기 PIN {initialN}
+                    </span>{" "}
+                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-800">
+                      설정됨 {setN}
+                    </span>
+                  </span>
+                );
+              })()}
+              <form action={resetAllPins}>
+                <input type="hidden" name="classroom_id" value={classroom.id} />
+                <ConfirmSubmit
+                  question="전체 학생 PIN을 0000으로 되돌릴까요?"
+                  confirmLabel="전체 초기화"
+                  className="rounded-lg border border-line px-2.5 py-1.5 text-xs text-ink-soft transition-colors hover:bg-paper-soft"
+                >
+                  전체 PIN 초기화
+                </ConfirmSubmit>
+              </form>
+            </div>
+          )}
+        </div>
         {students && students.length > 0 ? (
           <ul className="flex flex-col gap-1.5">
             {students.map((s) => (

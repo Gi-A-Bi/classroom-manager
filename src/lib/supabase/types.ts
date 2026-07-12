@@ -505,6 +505,41 @@ export type Database = {
           },
         ]
       }
+      post_templates: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          items: string[]
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          items?: string[]
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          items?: string[]
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_templates_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           classroom_id: string
@@ -512,6 +547,7 @@ export type Database = {
           created_at: string
           id: string
           post_date: string
+          publish_at: string
           title: string
           updated_at: string
         }
@@ -521,6 +557,7 @@ export type Database = {
           created_at?: string
           id?: string
           post_date?: string
+          publish_at?: string
           title: string
           updated_at?: string
         }
@@ -530,6 +567,7 @@ export type Database = {
           created_at?: string
           id?: string
           post_date?: string
+          publish_at?: string
           title?: string
           updated_at?: string
         }
