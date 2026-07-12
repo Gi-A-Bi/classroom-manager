@@ -5,10 +5,10 @@
 > 예: "오늘 작업 내용을 PROGRESS.md에 정리해줘"
 
 ## 현재 마일스톤
-**배포 완료 (2026-07-11)** — https://classroom-manager-gi-a-bis-projects.vercel.app
-- 완료: 클라우드 Supabase + Vercel 배포 + 실주소 E2E 점검(서버측 전 항목)
-- 남음: 폰(외부망) 확인, Supabase Site URL 설정, 테스트 데이터 정리
-- 다음: 파일럿 패키지 진행(PWA → 급식 → 온보딩 → 주간학습안내)
+**파일럿 패키지 진행 중 (2026-07-12)** — https://classroom-manager-gi-a-bis-projects.vercel.app
+- 완료: 배포, 서비스명 "학교수첩" 확정, 역할 선택 랜딩, 리전 서울 고정, **PWA 설치형**
+- 다음: 오늘의 급식(나이스 API) → 온보딩 → 주간학습안내
+- 남음(수동): 폰 홈 화면 "설치" 실제 테스트, 테스트 데이터 정리
 
 ## 완료한 것
 - 2026-07-09: git 저장소 초기화, GitHub(Gi-A-Bi/classroom-manager) 연결 및 첫 푸시
@@ -265,6 +265,22 @@
   남은 수동 확인: 폰 외부망 접속(테스트 데이터 XTZ72F·2번·PIN 0000 유지 중,
   확인 후 테스트 계정 삭제 예정), Supabase Auth Site URL을 배포 주소로 설정
   (기본 localhost:3000 → 교사 가입 확인 메일 링크 깨짐 방지)
+
+- 2026-07-12 (파일럿): 서비스명 "학교수첩" 확정 — Wordmark 컴포넌트(디스플레이
+  폰트)·수첩 파비콘(app/icon.svg)·탭 제목·푸터 통일. 첫 화면 역할 선택 랜딩
+  (학생/선생님, 학부모는 공유 링크 안내). 가입 흐름 개선(이메일 확인 환경 안내·
+  오류 코드별 메시지). Vercel 함수 리전 서울(icn1) 고정 → TTFB 0.37→0.20초.
+  라우트 전환 loading.tsx. 로그인/가입/학생로그인 "처음 화면으로" 링크. 전 화면
+  공통 푸터. 도구 서랍 카드 전부 대시보드 바로가기(즐겨찾기 ★ 우선). 배포 주소
+  유지 확정(이름 변경 안 함).
+- 2026-07-12 (파일럿·PWA): 설치형 PWA 완성 — scripts/gen-icons.mjs가 icon.svg에서
+  PNG 생성(192/512/maskable-512·apple-icon 180). manifest(standalone·portrait·
+  maskable). layout에 appleWebApp·theme-color(#f3ead9)·viewport +
+  apple-mobile-web-app-capable/mobile-web-app-capable 병기(구형 iOS 대비).
+  서비스워커(public/sw.js): **인증 HTML은 캐시 금지**(네트워크 우선+오프라인 폴백),
+  콘텐츠 해시 정적 자산·아이콘만 캐시, 프로덕션에서만 등록. /offline 폴백.
+  검증: 프로덕션에서 SW activated(scope 루트)·manifest 4아이콘·아이콘 렌더(수첩)·
+  head 링크 전부 확인. 남은 수동: 실제 폰에서 "홈 화면에 추가" 눌러 앱 모드 확인.
 
 ## 다음 할 것 (디자인 개편 순서)
 1. 캘린더 화면 개편 (스타일 확정)
