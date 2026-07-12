@@ -202,6 +202,7 @@ export default async function ClassroomPostsPage({
       )}
 
       <PostComposer
+        key={editInitial ? `edit-${editInitial.postId}` : "new"}
         classroomId={classroom.id}
         templates={templateList}
         today={todayString()}
