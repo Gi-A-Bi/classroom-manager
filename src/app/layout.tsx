@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Black_Han_Sans, Gaegu, Noto_Sans_KR } from "next/font/google";
-import { ServiceWorker } from "@/components/ServiceWorker";
+import { PwaUpdater } from "@/components/PwaUpdater";
 import "./globals.css";
 
 // 본문 — 가독성 우선 (그리드·데이터 화면까지 작은 크기로 잘 읽힘)
@@ -64,7 +64,7 @@ export default function RootLayout({
       className={`${notoKr.variable} ${blackHan.variable} ${gaegu.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <ServiceWorker />
+        <PwaUpdater />
         <div className="flex-1">{children}</div>
         <footer className="border-t border-line py-4 text-center text-xs text-ink-faint print:hidden">
           © 학교수첩 · 개발:{" "}
