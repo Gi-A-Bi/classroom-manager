@@ -133,12 +133,20 @@ export default async function LessonsPage({
 
       <div className="flex flex-wrap items-end justify-between gap-2">
         <h1 className="text-2xl font-display text-ink">📖 수업</h1>
-        <Link
-          href={`/work/lessons/subjects?class=${classroom.id}`}
-          className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
-        >
-          과목별 모아보기(진도표)
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/work/lessons/weekly-guide?class=${classroom.id}&week=${week}`}
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
+          >
+            주간학습안내
+          </Link>
+          <Link
+            href={`/work/lessons/subjects?class=${classroom.id}`}
+            className="rounded-lg border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-paper-soft"
+          >
+            과목별 모아보기(진도표)
+          </Link>
+        </div>
       </div>
 
       {/* 학급 선택 (여러 학급 운영 시) */}

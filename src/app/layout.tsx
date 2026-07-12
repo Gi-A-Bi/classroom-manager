@@ -66,7 +66,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <ServiceWorker />
         <div className="flex-1">{children}</div>
-        <footer className="border-t border-line py-4 text-center text-xs text-ink-faint">
+        <footer className="border-t border-line py-4 text-center text-xs text-ink-faint print:hidden">
           © 학교수첩 · 개발:{" "}
           <span className="font-semibold text-ink-soft">김민성</span> · 오류
           문의:{" "}
