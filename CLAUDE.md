@@ -46,3 +46,20 @@
 - 설계 문서: PLANNING.md (기능 명세와 마일스톤)
 - 진행 기록: PROGRESS.md — 세션을 마칠 때마다 "완료한 것 / 다음 할 것"을 여기에 갱신할 것
 - 세션 시작 시 PLANNING.md와 PROGRESS.md를 먼저 읽고 현재 위치를 파악할 것
+
+## DB 스키마 변경 규칙 (반드시 지킬 것)
+DB 스키마를 바꾸는 작업(마이그레이션 추가)은 **매번 아래 순서를 끝까지** 밟는다.
+수동 SQL 복붙은 더 이상 하지 않는다.
+1. **로컬 적용**: `supabase/migrations/`에 새 파일 작성(`if not exists`·`drop policy if
+   exists` 등 idempotent하게) → `npx supabase migration up` → 타입 재생성
+   `npx supabase gen types typescript --local > src/lib/supabase/types.ts`
+2. **검증**: 로컬에서 기능 동작 + RLS(학생·anon 차단) 확인
+3. **클라우드 반영**: `npm run db:push:cloud`
+   - 아직 클라우드에 없는 마이그레이션만 자동 적용된다.
+   - ⚠️ 학교망이 Postgres 포트(5432/6543)를 막아 `supabase db push`는 이 환경에서
+     동작하지 않는다("Failed to connect"). 그래서 HTTPS(443) Management API로 올리는
+     `scripts/push-migrations-cloud.mjs`를 쓴다. 1회 준비: `.env.cloud`에
+     `SUPABASE_ACCESS_TOKEN`(무료 PAT) 추가 후 최초 1회 `--baseline` 실행.
+   - (망이 바뀌어 DB 포트가 열리는 환경이면 `npx supabase db push`도 대안이 될 수 있음.)
+4. **배포 확인**: 커밋·푸시 → Vercel 자동 배포 → 프로덕션에서 해당 화면 정상 동작 확인
+- 이 순서를 세션 마무리 루틴에 포함한다: 스키마 변경이 있었으면 3·4를 빠뜨리지 말 것.
