@@ -223,10 +223,17 @@ export default async function StudentsPage({
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-ink">
-                      <span className="mr-2 font-mono text-ink-faint">
-                        {s.number}번
-                      </span>
-                      {s.nickname}
+                      <Link
+                        href={`/dashboard/classrooms/${classroom.id}/students/${s.id}`}
+                        className="group inline-flex items-center hover:text-ink"
+                      >
+                        <span className="mr-2 font-mono text-ink-faint">
+                          {s.number}번
+                        </span>
+                        <span className="font-medium underline decoration-line decoration-1 underline-offset-2 group-hover:decoration-ink-soft">
+                          {s.nickname}
+                        </span>
+                      </Link>
                       <span
                         className={`ml-3 rounded-full px-2 py-0.5 text-xs ${
                           s.pin_is_initial
@@ -239,10 +246,10 @@ export default async function StudentsPage({
                     </span>
                     <div className="flex items-center gap-1.5">
                       <Link
-                        href={`/dashboard/classrooms/${classroom.id}/records?student=${s.id}`}
+                        href={`/dashboard/classrooms/${classroom.id}/students/${s.id}`}
                         className="rounded-lg border border-line px-2 py-1 text-xs text-ink-soft transition-colors hover:bg-paper-soft"
                       >
-                        기록 보기
+                        상세 보기
                       </Link>
                       <form action={resetStudentPin}>
                         <input type="hidden" name="student_id" value={s.id} />

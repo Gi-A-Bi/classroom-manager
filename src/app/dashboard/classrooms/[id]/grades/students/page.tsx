@@ -144,11 +144,19 @@ export default async function GradesByStudentPage({
 
       {selectedStudent ? (
         <section className="flex flex-col gap-2">
-          <h2 className="text-xs font-bold tracking-wide text-ink-faint">
-            {selectedStudent.number}번 {selectedStudent.nickname} ·{" "}
-            {selectedSubject ? selectedSubject.name : "전 과목"} · {rows.length}건
-            (최신순)
-          </h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-xs font-bold tracking-wide text-ink-faint">
+              {selectedStudent.number}번 {selectedStudent.nickname} ·{" "}
+              {selectedSubject ? selectedSubject.name : "전 과목"} · {rows.length}건
+              (최신순)
+            </h2>
+            <Link
+              href={`/dashboard/classrooms/${id}/students/${selectedStudent.id}`}
+              className="rounded-lg border border-line bg-paper px-2.5 py-1 text-xs text-ink-soft transition-colors hover:bg-paper-soft"
+            >
+              학생 상세 →
+            </Link>
+          </div>
           {rows.length > 0 ? (
             <ul className="flex flex-col gap-1.5">
               {rows.map((a) => (

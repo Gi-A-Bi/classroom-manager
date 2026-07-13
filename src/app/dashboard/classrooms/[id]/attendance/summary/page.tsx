@@ -110,8 +110,13 @@ export default async function AttendanceSummaryPage({
               return (
                 <tr key={s.id}>
                   <th className="whitespace-nowrap border border-line bg-paper-soft p-2 text-left font-medium text-ink">
-                    <span className="tabular-nums text-ink-faint">{s.number}</span>{" "}
-                    {s.nickname}
+                    <Link
+                      href={`/dashboard/classrooms/${id}/students/${s.id}`}
+                      className="hover:text-ink hover:underline"
+                    >
+                      <span className="tabular-nums text-ink-faint">{s.number}</span>{" "}
+                      {s.nickname}
+                    </Link>
                   </th>
                   <td className="border border-line p-2 text-center">
                     {cell(t.absent, "bg-red-100 text-red-700")}

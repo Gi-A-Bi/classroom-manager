@@ -295,14 +295,20 @@ export default async function StudentRecordsPage({
                       : ""}
                   </span>
                   {!selectedStudent && (
-                    <span className="font-semibold text-ink">
+                    <Link
+                      href={`/dashboard/classrooms/${id}/students/${r.student_id}`}
+                      className="font-semibold text-ink underline decoration-line decoration-1 underline-offset-2 hover:decoration-ink-soft"
+                    >
                       {studentName.get(r.student_id) ?? "(삭제된 학생)"}
-                    </span>
+                    </Link>
                   )}
                   {r.peer_student_id && (
-                    <span className="text-xs text-red-600">
+                    <Link
+                      href={`/dashboard/classrooms/${id}/students/${r.peer_student_id}`}
+                      className="text-xs text-red-600 hover:underline"
+                    >
                       ↔ {studentName.get(r.peer_student_id) ?? "상대"}
-                    </span>
+                    </Link>
                   )}
                   <span className="tabular-nums text-ink-faint">
                     {formatKoreanDate(r.record_date)}
