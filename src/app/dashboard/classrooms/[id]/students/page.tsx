@@ -1,19 +1,50 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ClassroomHeader } from "@/components/ClassroomHeader";
 import { ClassroomNav } from "@/components/ClassroomNav";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
+import { todayString } from "@/lib/dates";
+import { typeChip, typeLabel } from "@/lib/record-types";
 import { createClient } from "@/lib/supabase/server";
 import { addStudentsBulk, resetAllPins, resetStudentPin } from "./actions";
+
+const RANGES = [
+  { key: "week", label: "이번 주" },
+  { key: "month", label: "이번 달" },
+  { key: "term", label: "학기" },
+] as const;
+
+// 기간 시작일(YYYY-MM-DD)
+function rangeStart(range: string, today: string): string {
+  const d = new Date(today + "T00:00:00");
+  if (range === "week") {
+    const mon = d.getDay() === 0 ? 6 : d.getDay() - 1; // 월=0
+    d.setDate(d.getDate() - mon);
+    return d.toISOString().slice(0, 10);
+  }
+  if (range === "term") {
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1; // 1-12
+    if (m >= 3 && m <= 8) return `${y}-03-01`; // 1학기
+    if (m >= 9) return `${y}-09-01`; // 2학기
+    return `${y - 1}-09-01`; // 1~2월: 지난 2학기 이어짐
+  }
+  // month
+  return `${today.slice(0, 7)}-01`;
+}
 
 export default async function StudentsPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ error?: string; success?: string }>;
+  searchParams: Promise<{ error?: string; success?: string; range?: string }>;
 }) {
   const { id } = await params;
-  const { error, success } = await searchParams;
+  const { error, success, range: rangeParam } = await searchParams;
+  const range = RANGES.some((r) => r.key === rangeParam) ? rangeParam! : "month";
+  const today = todayString();
+  const since = rangeStart(range, today);
 
   const supabase = await createClient();
   const {
@@ -21,21 +52,41 @@ export default async function StudentsPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: classroom }, { data: students }] = await Promise.all([
-    supabase
-      .from("classrooms")
-      .select("id, name, class_code, theme_color")
-      .eq("id", id)
-      .single(),
-    supabase
-      .from("students")
-      .select("id, number, nickname, pin_is_initial")
-      .eq("classroom_id", id)
-      .order("number"),
-  ]);
+  const [{ data: classroom }, { data: students }, { data: recs }] =
+    await Promise.all([
+      supabase
+        .from("classrooms")
+        .select("id, name, class_code, theme_color")
+        .eq("id", id)
+        .single(),
+      supabase
+        .from("students")
+        .select("id, number, nickname, pin_is_initial")
+        .eq("classroom_id", id)
+        .order("number"),
+      supabase
+        .from("student_records")
+        .select("student_id, record_type, detail")
+        .eq("classroom_id", id)
+        .gte("record_date", since),
+    ]);
 
   // RLS 때문에 남의 학급은 조회 자체가 안 된다
   if (!classroom) notFound();
+
+  // 학생별 유형 집계 — key = 커스텀이면 라벨, 아니면 record_type
+  const summary = new Map<string, Map<string, { label: string; type: string; count: number }>>();
+  for (const r of recs ?? []) {
+    const key = r.record_type === "custom" ? `custom:${r.detail ?? ""}` : r.record_type;
+    const label = typeLabel(r.record_type, r.detail);
+    const byType = summary.get(r.student_id) ?? new Map();
+    const cur = byType.get(key) ?? { label, type: r.record_type, count: 0 };
+    cur.count += 1;
+    byType.set(key, cur);
+    summary.set(r.student_id, byType);
+  }
+  const buildUrl = (rk: string) =>
+    `/dashboard/classrooms/${id}/students?range=${rk}`;
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-5 p-6">
@@ -137,44 +188,93 @@ export default async function StudentsPage({
             </div>
           )}
         </div>
+        {/* 기간별 기록 요약 필터 */}
+        {students && students.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-bold tracking-wide text-ink-faint">
+              기록 요약
+            </span>
+            {RANGES.map((r) => (
+              <Link
+                key={r.key}
+                href={buildUrl(r.key)}
+                className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                  range === r.key
+                    ? "bg-ink text-paper"
+                    : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
+                }`}
+              >
+                {r.label}
+              </Link>
+            ))}
+          </div>
+        )}
         {students && students.length > 0 ? (
           <ul className="flex flex-col gap-1.5">
-            {students.map((s) => (
-              <li
-                key={s.id}
-                className="flex items-center justify-between rounded-xl border border-line bg-paper p-2.5 text-sm"
-              >
-                <span className="text-ink">
-                  <span className="mr-2 font-mono text-ink-faint">
-                    {s.number}번
-                  </span>
-                  {s.nickname}
-                  <span
-                    className={`ml-3 rounded-full px-2 py-0.5 text-xs ${
-                      s.pin_is_initial
-                        ? "bg-amber-100 text-amber-800"
-                        : "bg-green-100 text-green-800"
-                    }`}
-                  >
-                    {s.pin_is_initial ? "초기 PIN(0000)" : "PIN 설정됨"}
-                  </span>
-                </span>
-                <form action={resetStudentPin}>
-                  <input type="hidden" name="student_id" value={s.id} />
-                  <input
-                    type="hidden"
-                    name="classroom_id"
-                    value={classroom.id}
-                  />
-                  <button
-                    type="submit"
-                    className="rounded-lg border border-line px-2 py-1 text-xs text-ink-soft transition-colors hover:bg-paper-soft"
-                  >
-                    PIN 초기화
-                  </button>
-                </form>
-              </li>
-            ))}
+            {students.map((s) => {
+              const byType = summary.get(s.id);
+              const chips = byType
+                ? [...byType.values()].sort((a, b) => b.count - a.count)
+                : [];
+              return (
+                <li
+                  key={s.id}
+                  className="flex flex-col gap-2 rounded-xl border border-line bg-paper p-2.5 text-sm"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-ink">
+                      <span className="mr-2 font-mono text-ink-faint">
+                        {s.number}번
+                      </span>
+                      {s.nickname}
+                      <span
+                        className={`ml-3 rounded-full px-2 py-0.5 text-xs ${
+                          s.pin_is_initial
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-green-100 text-green-800"
+                        }`}
+                      >
+                        {s.pin_is_initial ? "초기 PIN(0000)" : "PIN 설정됨"}
+                      </span>
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <Link
+                        href={`/dashboard/classrooms/${classroom.id}/records?student=${s.id}`}
+                        className="rounded-lg border border-line px-2 py-1 text-xs text-ink-soft transition-colors hover:bg-paper-soft"
+                      >
+                        기록 보기
+                      </Link>
+                      <form action={resetStudentPin}>
+                        <input type="hidden" name="student_id" value={s.id} />
+                        <input
+                          type="hidden"
+                          name="classroom_id"
+                          value={classroom.id}
+                        />
+                        <button
+                          type="submit"
+                          className="rounded-lg border border-line px-2 py-1 text-xs text-ink-soft transition-colors hover:bg-paper-soft"
+                        >
+                          PIN 초기화
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                  {chips.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {chips.map((c) => (
+                        <span
+                          key={c.label}
+                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${typeChip(c.type)}`}
+                        >
+                          {c.label} {c.count}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p className="font-hand text-base text-ink-soft">

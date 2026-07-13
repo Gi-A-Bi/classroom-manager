@@ -608,35 +608,86 @@ export type Database = {
         }
         Relationships: []
       }
-      student_records: {
+      record_types: {
         Row: {
-          category: string
-          classroom_id: string
-          content: string
           created_at: string
           id: string
-          record_date: string
-          student_id: string
+          label: string
+          sort_order: number
+          teacher_id: string
         }
         Insert: {
-          category?: string
-          classroom_id: string
-          content: string
           created_at?: string
           id?: string
-          record_date?: string
-          student_id: string
+          label: string
+          sort_order?: number
+          teacher_id: string
         }
         Update: {
-          category?: string
-          classroom_id?: string
-          content?: string
           created_at?: string
           id?: string
-          record_date?: string
-          student_id?: string
+          label?: string
+          sort_order?: number
+          teacher_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "record_types_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_records: {
+        Row: {
+          classroom_id: string
+          content: string | null
+          created_at: string
+          detail: string | null
+          id: string
+          link_group: string | null
+          peer_student_id: string | null
+          record_date: string
+          record_type: string
+          student_id: string
+          tags: string[]
+        }
+        Insert: {
+          classroom_id: string
+          content?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+          link_group?: string | null
+          peer_student_id?: string | null
+          record_date?: string
+          record_type?: string
+          student_id: string
+          tags?: string[]
+        }
+        Update: {
+          classroom_id?: string
+          content?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+          link_group?: string | null
+          peer_student_id?: string | null
+          record_date?: string
+          record_type?: string
+          student_id?: string
+          tags?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_records_peer_student_id_fkey"
+            columns: ["peer_student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "student_records_student_id_classroom_id_fkey"
             columns: ["student_id", "classroom_id"]
