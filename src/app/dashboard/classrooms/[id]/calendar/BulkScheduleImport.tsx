@@ -47,7 +47,9 @@ export function BulkScheduleImport({
               value={text}
               onChange={(e) => setText(e.target.value)}
               rows={8}
-              placeholder={"3/2 입학식\n3월 5일 학부모 총회\n7/21~8/24 여름방학"}
+              placeholder={
+                "엑셀·한글 표를 그대로 붙여넣거나, 한 줄에 하나씩 적어주세요.\n\n3/2 입학식\n2026-03-05 학부모 총회\n7/21~8/24 여름방학"
+              }
               className="rounded-lg border border-line bg-paper-soft p-3 font-mono text-sm text-ink placeholder:text-ink-faint"
             />
             <button
@@ -59,8 +61,10 @@ export function BulkScheduleImport({
               날짜 인식하기
             </button>
             <p className="text-xs text-ink-faint">
-              지원 형식: 3/2 · 3월 2일 · 3.2.(월) · 기간 7/21~8/24 (연도는{" "}
-              {academicYear}학년도 기준, 1~2월은 {academicYear + 1}년으로 인식)
+              표(날짜·행사 두 칸)를 붙여넣어도 알아서 정리돼요. 인식 형식: 3/2 ·
+              3월 2일 · 3.2.(월) · 2026-03-02 · 기간 7/21~8/24 · 3/2~3/6. 연도가
+              없으면 {academicYear}학년도 기준(1~2월은 {academicYear + 1}년)으로
+              인식하고, 인식 못 한 줄은 다음 화면에서 직접 고칠 수 있어요.
             </p>
           </>
         ) : (
