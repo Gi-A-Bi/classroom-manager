@@ -12,6 +12,7 @@ export type TimelineItem = {
   detail?: string | null; // 펼침 내용
   tags?: string[];
   recordType?: string;
+  recordDetail?: string | null; // 원본 record.detail (분류용: 발표/배려/과목 등)
   peerId?: string | null;
   peerName?: string | null;
   subject?: string;

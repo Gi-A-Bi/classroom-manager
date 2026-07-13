@@ -2,9 +2,19 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ClassroomNav } from "@/components/ClassroomNav";
+import { CopyButton } from "@/components/CopyButton";
 import { StudentTimeline, type TimelineItem } from "@/components/StudentTimeline";
+import { formatMonthDay } from "@/lib/dates";
 import { getTheme } from "@/lib/themes";
 import { typeChip, typeLabel } from "@/lib/record-types";
+import {
+  classifyGroup,
+  compressLine,
+  currentSemester,
+  REPORT_GROUPS,
+  REPORT_PERIODS,
+  reportWindow,
+} from "@/lib/report";
 import { createClient } from "@/lib/supabase/server";
 
 const PERIODS = [
@@ -39,7 +49,9 @@ export default async function StudentDetailPage({
 }: {
   params: Promise<{ id: string; studentId: string }>;
   searchParams: Promise<{
+    view?: string;
     period?: string;
+    rp?: string;
     kind?: string;
     subject?: string;
     tag?: string;
@@ -47,7 +59,12 @@ export default async function StudentDetailPage({
 }) {
   const { id, studentId } = await params;
   const sp = await searchParams;
+  const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+
+  const view = sp.view === "report" ? "report" : "timeline";
   const period = PERIODS.some((p) => p.key === sp.period) ? sp.period! : "term";
+  const defaultRp = currentSemester(today);
+  const rp = REPORT_PERIODS.some((p) => p.key === sp.rp) ? sp.rp! : defaultRp;
   const kind = ["grade", "attendance", "record"].includes(sp.kind ?? "")
     ? sp.kind!
     : "all";
@@ -60,8 +77,10 @@ export default async function StudentDetailPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-  const since = periodStart(period, today);
+  // 기간 창: 타임라인은 [since, ∞), 생기부는 학기·학년 반개구간 [since, endExcl)
+  const rw = view === "report" ? reportWindow(rp, today) : null;
+  const since = rw ? rw.since : periodStart(period, today);
+  const endExcl = rw ? rw.endExcl : null;
 
   // RLS가 담임 교사 전용을 강제 — 남의 학급/학생은 아예 조회 안 됨
   const [
@@ -116,7 +135,8 @@ export default async function StudentDetailPage({
   const subjectName = new Map((subjects ?? []).map((s) => [s.id, s.name]));
   const assessmentById = new Map((assessments ?? []).map((a) => [a.id, a]));
 
-  const inPeriod = (dateStr: string) => !since || dateStr >= since;
+  const inPeriod = (dateStr: string) =>
+    (!since || dateStr >= since) && (!endExcl || dateStr < endExcl);
 
   // ---------- 요약 집계 (기간 반영) ----------
   // 출결
@@ -139,7 +159,6 @@ export default async function StudentDetailPage({
   // 성적: 과목별 점수 평균 / 단계 최빈
   type SubjAgg = { scores: number[]; levels: string[] };
   const bySubject = new Map<string, SubjAgg>();
-  const gradeItems: TimelineItem[] = [];
   for (const r of results ?? []) {
     const a = assessmentById.get(r.assessment_id);
     if (!a || !inPeriod(a.assess_date)) continue;
@@ -234,6 +253,7 @@ export default async function StudentDetailPage({
       detail: r.content || null,
       tags: r.tags ?? [],
       recordType: r.record_type,
+      recordDetail: r.detail,
       peerId: r.peer_student_id,
       peerName: r.peer_student_id ? nameOf.get(r.peer_student_id) ?? "상대" : null,
       subject:
@@ -263,16 +283,95 @@ export default async function StudentDetailPage({
 
   const qs = (extra: Record<string, string | undefined>) => {
     const p = new URLSearchParams();
-    const merged = { period, kind, subject: subjectFilter, tag: tagFilter, ...extra };
+    const merged: Record<string, string | undefined> = {
+      view,
+      period,
+      rp,
+      kind,
+      subject: subjectFilter,
+      tag: tagFilter,
+      ...extra,
+    };
     for (const [k, v] of Object.entries(merged)) {
-      if (v && !(k === "period" && v === "term") && !(k === "kind" && v === "all"))
-        p.set(k, v);
+      if (!v) continue;
+      if (k === "view" && v === "timeline") continue;
+      if (k === "period" && v === "term") continue;
+      if (k === "rp" && v === defaultRp) continue;
+      if (k === "kind" && v === "all") continue;
+      p.set(k, v);
     }
     const s = p.toString();
     return s ? `?${s}` : "";
   };
   const base = `/dashboard/classrooms/${id}/students`;
   const detailUrl = (sid: string) => `${base}/${sid}${qs({})}`;
+
+  // ---------- 생기부 모드: 주제별 묶음 + 복사 텍스트 ----------
+  const reportItems = items
+    .filter((it) => inPeriod(it.date))
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  const grouped = REPORT_GROUPS.map((g) => ({
+    ...g,
+    items: reportItems.filter(
+      (it) =>
+        classifyGroup({
+          kind: it.kind,
+          recordType: it.recordType,
+          recordDetail: it.recordDetail,
+          tags: it.tags,
+        }) === g.key,
+    ),
+  })).filter((g) => g.items.length > 0);
+
+  // 통계 압축 텍스트(복사용 머리말)
+  const attParts: string[] = [];
+  if (absentTotal > 0)
+    attParts.push(
+      `결석 ${absentTotal}(${[...absentByReason.entries()]
+        .map(([r, n]) => `${r} ${n}`)
+        .join(", ")})`,
+    );
+  if (lateN > 0) attParts.push(`지각 ${lateN}`);
+  if (earlyN > 0) attParts.push(`조퇴 ${earlyN}`);
+  if (resultN > 0) attParts.push(`결과 ${resultN}`);
+  if (fieldTripDays > 0) attParts.push(`체험학습 ${fieldTripDays}일`);
+  const gradeParts = gradeSummary.map((g) =>
+    [
+      g.subject,
+      g.avg !== null ? `평균 ${g.avg}` : "",
+      g.mode ? `최빈 '${g.mode}'` : "",
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+  const recParts = recSummary.map((c) => `${c.label} ${c.count}`);
+  const statsText = [
+    attParts.length ? `출결: ${attParts.join(" · ")}` : null,
+    gradeParts.length ? `성적: ${gradeParts.join(" · ")}` : null,
+    recParts.length ? `기록: ${recParts.join(" · ")}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const lineInput = (it: TimelineItem) => ({
+    date: it.date,
+    kind: it.kind,
+    title: it.title,
+    value: it.value,
+    detail: it.detail,
+    tags: it.tags,
+    peerName: it.peerName,
+  });
+  const lineText = (it: TimelineItem) => compressLine(lineInput(it));
+  const bodyText = (it: TimelineItem) => compressLine(lineInput(it), false);
+  const groupText = (g: (typeof grouped)[number]) =>
+    `[${g.label}]\n` + g.items.map((it) => `- ${lineText(it)}`).join("\n");
+  const header = `${student.number}번 ${student.nickname} · ${rw?.label ?? ""}`;
+  const wholeText =
+    header +
+    (statsText ? `\n${statsText}` : "") +
+    "\n\n" +
+    grouped.map(groupText).join("\n\n");
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-6">
@@ -315,6 +414,26 @@ export default async function StudentDetailPage({
         </div>
       </div>
 
+      {/* 보기 전환 */}
+      <div className="flex items-center gap-1 rounded-xl border border-line bg-paper-soft p-1 text-sm print:hidden">
+        <Link
+          href={`${base}/${studentId}${qs({ view: "timeline" })}`}
+          className={`flex-1 rounded-lg px-3 py-1.5 text-center font-medium transition-colors ${
+            view === "timeline" ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
+          }`}
+        >
+          타임라인
+        </Link>
+        <Link
+          href={`${base}/${studentId}${qs({ view: "report" })}`}
+          className={`flex-1 rounded-lg px-3 py-1.5 text-center font-medium transition-colors ${
+            view === "report" ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
+          }`}
+        >
+          생기부 참고
+        </Link>
+      </div>
+
       {/* 요약 카드 */}
       <section className="overflow-hidden rounded-2xl border border-line bg-paper">
         <div className={`h-1.5 w-full ${theme.topbar}`} aria-hidden />
@@ -329,19 +448,40 @@ export default async function StudentDetailPage({
 
         {/* 기간 필터 */}
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
-          {PERIODS.map((p) => (
-            <Link
-              key={p.key}
-              href={`${base}/${studentId}${qs({ period: p.key })}`}
-              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
-                period === p.key
-                  ? "bg-ink text-paper"
-                  : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
-              }`}
-            >
-              {p.label}
-            </Link>
-          ))}
+          {view === "report" ? (
+            <>
+              {REPORT_PERIODS.map((p) => (
+                <Link
+                  key={p.key}
+                  href={`${base}/${studentId}${qs({ rp: p.key })}`}
+                  className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                    rp === p.key
+                      ? "bg-ink text-paper"
+                      : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
+                  }`}
+                >
+                  {p.label}
+                </Link>
+              ))}
+              {rw && (
+                <span className="ml-1 text-xs text-ink-faint">{rw.label}</span>
+              )}
+            </>
+          ) : (
+            PERIODS.map((p) => (
+              <Link
+                key={p.key}
+                href={`${base}/${studentId}${qs({ period: p.key })}`}
+                className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                  period === p.key
+                    ? "bg-ink text-paper"
+                    : "border border-line bg-paper text-ink-soft hover:bg-paper-soft"
+                }`}
+              >
+                {p.label}
+              </Link>
+            ))
+          )}
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -420,7 +560,78 @@ export default async function StudentDetailPage({
         </div>
       </section>
 
-      {/* 타임라인 필터 */}
+      {/* ===== 생기부 참고 모드 ===== */}
+      {view === "report" && (
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2 print:hidden">
+            <CopyButton
+              text={wholeText}
+              label="전체 복사"
+              copiedLabel="전체 복사됨 ✓"
+              className="rounded-lg border border-line bg-paper px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:bg-paper-soft"
+            />
+            <Link
+              href={`${base}/export?rp=${rp}&format=txt`}
+              className="rounded-lg border border-line bg-paper px-3 py-1.5 text-xs text-ink-soft transition-colors hover:bg-paper-soft"
+            >
+              반 전체 텍스트 ↓
+            </Link>
+            <Link
+              href={`${base}/export?rp=${rp}&format=csv`}
+              className="rounded-lg border border-line bg-paper px-3 py-1.5 text-xs text-ink-soft transition-colors hover:bg-paper-soft"
+            >
+              반 전체 CSV ↓
+            </Link>
+            <span className="text-xs text-ink-faint">
+              나이스 작성 중 옆에 띄워두고 참고하세요.
+            </span>
+          </div>
+
+          {grouped.length === 0 ? (
+            <p className="rounded-2xl border-2 border-dashed border-line-strong bg-paper/60 p-8 text-center font-hand text-base text-ink-soft">
+              이 기간에는 정리할 기록이 없어요.
+            </p>
+          ) : (
+            grouped.map((g) => (
+              <section
+                key={g.key}
+                className="overflow-hidden rounded-2xl border border-line bg-paper"
+              >
+                <div className="flex items-center justify-between gap-2 border-b border-line bg-paper-soft/60 px-4 py-2.5">
+                  <h3 className="text-sm font-semibold text-ink">
+                    {g.label}{" "}
+                    <span className="tabular-nums text-ink-faint">
+                      {g.items.length}
+                    </span>
+                  </h3>
+                  <CopyButton
+                    text={groupText(g)}
+                    label="이 묶음 복사"
+                    copiedLabel="복사됨 ✓"
+                    className="rounded-lg border border-line bg-paper px-2.5 py-1 text-xs text-ink-soft transition-colors hover:bg-paper-soft print:hidden"
+                  />
+                </div>
+                <ul className="flex flex-col divide-y divide-line/60">
+                  {g.items.map((it) => (
+                    <li key={it.id} className="flex gap-2.5 px-4 py-2 text-sm">
+                      <span className="w-11 shrink-0 font-hand tabular-nums text-ink-faint">
+                        {formatMonthDay(it.date)}
+                      </span>
+                      <span className="whitespace-pre-wrap break-words text-ink">
+                        {bodyText(it)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* ===== 타임라인 모드 ===== */}
+      {view === "timeline" && (
+        <>
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="text-xs font-bold tracking-wide text-ink-faint">유형</span>
@@ -507,6 +718,8 @@ export default async function StudentDetailPage({
             : "이 기간에는 기록이 없어요."
         }
       />
+        </>
+      )}
     </main>
   );
 }
