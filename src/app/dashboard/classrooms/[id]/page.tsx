@@ -84,7 +84,7 @@ export default async function ClassroomHomePage({
       .or(`end_date.gte.${monthStart},event_date.gte.${monthStart}`),
     supabase
       .from("posts")
-      .select("id, title, post_date")
+      .select("id, title, content, post_date, publish_at")
       .eq("classroom_id", id)
       .order("post_date", { ascending: false })
       .order("created_at", { ascending: false })
@@ -97,6 +97,18 @@ export default async function ClassroomHomePage({
         .from("post_reads")
         .select("id", { count: "exact", head: true })
         .eq("post_id", todayPost.id)
+    : { count: 0 };
+
+  // 가장 최근 "게시된" 알림장 (예약분 제외) — 내용을 바로 보여준다
+  const latestPost =
+    (recentPosts ?? []).find(
+      (p) => new Date(p.publish_at).getTime() <= Date.now(),
+    ) ?? null;
+  const { count: latestReadCount } = latestPost
+    ? await supabase
+        .from("post_reads")
+        .select("id", { count: "exact", head: true })
+        .eq("post_id", latestPost.id)
     : { count: 0 };
 
   const theme = getTheme(classroom.theme_color);
@@ -350,25 +362,39 @@ export default async function ClassroomHomePage({
               더보기 →
             </Link>
           </div>
-          <div className="flex flex-1 flex-col gap-2 rounded-2xl border border-line bg-paper p-3">
-            {recentPosts && recentPosts.length > 0 ? (
-              <ul className="flex flex-col divide-y divide-line">
-                {recentPosts.map((p) => (
-                  <li key={p.id}>
-                    <Link
-                      href={`${base}/posts`}
-                      className="flex items-center justify-between gap-2 py-2.5 transition-colors hover:text-ink"
+          <div className="flex flex-1 flex-col rounded-2xl border border-line bg-paper p-4">
+            {latestPost ? (
+              <Link
+                href={`${base}/posts`}
+                className="group flex flex-1 flex-col gap-2"
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <h3 className="font-semibold text-ink group-hover:underline">
+                    {latestPost.title}
+                  </h3>
+                  <span className="shrink-0 text-xs text-ink-faint tabular-nums">
+                    {formatMonthDay(latestPost.post_date)}
+                  </span>
+                </div>
+                <p className="line-clamp-[12] whitespace-pre-wrap text-sm leading-relaxed text-ink-soft">
+                  {latestPost.content}
+                </p>
+                {totalStudents > 0 && (
+                  <span className="mt-auto pt-1 text-xs text-ink-faint">
+                    읽음{" "}
+                    <strong
+                      className={`tabular-nums ${
+                        (latestReadCount ?? 0) === totalStudents
+                          ? "text-green-600"
+                          : theme.text
+                      }`}
                     >
-                      <span className="line-clamp-1 text-sm font-medium text-ink">
-                        {p.title}
-                      </span>
-                      <span className="shrink-0 text-xs text-ink-faint tabular-nums">
-                        {formatMonthDay(p.post_date)}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+                      {latestReadCount ?? 0}
+                    </strong>
+                    /{totalStudents}
+                  </span>
+                )}
+              </Link>
             ) : (
               <div className="flex flex-1 flex-col items-center justify-center gap-1 py-8 text-center">
                 <span className="text-2xl">📮</span>
