@@ -45,10 +45,21 @@ export function WeekGrid({
   const [open, setOpen] = useState<{ p: number; d: number } | null>(null);
 
   const openCell = open ? cells[open.p]?.[open.d] : null;
-  // 계획이 없는 칸을 열 때, 시간표 과목명과 이름이 같은 과목을 기본 선택
+
+  // 이 칸의 시간표 과목 + 그것이 이미 성적 과목 목록에 있는지
+  const timetableName = openCell?.timetableSubject ?? null;
+  const matchedSubjectId =
+    timetableName != null
+      ? (subjects.find((s) => s.name === timetableName)?.id ?? null)
+      : null;
+  // 시간표 과목이 목록에 없으면 "new:이름"으로 넣어 기본 선택(저장 시 자동 추가)
+  const timetableOptionValue =
+    timetableName && !matchedSubjectId ? `new:${timetableName}` : null;
+  // 기본값: 저장된 계획의 과목 → 없으면 시간표 과목(있는 것/새로 추가할 것)
   const defaultSubjectId =
     openCell?.plan?.subjectId ??
-    subjects.find((s) => s.name === openCell?.timetableSubject)?.id ??
+    matchedSubjectId ??
+    timetableOptionValue ??
     "";
 
   return (
@@ -161,7 +172,10 @@ export function WeekGrid({
       </div>
 
       {openCell && (
-        <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
+        <section
+          key={`${openCell.date}-${openCell.period}`}
+          className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5"
+        >
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-ink">
               {days[open!.d].label}요일 {formatMonthDay(openCell.date)} · {openCell.period}교시
@@ -190,6 +204,9 @@ export function WeekGrid({
                   className="rounded-lg border border-line bg-paper-soft p-2 text-ink"
                 >
                   <option value="">- 과목 없음</option>
+                  {timetableOptionValue && (
+                    <option value={timetableOptionValue}>{timetableName}</option>
+                  )}
                   {subjects.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.name}

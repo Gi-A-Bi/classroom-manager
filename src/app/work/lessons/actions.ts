@@ -29,13 +29,49 @@ async function assertOwnsClassroom(
   return Boolean(data);
 }
 
-// subject_id가 이 학급 과목인지 확인 (아니면 null 처리)
+// 과목 선택값을 실제 subject_id로 변환.
+//  - "" → null
+//  - "new:이름" → 시간표 과목. 이 학급 과목 목록에 없으면 자동 추가(find-or-create)
+//  - uuid → 이 학급 과목인지 검증 후 사용
 async function resolveSubjectId(
   supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
   classroomId: string,
   raw: string,
 ): Promise<string | null> {
   if (!raw) return null;
+
+  if (raw.startsWith("new:")) {
+    const name = raw.slice(4).trim().slice(0, 30);
+    if (!name) return null;
+    // 이미 같은 이름 과목이 있으면 재사용
+    const { data: existing } = await supabase
+      .from("subjects")
+      .select("id")
+      .eq("classroom_id", classroomId)
+      .eq("name", name)
+      .maybeSingle();
+    if (existing) return existing.id;
+    // 없으면 성적 과목 목록에 추가 (position은 맨 뒤)
+    const { count } = await supabase
+      .from("subjects")
+      .select("id", { count: "exact", head: true })
+      .eq("classroom_id", classroomId);
+    const { data: created } = await supabase
+      .from("subjects")
+      .insert({ classroom_id: classroomId, name, position: count ?? 0 })
+      .select("id")
+      .single();
+    if (created) return created.id;
+    // 동시 저장 등으로 실패하면 다시 조회
+    const { data: refetch } = await supabase
+      .from("subjects")
+      .select("id")
+      .eq("classroom_id", classroomId)
+      .eq("name", name)
+      .maybeSingle();
+    return refetch?.id ?? null;
+  }
+
   const { data } = await supabase
     .from("subjects")
     .select("id")
