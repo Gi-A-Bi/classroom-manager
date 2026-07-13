@@ -12,10 +12,12 @@ import { CLASSROOM_MENU } from "@/components/ClassroomNav";
 import { ModeSwitch } from "@/components/ModeSwitch";
 import { Wordmark } from "@/components/Wordmark";
 import {
+  addDaysString,
   DAY_NAMES,
   dayOfWeekMon1,
   daysBetween,
   formatKoreanDate,
+  formatKstDateTime,
   formatMonthDay,
   todayString,
 } from "@/lib/dates";
@@ -86,6 +88,9 @@ export default async function DashboardPage({
     { data: recentPosts },
     { data: todayEvents },
     { data: todayPosts },
+    { data: allStudents },
+    { data: attendanceToday },
+    { data: recentRecords },
   ] =
     classroomIds.length > 0
       ? await Promise.all([
@@ -105,11 +110,11 @@ export default async function DashboardPage({
               }),
           supabase
             .from("posts")
-            .select("id, classroom_id, title, post_date")
+            .select("id, classroom_id, title, post_date, publish_at")
             .in("classroom_id", classroomIds)
             .order("post_date", { ascending: false })
             .order("created_at", { ascending: false })
-            .limit(10),
+            .limit(30),
           supabase
             .from("events")
             .select("id, classroom_id, title, layer")
@@ -121,8 +126,31 @@ export default async function DashboardPage({
             .select("classroom_id")
             .in("classroom_id", classroomIds)
             .eq("post_date", today),
+          // 특이사항용 — 학생 수, 오늘 출결 예외, 최근 3일 기록카드
+          supabase
+            .from("students")
+            .select("id, classroom_id")
+            .in("classroom_id", classroomIds),
+          supabase
+            .from("attendance_records")
+            .select("classroom_id, type")
+            .eq("record_date", today)
+            .in("classroom_id", classroomIds),
+          supabase
+            .from("student_records")
+            .select("classroom_id")
+            .in("classroom_id", classroomIds)
+            .gte("record_date", addDaysString(today, -2)),
         ])
-      : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }];
+      : [
+          { data: [] },
+          { data: [] },
+          { data: [] },
+          { data: [] },
+          { data: [] },
+          { data: [] },
+          { data: [] },
+        ];
 
   const { data: nextEvents } =
     classroomIds.length > 0
@@ -136,6 +164,104 @@ export default async function DashboardPage({
       : { data: [] };
   const nextEvent = nextEvents?.[0] ?? null;
   const dday = nextEvent ? daysBetween(today, nextEvent.event_date) : null;
+
+  // --- 학급별 "오늘의 특이사항" 계산 ---
+  const nowMs = Date.now();
+  // 학급별 가장 최근 "게시된" 알림장 (안 읽음 계산용)
+  const latestPublished = new Map<string, { id: string; post_date: string }>();
+  for (const p of recentPosts ?? []) {
+    if (new Date(p.publish_at).getTime() > nowMs) continue; // 예약분 제외
+    if (!latestPublished.has(p.classroom_id)) {
+      latestPublished.set(p.classroom_id, { id: p.id, post_date: p.post_date });
+    }
+  }
+  const latestPostIds = [...latestPublished.values()].map((p) => p.id);
+  const { data: latestReads } =
+    latestPostIds.length > 0
+      ? await supabase
+          .from("post_reads")
+          .select("post_id")
+          .in("post_id", latestPostIds)
+      : { data: [] };
+  const readCountByPost = new Map<string, number>();
+  for (const r of latestReads ?? []) {
+    readCountByPost.set(r.post_id, (readCountByPost.get(r.post_id) ?? 0) + 1);
+  }
+  const studentCountByClass = new Map<string, number>();
+  for (const s of allStudents ?? []) {
+    studentCountByClass.set(
+      s.classroom_id,
+      (studentCountByClass.get(s.classroom_id) ?? 0) + 1,
+    );
+  }
+  const recordCountByClass = new Map<string, number>();
+  for (const r of recentRecords ?? []) {
+    recordCountByClass.set(
+      r.classroom_id,
+      (recordCountByClass.get(r.classroom_id) ?? 0) + 1,
+    );
+  }
+
+  const ATT_LABEL: Record<string, string> = {
+    absent: "결석",
+    late: "지각",
+    early: "조퇴",
+    result: "결과",
+  };
+
+  // 학급 하나의 특이사항 목록 만들기 (있는 것만)
+  type Issue = { icon: string; text: string; href: string };
+  const issuesFor = (classroomId: string): Issue[] => {
+    const base = `/dashboard/classrooms/${classroomId}`;
+    const list: Issue[] = [];
+
+    // 1) 안 읽은 알림장
+    const latest = latestPublished.get(classroomId);
+    const total = studentCountByClass.get(classroomId) ?? 0;
+    if (latest && total > 0) {
+      const unread = total - (readCountByPost.get(latest.id) ?? 0);
+      if (unread > 0) {
+        list.push({
+          icon: "⚠️",
+          text: `${formatMonthDay(latest.post_date)} 알림장 안 읽음 ${unread}명`,
+          href: `${base}/posts`,
+        });
+      }
+    }
+
+    // 2) 오늘 출결 예외
+    const att = (attendanceToday ?? []).filter((a) => a.classroom_id === classroomId);
+    if (att.length > 0) {
+      const counts = new Map<string, number>();
+      for (const a of att) counts.set(a.type, (counts.get(a.type) ?? 0) + 1);
+      const parts = ["absent", "late", "early", "result"]
+        .filter((t) => counts.get(t))
+        .map((t) => `${ATT_LABEL[t]} ${counts.get(t)}`);
+      if (parts.length > 0) {
+        list.push({ icon: "📅", text: `오늘 ${parts.join(" · ")}`, href: `${base}/attendance` });
+      }
+    }
+
+    // 3) 예약된 알림장
+    const scheduled = (recentPosts ?? [])
+      .filter((p) => p.classroom_id === classroomId && new Date(p.publish_at).getTime() > nowMs)
+      .sort((a, b) => new Date(a.publish_at).getTime() - new Date(b.publish_at).getTime());
+    if (scheduled.length > 0) {
+      list.push({
+        icon: "⏰",
+        text: `예약 알림장 ${scheduled.length}건 · 다음 ${formatKstDateTime(scheduled[0].publish_at)}`,
+        href: `${base}/posts`,
+      });
+    }
+
+    // 4) 최근 기록 카드 (3일 내)
+    const rec = recordCountByClass.get(classroomId) ?? 0;
+    if (rec > 0) {
+      list.push({ icon: "📝", text: `최근 상담·관찰 기록 ${rec}건`, href: `${base}/records` });
+    }
+
+    return list;
+  };
 
   // 등록한 도구 전부 — 즐겨찾기 먼저, 그다음 서랍 순서
   const { data: myTools } = await supabase
@@ -358,9 +484,6 @@ export default async function DashboardPage({
             const slots = (todaySlots ?? []).filter(
               (s) => s.classroom_id === c.id,
             );
-            const posts = (recentPosts ?? [])
-              .filter((p) => p.classroom_id === c.id)
-              .slice(0, 2);
             const events = (todayEvents ?? []).filter(
               (e) => e.classroom_id === c.id,
             );
@@ -447,29 +570,33 @@ export default async function DashboardPage({
 
                   <div className="flex flex-col gap-1 text-sm">
                     <span className="font-semibold text-ink-soft">
-                      최근 알림장
+                      오늘의 특이사항
                     </span>
-                    {posts.length > 0 ? (
-                      <ul className="flex flex-col gap-0.5">
-                        {posts.map((p) => (
-                          <li key={p.id}>
-                            <Link
-                              href={`/dashboard/classrooms/${c.id}/posts`}
-                              className="font-medium text-ink underline decoration-line-strong underline-offset-2 hover:decoration-ink"
-                            >
-                              {p.title}
-                            </Link>{" "}
-                            <span className="text-ink-faint tabular-nums">
-                              {formatMonthDay(p.post_date)}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <span className="font-hand text-base text-ink-soft">
-                        아직 알림장이 없어요 — 첫 알림장을 써보세요
-                      </span>
-                    )}
+                    {(() => {
+                      const issues = issuesFor(c.id);
+                      if (issues.length === 0) {
+                        return (
+                          <span className="font-hand text-base text-ink-soft">
+                            오늘은 특이사항이 없어요 🍃
+                          </span>
+                        );
+                      }
+                      return (
+                        <ul className="flex flex-col gap-1">
+                          {issues.map((it, i) => (
+                            <li key={i}>
+                              <Link
+                                href={it.href}
+                                className="inline-flex items-start gap-1.5 rounded-md px-1 py-0.5 text-ink transition-colors hover:bg-paper-soft"
+                              >
+                                <span aria-hidden>{it.icon}</span>
+                                <span>{it.text}</span>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
