@@ -127,6 +127,7 @@ export default async function AttendancePage({
       <section className="flex flex-col gap-3 rounded-2xl border border-line bg-paper p-5">
         {students && students.length > 0 ? (
           <AttendanceGrid
+            key={date}
             classroomId={classroom.id}
             date={date}
             students={students}
