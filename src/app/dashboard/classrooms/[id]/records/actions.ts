@@ -145,6 +145,47 @@ export async function addRecord(formData: FormData) {
   redirect(back);
 }
 
+// --- 기록 수정 (내용·태그·날짜) ---
+export async function updateRecord(formData: FormData) {
+  const classroomId = String(formData.get("classroom_id") ?? "");
+  const recordId = String(formData.get("record_id") ?? "");
+  const recordDate = String(formData.get("record_date") ?? "");
+  const content = String(formData.get("content") ?? "").trim().slice(0, 2000);
+  const tags = parseTags(String(formData.get("tags") ?? ""));
+  const back = String(
+    formData.get("back") ?? `/dashboard/classrooms/${classroomId}/records`,
+  );
+  const err = (m: string) =>
+    back + (back.includes("?") ? "&" : "?") + "error=" + encodeURIComponent(m);
+
+  if (!recordId || !DATE_RE.test(recordDate)) {
+    redirect(err("날짜를 확인해주세요."));
+  }
+
+  const { supabase } = await requireUser();
+  const patch = { record_date: recordDate, content: content || null, tags };
+
+  // 갈등 상호 기록이면 짝도 함께 수정 — 내용·태그·날짜를 양쪽 동일하게 유지
+  const { data: rec } = await supabase
+    .from("student_records")
+    .select("id, link_group")
+    .eq("id", recordId)
+    .maybeSingle();
+  if (!rec) redirect(err("기록을 찾을 수 없습니다."));
+
+  const { error } = rec.link_group
+    ? await supabase
+        .from("student_records")
+        .update(patch)
+        .eq("link_group", rec.link_group)
+    : await supabase.from("student_records").update(patch).eq("id", recordId);
+  if (error) redirect(err("기록 수정에 실패했습니다."));
+
+  revalidatePath(`/dashboard/classrooms/${classroomId}/records`);
+  revalidatePath(`/dashboard/classrooms/${classroomId}/students`);
+  redirect(back);
+}
+
 export async function deleteRecord(formData: FormData) {
   const classroomId = String(formData.get("classroom_id") ?? "");
   const recordId = String(formData.get("record_id") ?? "");

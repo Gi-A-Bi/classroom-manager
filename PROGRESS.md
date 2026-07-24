@@ -16,6 +16,10 @@
   **클라우드에 20260713140000_quick_records.sql 적용**(배포와 함께 — 아래 메모)
 
 ## 완료한 것
+- 2026-07-24: **기록 카드 수정** — 기록 카드 목록의 각 기록을 그 자리에서
+  내용(메모)·태그·날짜까지 수정 가능(`RecordEditor` 클라이언트 컴포넌트 +
+  `updateRecord` 서버 액션). 그동안은 추가·삭제만 되고 오타 수정은 삭제 후
+  재작성해야 했음. 갈등(상호) 기록은 link_group으로 양쪽을 함께 수정해 일관성 유지.
 - 2026-07-09: git 저장소 초기화, GitHub(Gi-A-Bi/classroom-manager) 연결 및 첫 푸시
 - 2026-07-09: Next.js + TypeScript + Tailwind 프로젝트 초기화
   (create-next-app, App Router, src 디렉토리, ESLint, Turbopack, npm)
