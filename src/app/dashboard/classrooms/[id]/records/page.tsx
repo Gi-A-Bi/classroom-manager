@@ -6,6 +6,7 @@ import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { formatKoreanDate, todayString } from "@/lib/dates";
 import { BUILTIN_TYPES, typeChip, typeLabel } from "@/lib/record-types";
 import { createClient } from "@/lib/supabase/server";
+import { RecordEditor } from "./RecordEditor";
 import {
   addRecord,
   addRecordType,
@@ -78,6 +79,9 @@ export default async function StudentRecordsPage({
   const studentName = new Map(
     (students ?? []).map((s) => [s.id, `${s.number}번 ${s.nickname}`]),
   );
+  const existingTags = [
+    ...new Set((records ?? []).flatMap((r) => r.tags ?? [])),
+  ].sort();
 
   const buildUrl = (o: { student?: string; type?: string; tag?: string }) => {
     const p = new URLSearchParams();
@@ -330,28 +334,24 @@ export default async function StudentRecordsPage({
                     </button>
                   </form>
                 </div>
-                {r.content && (
-                  <p className="whitespace-pre-wrap text-sm text-ink">
-                    {r.content}
-                  </p>
-                )}
-                {r.tags && r.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {r.tags.map((t: string) => (
-                      <Link
-                        key={t}
-                        href={buildUrl({
-                          student: selectedStudent?.id,
-                          type: typeParam,
-                          tag: t,
-                        })}
-                        className="rounded-full bg-paper-soft px-2 py-0.5 text-xs text-ink-soft transition-colors hover:bg-line hover:text-ink"
-                      >
-                        #{t}
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                <RecordEditor
+                  classroomId={classroom.id}
+                  recordId={r.id}
+                  back={currentUrl}
+                  content={r.content}
+                  tags={r.tags ?? []}
+                  recordDate={r.record_date}
+                  tagLinks={(r.tags ?? []).map((t: string) => ({
+                    tag: t,
+                    href: buildUrl({
+                      student: selectedStudent?.id,
+                      type: typeParam,
+                      tag: t,
+                    }),
+                  }))}
+                  existingTags={existingTags}
+                  isLinked={!!r.link_group}
+                />
               </li>
             ))}
           </ul>
