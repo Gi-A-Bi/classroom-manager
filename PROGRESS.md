@@ -536,3 +536,8 @@
   ※ 확인 방법: 브라우저용 Supabase 클라이언트를 쓰는 화면(/reset-password)을 열고
   DevTools → Sources → Ctrl+Shift+F → `supabase.co` 검색.
   서버 전용 화면에서는 주소가 번들에 실리지 않아 안 나온다.
+- **Supabase 로그인 계정은 GitHub(Gi-A-Bi) 계정이 아니라 개인 Gmail 계정이다.**
+  (저장소가 Public이라 주소는 적지 않는다. 못 찾겠으면 메일함에서 `supabase` 검색 —
+  프로젝트 일시중지 알림이 소유자 주소로 온다.)
+  GitHub 계정으로 로그인하면 조직이 3개 보이는데 그중에 학교수첩은 없다.
+  `Gi-A-Bi's Org`는 GitHub 가입 시 자동 생성된 기본 조직이라 헷갈리기 쉽다.
