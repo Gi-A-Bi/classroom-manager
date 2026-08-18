@@ -527,3 +527,12 @@
   해당 계정의 "Send password recovery"로 직접 보내거나 비밀번호를 재설정할 수 있다.
 - **무료 플랜 자동 일시중지 주의**: Supabase 무료 프로젝트는 오래 미사용 시 잠긴다.
   깨우면 캐시가 비어 한동안 느리다(정상). 잠긴 동안의 앱 증상은 "로그인 실패"로 보인다.
+- **클라우드 Supabase 프로젝트 ref: `hkjogjnogsapdppkaccy`**
+  (대시보드 https://supabase.com/dashboard/project/hkjogjnogsapdppkaccy)
+  저장소가 CLI로 링크돼 있지 않고 Vercel 환경변수는 Sensitive라 값을 되읽을 수 없어서,
+  어느 프로젝트인지 확인할 방법이 없었다(2026-08-18에 조직 3개를 뒤지며 헤맴).
+  ⚠ `supabase/config.toml`의 `project_id = "classroom-platform"`은 로컬 Docker
+  식별자일 뿐 클라우드와 무관하다. 같은 이름의 Supabase 조직이 따로 있는데 그쪽은 비어 있다.
+  ※ 확인 방법: 브라우저용 Supabase 클라이언트를 쓰는 화면(/reset-password)을 열고
+  DevTools → Sources → Ctrl+Shift+F → `supabase.co` 검색.
+  서버 전용 화면에서는 주소가 번들에 실리지 않아 안 나온다.
