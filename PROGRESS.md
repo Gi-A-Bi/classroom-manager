@@ -16,6 +16,14 @@
   **클라우드에 20260713140000_quick_records.sql 적용**(배포와 함께 — 아래 메모)
 
 ## 완료한 것
+- 2026-08-18: **교사 비밀번호 재설정** — 그동안 앱에 비밀번호 복구 경로가 아예 없어
+  비밀번호를 잊으면 로그인 불가 상태였음. `/forgot-password`(재설정 메일 요청) →
+  메일 링크 → `/auth/callback`(PKCE `code` / `token_hash` 둘 다 처리) →
+  `/reset-password`(새 비밀번호 저장) 흐름 추가. 로그인 화면에 '비밀번호를
+  잊으셨나요?' 링크 노출. 로그인 실패 메시지도 원인별로 분리(미확인 메일 /
+  시도 과다 / 자격 불일치) — 예전엔 모든 실패가 "비밀번호가 틀렸다"로 보였음.
+  ※ **클라우드 설정 필요**: Supabase Dashboard → Authentication → URL Configuration의
+  Redirect URLs에 `https://<배포주소>/auth/callback` 추가해야 메일 링크가 동작함.
 - 2026-07-24: **기록 카드 수정** — 기록 카드 목록의 각 기록을 그 자리에서
   내용(메모)·태그·날짜까지 수정 가능(`RecordEditor` 클라이언트 컴포넌트 +
   `updateRecord` 서버 액션). 그동안은 추가·삭제만 되고 오타 수정은 삭제 후
@@ -502,3 +510,7 @@
   content NOT NULL 해제, record_types 테이블 생성.) idempotent라 재실행 안전.
   이걸 안 하면 배포 후 기록카드·명렬·빠른 기록 화면이 record_type 컬럼 부재로 에러남.
   기존 클라우드 기록(데모 계정)은 실행 즉시 전부 '기타 관찰'로 이관됨(정상).
+- 비밀번호 재설정 메일은 Supabase 기본 SMTP를 쓴다(무료, 시간당 발송 한도 낮음).
+  링크는 **메일을 요청한 것과 같은 브라우저**에서 열어야 PKCE 코드 교환이 성립한다.
+  다른 기기에서 열어야 하는 상황이면 Supabase Dashboard → Authentication → Users에서
+  해당 계정의 "Send password recovery"로 직접 보내거나 비밀번호를 재설정할 수 있다.

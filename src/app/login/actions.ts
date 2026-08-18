@@ -19,7 +19,14 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    redirect("/login?error=" + encodeURIComponent("이메일 또는 비밀번호가 올바르지 않습니다."));
+    // 원인을 뭉뚱그리면 "비밀번호가 틀렸다"로만 보여 사용자가 헤맨다.
+    const message =
+      error.code === "email_not_confirmed"
+        ? "가입 확인 메일의 링크를 아직 누르지 않으셨어요. 메일함을 확인해주세요."
+        : error.code === "over_request_rate_limit"
+          ? "로그인 시도가 너무 잦아요. 잠시 후 다시 시도해주세요."
+          : "이메일 또는 비밀번호가 올바르지 않습니다. 비밀번호가 기억나지 않으면 아래 '비밀번호를 잊으셨나요?'를 눌러주세요.";
+    redirect("/login?error=" + encodeURIComponent(message));
   }
 
   // 마지막 사용 모드로 진입
