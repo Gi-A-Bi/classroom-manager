@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
 export async function login(formData: FormData) {
@@ -20,8 +21,11 @@ export async function login(formData: FormData) {
 
   if (error) {
     // 원인을 뭉뚱그리면 "비밀번호가 틀렸다"로만 보여 사용자가 헤맨다.
-    const message =
-      error.code === "email_not_confirmed"
+    // 특히 Supabase 프로젝트가 무료 플랜에서 자동 일시중지되면 요청 자체가
+    // 실패하는데, 이것까지 자격 오류로 보이면 멀쩡한 비밀번호를 의심하게 된다.
+    const message = isAuthRetryableFetchError(error)
+      ? "서버에 연결하지 못했습니다. 잠시 후 다시 시도해주세요. (비밀번호 문제가 아닐 수 있어요)"
+      : error.code === "email_not_confirmed"
         ? "가입 확인 메일의 링크를 아직 누르지 않으셨어요. 메일함을 확인해주세요."
         : error.code === "over_request_rate_limit"
           ? "로그인 시도가 너무 잦아요. 잠시 후 다시 시도해주세요."
@@ -60,8 +64,9 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
-    const message =
-      error.code === "user_already_exists"
+    const message = isAuthRetryableFetchError(error)
+      ? "서버에 연결하지 못했습니다. 잠시 후 다시 시도해주세요."
+      : error.code === "user_already_exists"
         ? "이미 가입된 이메일입니다."
         : error.code === "over_email_send_rate_limit"
           ? "확인 메일 발송 한도에 걸렸어요. 1시간 뒤 다시 시도해주세요."

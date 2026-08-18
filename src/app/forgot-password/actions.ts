@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteOrigin } from "@/lib/site-url";
 
@@ -19,8 +20,9 @@ export async function requestPasswordReset(formData: FormData) {
   });
 
   if (error) {
-    const message =
-      error.code === "over_email_send_rate_limit"
+    const message = isAuthRetryableFetchError(error)
+      ? "서버에 연결하지 못했습니다. 잠시 후 다시 시도해주세요."
+      : error.code === "over_email_send_rate_limit"
         ? "메일 발송 한도에 걸렸어요. 잠시 후 다시 시도해주세요."
         : "메일 발송에 실패했어요. 잠시 후 다시 시도해주세요.";
     redirect("/forgot-password?error=" + encodeURIComponent(message));
