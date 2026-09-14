@@ -6,7 +6,6 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "개인정보처리방침 | 학교수첩",
   description: "학교수첩이 처리하는 개인정보의 항목·목적·보유기간과 정보주체의 권리를 안내합니다.",
-  robots: { index: false },
 };
 
 const CSS = `
@@ -61,14 +60,6 @@ export default function PrivacyPage() {
       <div className="wrap">
       <h1>개인정보처리방침</h1>
       <p className="sub">학교수첩</p>
-
-      <div className="draft">
-        <strong>⚠️ 검토 중인 초안입니다 — 아직 공개용이 아닙니다</strong>
-        <p>앱의 실제 코드와 데이터베이스 스키마를 확인해 작성했으나, 노란색
-        <span className="todo">[확인 필요]</span> 및 빨간색 <span className="warn">[조치 필요]</span> 표시가
-        남아 있습니다. 이 표시를 모두 채우고 검토를 마친 뒤 공개해 주세요.</p>
-      
-      </div>
       <p>학교수첩은 교사가 학급을 개설해 알림장·일정·시간표를 학생과 공유하고, 개인 업무 공간과 학급운영 도구를 함께 사용하는 학급운영 플랫폼입니다. 운영자는 「개인정보 보호법」에 따라 정보주체의 개인정보를 보호하고
       이와 관련한 고충을 신속하게 처리할 수 있도록 다음과 같이 개인정보처리방침을 수립·공개합니다.</p>
 
