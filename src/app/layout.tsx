@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata, Viewport } from "next";
 import { Black_Han_Sans, Gaegu, Noto_Sans_KR } from "next/font/google";
 import { PwaUpdater } from "@/components/PwaUpdater";
@@ -76,6 +77,13 @@ export default function RootLayout({
           >
             healthydol@gmail.com
           </a>
+          {" · "}
+          <Link
+            href="/privacy"
+            className="underline decoration-line-strong underline-offset-2 hover:text-ink-soft"
+          >
+            개인정보처리방침
+          </Link>
         </footer>
       </body>
     </html>
